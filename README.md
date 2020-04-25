@@ -1,2 +1,2 @@
-# MATAM-HW3
-Technion Intro To Systems Programming class 234124 Homework 3 coding assignments
+# DS-HW1
+Technion Data Structures course 234218 Homework 1 coding assignments
