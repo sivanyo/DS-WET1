@@ -6,8 +6,8 @@
 #define WET1_ARTISTNODE_H
 
 
-#include "TreeNode.h"
-#include "Artist.h"
+#include "../TreeNode/TreeNode.h"
+#include "../Artist/Artist.h"
 
 class ArtistNode : public TreeNode {
 private:
@@ -15,6 +15,7 @@ private:
 public:
     ArtistNode(int artistId, int numberOfSongs);
     Artist GetData();
+    void SetData(int artistId, int numberOfSongs);
 };
 
 

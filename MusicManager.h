@@ -7,10 +7,19 @@
 
 
 #include "library1.h"
+#include "ArtistTree/ArtistNode.h"
+#include "MostPlayedList/MostPlayedListNode.h"
+
+using std::unique_ptr;
+using std::shared_ptr;
 
 class MusicManager {
 private:
-
+    unique_ptr<ArtistNode> artistTree;
+    unique_ptr<MostPlayedListNode> mostPlayedList;
+    MostPlayedListNode* ptrToMostRecommended;
+    int numberOfArtists = 0;
+    int numberOfSongs = 0;
 public:
     MusicManager();
     StatusType AddArtist(int artistId, int numOfSongs);

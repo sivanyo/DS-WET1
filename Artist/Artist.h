@@ -6,12 +6,12 @@
 #define WET1_ARTIST_H
 
 
-#include "Song.h"
+#include "../Song/Song.h"
 
 class Artist {
 private:
     int artistId;
-    //Song artistSongs[];
+    Song artistSongs[];
 
     int GetArtistId();
 
