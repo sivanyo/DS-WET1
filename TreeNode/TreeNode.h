@@ -8,15 +8,14 @@
 #include <memory>
 #include "../library1.h"
 
-using std::unique_ptr;
-using std::weak_ptr;
+using std::shared_ptr;
 
 class TreeNode {
 protected:
     int key;
-    weak_ptr<TreeNode> father;
-    unique_ptr<TreeNode> left;
-    unique_ptr<TreeNode> right;
+    shared_ptr<TreeNode> father;
+    shared_ptr<TreeNode> left;
+    shared_ptr<TreeNode> right;
 public:
     explicit TreeNode(int key);
 
