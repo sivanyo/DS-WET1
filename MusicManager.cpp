@@ -2,29 +2,23 @@
 // Created by Mor on 26/04/2020.
 //
 
-#include <memory>>
+#include <memory>
 #include "MusicManager.h"
 
-using std::unique_ptr;
 using std::shared_ptr;
 using std::make_shared;
 
 MusicManager::MusicManager() {
-    try {
-        this->artistTree = unique_ptr<ArtistNode>(new ArtistNode(0, 0));
-        this->mostPlayedList = unique_ptr<MostPlayedListNode>(new MostPlayedListNode(0));
-        this->numberOfArtists = 0;
-        this->ptrToMostRecommended = this->mostPlayedList.get();
-    } catch (std::bad_alloc &e) {
-        throw ALLOCATION_ERROR;
-    }
+    this->artistTree = shared_ptr<ArtistNode>(make_shared<ArtistNode>(ArtistNode(0, 0)));
+    this->mostPlayedList = shared_ptr<MostPlayedListNode>(make_shared<MostPlayedListNode>(MostPlayedListNode(0)));
+    this->numberOfArtists = 0;
+    this->ptrToMostRecommended = shared_ptr<MostPlayedListNode>(this->mostPlayedList);
 }
 
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     if (numberOfArtists == 0) {
         this->artistTree->SetData(artistId, numOfSongs);
-        this->artistTree.
-        this->artistTree = new ArtistNode(artistId, numOfSongs);
+        this->artistTree->SetKey(artistId);
         this->numberOfSongs += numOfSongs;
         this->numberOfArtists++;
         return SUCCESS;

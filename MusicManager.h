@@ -10,7 +10,6 @@
 #include "ArtistTree/ArtistNode.h"
 #include "MostPlayedList/MostPlayedListNode.h"
 
-using std::unique_ptr;
 using std::shared_ptr;
 
 class MusicManager {

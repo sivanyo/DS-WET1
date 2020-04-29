@@ -6,15 +6,15 @@
 #define WET1_SONG_H
 
 
-#include "../MostPlayedList/SongPlaysByArtistIdNode.h"
-#include "../MostPlayedList/ArtistPlaysByIdNode.h"
+#include "../MostPlayedList/SongPlaysNode.h"
+#include "../MostPlayedList/ArtistPlaysNode.h"
 
 class Song {
 public:
     int songId;
     int numberOfPlays = 0;
-    ArtistPlaysByIdNode* ptrToArtistIdPlaysTree = nullptr;
-    SongPlaysByArtistIdNode* ptrToArtistsNode = nullptr;
+    ArtistPlaysNode* ptrToArtistIdPlaysTree = nullptr;
+    SongPlaysNode* ptrToArtistsNode = nullptr;
 
     Song(int songId);
 };

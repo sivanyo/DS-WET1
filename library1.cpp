@@ -7,6 +7,9 @@
 
 void *Init() {
     MusicManager *DS = new MusicManager();
+    if (!DS) {
+        return nullptr;
+    }
     return (void *) DS;
 }
 
