@@ -9,13 +9,10 @@ MostPlayedListNode::MostPlayedListNode(int numOfPlays) {
 }
 
 bool MostPlayedListNode::AddArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode) {
-    shared_ptr<ArtistPlaysNode> test = make_shared<ArtistPlaysNode>(5);
-    test->AddNode(make_shared<ArtistPlaysNode>(4))
-    artistPlaysNode.ad
     if (ptrToLowestArtistId) {
         // There are already artists stored in this linked list
         // TODO: might be related to code progression
-        this->artistPlaysTree.
+        this->artistPlaysTree->AddNode(artistPlaysNode);
     }
     return false;
 }
