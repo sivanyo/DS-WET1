@@ -19,3 +19,7 @@ int ArtistPlaysNode::GetArtistId() {
     test->AddNode(make_shared<ArtistPlaysNode>(4));
     return this->artistId;
 }
+
+//StatusType ArtistPlaysNode::AddNode(shared_ptr<TreeNode> node) {
+//    return TreeNode::AddNode(node);
+//}

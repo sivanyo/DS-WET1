@@ -7,11 +7,11 @@
 
 #include <memory>
 #include "ArtistPlaysNode.h"
-#include "SongPlaysNode.h"
-
 
 using std::shared_ptr;
 using std::make_shared;
+class ArtistPlaysNode;
+class SongPlaysNode;
 
 class MostPlayedListNode {
 private:
@@ -32,7 +32,7 @@ public:
     // Create a new node with a number of plays between to values (1<2<3)
     MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous, shared_ptr<MostPlayedListNode> next);
 
-    bool AddArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode);
+    bool AddArtist(shared_ptr<ArtistPlaysNode> artistNode);
 
     shared_ptr<ArtistPlaysNode> GetPtrToLowestArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode);
 

@@ -9,6 +9,8 @@
 #include "../TreeNode/TreeNode.h"
 #include "MostPlayedListNode.h"
 
+class MostPlayedListNode;
+
 class SongPlaysNode : public TreeNode {
 private:
     int songId;

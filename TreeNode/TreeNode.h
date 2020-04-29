@@ -7,7 +7,6 @@
 
 #include <memory>
 #include "../library1.h"
-#include "../MostPlayedList/ArtistPlaysNode.h"
 
 using std::shared_ptr;
 using std::make_shared;
@@ -43,8 +42,6 @@ public:
     virtual shared_ptr<TreeNode> GetRight();
 
     virtual shared_ptr<TreeNode> Find(int key);
-
-    virtual StatusType AddNodeT(TreeNode *node);
 };
 
 

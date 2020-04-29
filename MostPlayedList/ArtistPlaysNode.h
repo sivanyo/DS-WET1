@@ -6,10 +6,14 @@
 #define WET1_ARTISTPLAYSNODE_H
 
 #include <memory>
+#include "../TreeNode/TreeNode.h"
 #include "SongPlaysNode.h"
 
 using std::shared_ptr;
 using std::make_shared;
+
+class SongPlaysNode;
+class MostPlayedListNode;
 
 class ArtistPlaysNode : public TreeNode {
 private:
@@ -18,10 +22,10 @@ private:
     shared_ptr<MostPlayedListNode> ptrToListNode;
 public:
     ArtistPlaysNode(int artistId);
+
     ArtistPlaysNode(int artistId, shared_ptr<SongPlaysNode> ptrToSongPlaysTree, shared_ptr<MostPlayedListNode> ptrToListNode);
+
     int GetArtistId();
-
-
 };
 
 

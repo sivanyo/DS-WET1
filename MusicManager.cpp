@@ -17,13 +17,13 @@ MusicManager::MusicManager() {
 
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     if (numberOfArtists == 0) {
-        this->artistTree->SetData(artistId, numOfSongs);
+        //this->artistTree->SetData(artistId, numOfSongs);
         this->artistTree->SetKey(artistId);
         this->numberOfSongs += numOfSongs;
         this->numberOfArtists++;
         return SUCCESS;
     } else {
-        this->artistTree->AddNode(new ArtistNode(artistId, numOfSongs));
+        this->artistTree->AddNode(make_shared<ArtistNode>(artistId, numOfSongs));
         this->numberOfSongs += numOfSongs;
         this->numberOfArtists++;
         return SUCCESS;
