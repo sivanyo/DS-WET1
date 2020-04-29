@@ -37,13 +37,13 @@ void MostPlayedListNode::SetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysN
 }
 
 
-MostPlayedListNode::MostPlayedListNode(int numOfPlays, MostPlayedListNode *previous) {
+MostPlayedListNode::MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous) {
     this->numberOfPlays = numOfPlays;
     this->previous = previous;
     this->next = nullptr;
 }
 
-MostPlayedListNode::MostPlayedListNode(int numOfPlays, MostPlayedListNode *previous, MostPlayedListNode *next) {
+MostPlayedListNode::MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous, shared_ptr<MostPlayedListNode> next) {
     this->numberOfPlays = numOfPlays;
     this->previous = previous;
     this->next = next;
