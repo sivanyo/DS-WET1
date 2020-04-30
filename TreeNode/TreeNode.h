@@ -56,8 +56,10 @@ public:
     void SetFather (shared_ptr<TreeNode<T>> newFather);
 
     shared_ptr<TreeNode<T>> FindMin(shared_ptr<TreeNode<T>> node);
+    static int GetBalance(const shared_ptr<TreeNode>&node);
 
     shared_ptr<TreeNode<T>> FindMax(shared_ptr<TreeNode<T>>node);
+    static shared_ptr<TreeNode> LeftRotate (const shared_ptr<TreeNode>&node);
 
     int GetBalance(shared_ptr<TreeNode<T>>node);
 
@@ -68,6 +70,8 @@ public:
     shared_ptr<TreeNode<T>> RR (shared_ptr<TreeNode<T>>node);
 
     shared_ptr<TreeNode<T>> RL (shared_ptr<TreeNode<T>>node);
+    static shared_ptr<TreeNode> RightRotate (const shared_ptr<TreeNode>&node);
+
 };
 
 #include "TreeNodeImp.h"
