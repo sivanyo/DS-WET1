@@ -55,18 +55,11 @@ public:
 
     shared_ptr<TreeNode> FindMax(shared_ptr<TreeNode>node);
 
-    int GetBalance(shared_ptr<TreeNode>node);
+    static int GetBalance(const shared_ptr<TreeNode>&node);
 
-    shared_ptr<TreeNode> LL (shared_ptr<TreeNode>node);
+    static shared_ptr<TreeNode> LeftRotate (const shared_ptr<TreeNode>&node);
 
-    shared_ptr<TreeNode> LR (shared_ptr<TreeNode>node);
-
-    shared_ptr<TreeNode> RR (shared_ptr<TreeNode>node);
-
-    shared_ptr<TreeNode> RL (shared_ptr<TreeNode>node);
-
-
-
+    static shared_ptr<TreeNode> RightRotate (const shared_ptr<TreeNode>&node);
 
 };
 

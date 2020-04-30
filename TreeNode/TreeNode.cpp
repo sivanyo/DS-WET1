@@ -66,10 +66,46 @@ StatusType TreeNode::AddNode(const shared_ptr<TreeNode>& node) {
         else{
             return FAILURE;
         }
-        node->SetHeight(1); //always added as a leaf
+        node->SetHeight(1+max(node->left->GetHeight(), node->right->GetHeight()));
 
-        //TODO: add rotations
+        //get BF
+        int balance = GetBalance(node);
 
+        //check which rotate we should perform if this node is not balanced
+
+        //LL case
+        if(balance>1 && (node->GetKey() < node->left->GetKey())){
+            if(!RightRotate(node)){
+                return ALLOCATION_ERROR;
+            }
+        }
+
+        //RR case
+        if(balance<-1 && (node->GetKey() > node->right->GetKey())){
+            if(!LeftRotate(node)){
+                return ALLOCATION_ERROR;
+            }
+        }
+
+        //LR case
+        if(balance>1 && (node->GetKey() > node->left->GetKey())){
+            if(!LeftRotate(node->GetLeft())){
+                return ALLOCATION_ERROR;
+            }
+            if(!RightRotate(node)){
+                return ALLOCATION_ERROR;
+            }
+        }
+
+        //RL case
+        if(balance<-1 && (node->GetKey() < node->right->GetKey())){
+            if(!RightRotate(node->GetRight())){
+                return ALLOCATION_ERROR;
+            }
+            if(!LeftRotate(node)){
+                return ALLOCATION_ERROR;
+            }
+        }
         return SUCCESS;
     }
 
@@ -119,7 +155,7 @@ StatusType TreeNode::RemoveNode(int key) {
         }
         //with two children case
         else{
-            shared_ptr<TreeNode>(temp) = FindMin(shared_ptr<TreeNode>(this));
+            shared_ptr<TreeNode>(temp) = FindMin(shared_ptr<TreeNode>(this->GetRight()));
             this->SetKey(temp->GetKey()); //Copy the inorder successor's data to this node
             this->GetRight()->RemoveNode(temp->GetKey()); //Delete the inorder successor
         }
@@ -130,9 +166,44 @@ StatusType TreeNode::RemoveNode(int key) {
         //get the BF of this node
         int balance = GetBalance(shared_ptr<TreeNode>(this));
 
+        //in case this node is not balanced, there are 4 cases
 
+        //LL rotate case
+        if (balance>1 && GetBalance(this->GetLeft())>=0) {
+            if(!RightRotate(shared_ptr<TreeNode>(this))) {
+                return ALLOCATION_ERROR; // ????
+            }
+        }
+
+        //LR case
+        if (balance>1 && GetBalance(this->left)<0) {
+            if(!LeftRotate(this->left)){
+                return ALLOCATION_ERROR;
+            }
+            if(!RightRotate(shared_ptr<TreeNode>(this))){
+                return ALLOCATION_ERROR;
+            }
+        }
+
+        //RR case
+        if (balance<-1 && GetBalance(this->right)<=0) {
+            if (!LeftRotate(shared_ptr<TreeNode>(this))){
+                return ALLOCATION_ERROR;
+            }
+        }
+
+        //RL case
+        if(balance<-1 && GetBalance(this->right)>0) {
+            if(!RightRotate(this->right)){
+                return ALLOCATION_ERROR;
+            }
+            if(!LeftRotate(shared_ptr<TreeNode>(this))){
+                return ALLOCATION_ERROR;
+            }
+        }
 
     }
+    return SUCCESS;
 }
 
 shared_ptr<TreeNode> TreeNode::Find(int key) {
@@ -165,11 +236,10 @@ void TreeNode::SetFather(shared_ptr<TreeNode> newFather) {
     this->father = std::move(newFather);
 }
 
-int TreeNode::GetBalance(shared_ptr<TreeNode> node) {
+int TreeNode::GetBalance(const shared_ptr<TreeNode>& node) {
     if (node == nullptr)
         return 0;
-    return height(node->GetLeft()) -
-           height(node->GetRight());
+    return (node->GetLeft())->height - (node->GetRight()->height);
 }
 
 shared_ptr<TreeNode> TreeNode::FindMax(shared_ptr<TreeNode> node) {
@@ -190,30 +260,36 @@ shared_ptr<TreeNode> TreeNode::FindMin(shared_ptr<TreeNode> node) {
         return FindMax(node->GetRight());
 }
 
-shared_ptr<TreeNode> TreeNode::LL(shared_ptr<TreeNode> node) {
-    return shared_ptr<TreeNode>();
-}
-
-shared_ptr<TreeNode> TreeNode::LR(shared_ptr<TreeNode> node) {
-    return shared_ptr<TreeNode>();
-}
-
-shared_ptr<TreeNode> TreeNode::RR(shared_ptr<TreeNode> node) {
-    shared_ptr<TreeNode> nodeLeft = node->GetLeft();
+shared_ptr<TreeNode> TreeNode::LeftRotate(const shared_ptr<TreeNode>& node) {
     shared_ptr<TreeNode> nodeRight = node->GetRight();
+    shared_ptr<TreeNode> LeftOfRight = nodeRight->GetLeft();
+
+    //perform rotation
+    nodeRight->left = node;
+    node->right = LeftOfRight;
+
+    //update heights
+    node->SetHeight(max(node->left->GetHeight(), node->right->GetHeight())+1);
+    nodeRight->SetHeight(max(nodeRight->left->GetHeight(),
+            nodeRight->right->GetHeight())+1);
+
+    //return new root
+    return nodeRight;
+}
+
+shared_ptr<TreeNode> TreeNode::RightRotate(const shared_ptr<TreeNode>& node) {
+
+    shared_ptr<TreeNode> nodeLeft = node->GetLeft();
+    shared_ptr<TreeNode> RightOfLeft = nodeLeft->GetRight();
 
      //perform rotation
      nodeLeft->right = node;
-     node->left = nodeRight;
+     node->left = RightOfLeft;
 
      //update heights
      node->SetHeight(max(node->left->GetHeight(), node->right->GetHeight())+1);
-     nodeLeft->SetHeight(max(node->left->GetHeight(), node->right->GetHeight())+1);
+     nodeLeft->SetHeight(max(nodeLeft->left->GetHeight(),
+             nodeLeft->right->GetHeight())+1);
      //return new root
     return nodeLeft;
 }
-
-shared_ptr<TreeNode> TreeNode::RL(shared_ptr<TreeNode> node) {
-    return shared_ptr<TreeNode>();
-}
-
