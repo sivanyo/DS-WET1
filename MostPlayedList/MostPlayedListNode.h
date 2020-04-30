@@ -6,12 +6,15 @@
 #define WET1_MOSTPLAYEDLISTNODE_H
 
 #include <memory>
-#include "ArtistPlaysNode.h"
+#include "../ArtistPlays/ArtistPlays.h"
+#include "../SongPlays/SongPlays.h"
 
 using std::shared_ptr;
 using std::make_shared;
-class ArtistPlaysNode;
-class SongPlaysNode;
+
+typedef TreeNode<ArtistPlays> ArtistPlaysNode;
+
+//typedef TreeNode<SongPlays> SongPlaysNode;
 
 class MostPlayedListNode {
 private:

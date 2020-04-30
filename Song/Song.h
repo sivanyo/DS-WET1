@@ -7,7 +7,7 @@
 
 
 #include "../MostPlayedList/SongPlaysNode.h"
-#include "../MostPlayedList/ArtistPlaysNode.h"
+#include "../ArtistPlays/ArtistPlays.h"
 
 class Song {
 public:

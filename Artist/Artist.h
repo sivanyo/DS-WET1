@@ -11,13 +11,21 @@
 class Artist {
 private:
     int artistId;
-    Song artistSongs[];
+    //Song *artistSongs;
+public:
+    Artist(int artistId, int numOfSongs);
 
     int GetArtistId();
 
-public:
-    Artist(int artistId, int numOfSongs);
+    int getArtistId() const;
+
+    void setArtistId(int artistId);
+
+//    Song &operator[](int index);
+//
+//    Song operator[](int index) const;
 };
 
+typedef TreeNode<Artist> ArtistNode;
 
 #endif //WET1_ARTIST_H

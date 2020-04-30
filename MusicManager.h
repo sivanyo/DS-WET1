@@ -21,6 +21,7 @@ private:
     int numberOfSongs = 0;
 public:
     MusicManager();
+
     StatusType AddArtist(int artistId, int numOfSongs);
 
     StatusType RemoveArtist(int artistId);
@@ -29,7 +30,7 @@ public:
 
     StatusType NumberOfStreams(int artistId, int songID, int *streams);
 
-    StatusType GetRecommendedSongs(int numOfSongs,int *artist, int *songs);
+    StatusType GetRecommendedSongs(int numOfSongs, int *artist, int *songs);
 
     ~MusicManager();
 };

@@ -8,14 +8,21 @@ MostPlayedListNode::MostPlayedListNode(int numOfPlays) {
     this->numberOfPlays = numOfPlays;
 }
 
-// MostPlayedListNode.cpp
 bool MostPlayedListNode::AddArtist(shared_ptr<ArtistPlaysNode> artistNode) {
     if (ptrToLowestArtistId) {
         // There are already artists stored in this linked list
         this->artistPlaysTree->AddNode(artistNode);
+        if (this->ptrToLowestArtistId->GetData().GetArtistId() > artistNode->GetData().GetArtistId()) {
+            this->ptrToLowestArtistId.reset();
+            this->ptrToLowestArtistId = artistNode;
+            this->ptrToLowestSongId.reset();
+            this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
+        }
         return true;
     } else {
         this->artistPlaysTree = artistNode;
+        this->ptrToLowestArtistId = artistNode;
+        this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
         return true;
     }
 }

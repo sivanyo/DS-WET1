@@ -13,62 +13,62 @@ using namespace std;
 using std::shared_ptr;
 using std::make_shared;
 
-class TreeNode {
+template <class T>
+class TreeNode : public std::enable_shared_from_this<TreeNode<T>> {
 protected:
     int key;
-    int height;
-    shared_ptr<TreeNode> father;
-    shared_ptr<TreeNode> left;
-    shared_ptr<TreeNode> right;
+    int height = 0;
+    T data;
+    shared_ptr<TreeNode<T>> father;
+    shared_ptr<TreeNode<T>> left;
+    shared_ptr<TreeNode<T>> right;
 public:
-    explicit TreeNode(int key);
+    TreeNode(int key, T data);
 
-    TreeNode(int key, shared_ptr<TreeNode> father, shared_ptr<TreeNode> left, shared_ptr<TreeNode> right);
+    TreeNode(int key, T data, shared_ptr<TreeNode<T>> father, shared_ptr<TreeNode<T>> left, shared_ptr<TreeNode<T>> right);
 
-    virtual int GetKey();
+    int GetKey();
 
-    virtual void SetKey(int key);
+    void SetKey(int key);
 
-    virtual int GetHeight();
+    int GetHeight();
 
     void SetHeight(int height);
 
-    StatusType AddNode(const shared_ptr<TreeNode>& node);
+    virtual T GetData();
+
+    virtual void SetData(T data);
+
+    StatusType AddNode(const shared_ptr<TreeNode<T>>& node);
 
     StatusType RemoveNode(int key);
 
-    virtual shared_ptr<TreeNode> GetFather();
+    virtual shared_ptr<TreeNode<T>> GetFather();
 
-    virtual shared_ptr<TreeNode> GetLeft();
+    virtual shared_ptr<TreeNode<T>> GetLeft();
 
-    virtual shared_ptr<TreeNode> GetRight();
+    virtual shared_ptr<TreeNode<T>> GetRight();
 
-    virtual shared_ptr<TreeNode> Find(int key);
+    virtual shared_ptr<TreeNode<T>> Find(int key);
 
-    static int max (int a,int b);
+    static int CalcHeight (const shared_ptr<TreeNode<T>>& node);
 
-    static int CalcHeight (const shared_ptr<TreeNode>& node);
+    void SetFather (shared_ptr<TreeNode<T>> newFather);
 
-    void SetFather (shared_ptr<TreeNode> newFather);
+    shared_ptr<TreeNode<T>> FindMin(shared_ptr<TreeNode<T>> node);
 
-    shared_ptr<TreeNode> FindMin(shared_ptr<TreeNode> node);
+    shared_ptr<TreeNode<T>> FindMax(shared_ptr<TreeNode<T>>node);
 
-    shared_ptr<TreeNode> FindMax(shared_ptr<TreeNode>node);
+    int GetBalance(shared_ptr<TreeNode<T>>node);
 
-    int GetBalance(shared_ptr<TreeNode>node);
+    shared_ptr<TreeNode<T>> LL (shared_ptr<TreeNode<T>>node);
 
-    shared_ptr<TreeNode> LL (shared_ptr<TreeNode>node);
+    shared_ptr<TreeNode<T>> LR (shared_ptr<TreeNode<T>>node);
 
-    shared_ptr<TreeNode> LR (shared_ptr<TreeNode>node);
+    shared_ptr<TreeNode<T>> RR (shared_ptr<TreeNode<T>>node);
 
-    shared_ptr<TreeNode> RR (shared_ptr<TreeNode>node);
-
-    shared_ptr<TreeNode> RL (shared_ptr<TreeNode>node);
-
-
-
-
+    shared_ptr<TreeNode<T>> RL (shared_ptr<TreeNode<T>>node);
 };
 
-
+#include "TreeNodeImp.h"
 #endif //WET1_TREENODE_H

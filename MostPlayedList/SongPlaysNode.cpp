@@ -1,36 +1,41 @@
+////
+//// Created by Mor on 27/04/2020.
+////
 //
-// Created by Mor on 27/04/2020.
+//#include "SongPlaysNode.h"
 //
-
-#include "SongPlaysNode.h"
-
-SongPlaysNode::SongPlaysNode(int songId, int artistId, shared_ptr<MostPlayedListNode> ptrToList) : TreeNode(songId) {
-    this->songId = songId;
-    this->numberOfPlays = 0;
-    this->artistId = artistId;
-    this->ptrToListNode = ptrToList;
-}
-
-int SongPlaysNode::GetSongId() const {
-    return songId;
-}
-
-int SongPlaysNode::GetNumberOfPlays() const {
-    return numberOfPlays;
-}
-
-int SongPlaysNode::GetArtistId() const {
-    return artistId;
-}
-
-void SongPlaysNode::IncrementNumberOfPlays() {
-    this->numberOfPlays++;
-}
-
-shared_ptr<MostPlayedListNode> SongPlaysNode::GetPtrToListNode() {
-    return this->ptrToListNode;
-}
-
-void SongPlaysNode::SetPtrToListNode(shared_ptr<MostPlayedListNode> listNode) {
-    this->ptrToListNode = listNode;
-}
+//SongPlays::SongPlays(int songId, int artistId, shared_ptr<MostPlayedListNode> ptrToList) {
+//
+//}
+//
+//
+////SongPlays::SongPlays(int songId, int artistId, shared_ptr<MostPlayedListNode> ptrToList) {
+////    this->songId = songId;
+////    this->numberOfPlays = 0;
+////    this->artistId = artistId;
+////    this->ptrToListNode = ptrToList;
+////}
+//
+//int SongPlays::GetSongId() const {
+//    return songId;
+//}
+//
+//int SongPlays::GetNumberOfPlays() const {
+//    return numberOfPlays;
+//}
+//
+//int SongPlays::GetArtistId() const {
+//    return artistId;
+//}
+//
+//void SongPlays::IncrementNumberOfPlays() {
+//    this->numberOfPlays++;
+//}
+//
+//shared_ptr<MostPlayedListNode> SongPlays::GetPtrToListNode() {
+//    return this->ptrToListNode;
+//}
+//
+//void SongPlays::SetPtrToListNode(shared_ptr<MostPlayedListNode> listNode) {
+//    this->ptrToListNode = listNode;
+//}
