@@ -5,9 +5,11 @@
 #ifndef WET1_TREENODE_H
 #define WET1_TREENODE_H
 
+#include <iostream>
 #include <memory>
 #include "../library1.h"
 
+using namespace std;
 using std::shared_ptr;
 using std::make_shared;
 
@@ -29,11 +31,11 @@ public:
 
     virtual int GetHeight();
 
-    virtual void SetHeight(int height);
+    void SetHeight(int height);
 
-    virtual StatusType AddNode(shared_ptr<TreeNode> node);
+    StatusType AddNode(const shared_ptr<TreeNode>& node);
 
-    virtual StatusType RemoveNode(int key);
+    StatusType RemoveNode(int key);
 
     virtual shared_ptr<TreeNode> GetFather();
 
@@ -42,6 +44,30 @@ public:
     virtual shared_ptr<TreeNode> GetRight();
 
     virtual shared_ptr<TreeNode> Find(int key);
+
+    static int max (int a,int b);
+
+    static int CalcHeight (const shared_ptr<TreeNode>& node);
+
+    void SetFather (shared_ptr<TreeNode> newFather);
+
+    shared_ptr<TreeNode> FindMin(shared_ptr<TreeNode> node);
+
+    shared_ptr<TreeNode> FindMax(shared_ptr<TreeNode>node);
+
+    int GetBalance(shared_ptr<TreeNode>node);
+
+    shared_ptr<TreeNode> LL (shared_ptr<TreeNode>node);
+
+    shared_ptr<TreeNode> LR (shared_ptr<TreeNode>node);
+
+    shared_ptr<TreeNode> RR (shared_ptr<TreeNode>node);
+
+    shared_ptr<TreeNode> RL (shared_ptr<TreeNode>node);
+
+
+
+
 };
 
 
