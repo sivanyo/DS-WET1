@@ -4,8 +4,7 @@
 
 #include "Artist.h"
 
-Artist::Artist(int artistId, int numOfSongs) {
-    this->artistId = artistId;
+Artist::Artist(int artistId, int numOfSongs): artistId(artistId), numberOfSongs(numOfSongs) {
     if (numOfSongs != 0) {
         this->artistSongs = unique_ptr<Song[]>(new Song[numOfSongs]);
         for (int i = 0; i < numOfSongs; ++i) {
@@ -21,6 +20,11 @@ int Artist::GetArtistId() {
 void Artist::SetArtistId(int artistId) {
     Artist::artistId = artistId;
 }
+
+int Artist::GetNumberOfSongs() {
+    return numberOfSongs;
+}
+
 
 Song &Artist::operator[](int index) {
     return artistSongs[index];

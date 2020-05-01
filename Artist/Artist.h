@@ -11,6 +11,7 @@
 class Artist {
 private:
     int artistId;
+    int numberOfSongs;
     unique_ptr<Song[]> artistSongs;
 public:
     Artist(int artistId, int numOfSongs);
@@ -18,6 +19,8 @@ public:
     int GetArtistId();
 
     void SetArtistId(int artistId);
+
+    int GetNumberOfSongs();
 
     Song &operator[](int index);
 

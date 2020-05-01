@@ -35,7 +35,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         }
     }
     // Creating artist node to store the tree of it's songs with 0 plays
-    shared_ptr<ArtistPlaysNode> artistNode = make_shared<ArtistPlaysNode>(artistId, ArtistPlays(artistId));
+    shared_ptr<ArtistPlaysNode> artistNode = make_shared<ArtistPlaysNode>(artistId, ArtistPlays(artistId, this->mostPlayedList));
     // Create tree for songs of the new artist with 0 plays
     shared_ptr<SongPlaysNode> songNode = make_shared<SongPlaysNode>(0, SongPlays(0, artistId, this->mostPlayedList));
     // TODO: check that data transferred to the artistObj is saved properly
@@ -56,10 +56,29 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     return SUCCESS;
 }
 
+
+/**
+ * Flow of remove artist:
+ * check if an artist with that ID exists,
+ * go over all songs of that artist (in songs array from Artist object)
+ * for each song, go to the pointer for the artistPlaysNode, remove the node
+ * @param artistId
+ * @return
+ */
+
+// TODO: add function to most played list - RemoveArtistFromListById(int artistId)
 StatusType MusicManager::RemoveArtist(int artistId) {
     if (numberOfArtists == 0) {
-
+        // There are no artists so this counts as a case where no artist with the input ID exists
+        return FAILURE;
     }
+    shared_ptr<ArtistNode> artist = artistTree->Find(artistId);
+    if (!artist) {
+        // There is no artist with the input ID
+        return FAILURE;
+    }
+    Artist &artistObj = artist->GetData();
+
     return INVALID_INPUT;
 }
 
