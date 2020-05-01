@@ -6,7 +6,6 @@
 #define WET1_SONG_H
 
 
-#include "../MostPlayedList/SongPlaysNode.h"
 #include "../ArtistPlays/ArtistPlays.h"
 
 class Song {

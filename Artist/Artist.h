@@ -5,8 +5,10 @@
 #ifndef WET1_ARTIST_H
 #define WET1_ARTIST_H
 
-
+#include <memory>
 #include "../Song/Song.h"
+
+using std::unique_ptr;
 
 class Artist {
 private:

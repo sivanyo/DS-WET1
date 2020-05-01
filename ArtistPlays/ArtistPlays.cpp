@@ -40,6 +40,14 @@ const shared_ptr<MostPlayedListNode> &ArtistPlays::getPtrToListNode() const {
     return this->ptrToListNode;
 }
 
+shared_ptr<SongPlaysNode> ArtistPlays::GetSongPlaysTree() {
+    return SongPlaysTree;
+}
+
+void ArtistPlays::SetSongPlaysTree(shared_ptr<SongPlaysNode> ptr) {
+    SongPlaysTree = ptr;
+}
+
 
 void ArtistPlays::SetPtrToListNode(shared_ptr<MostPlayedListNode> ptr) {
     ptrToListNode.reset();

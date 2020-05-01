@@ -7,7 +7,6 @@
 
 #include <memory>
 #include "../TreeNode/TreeNode.h"
-#include "../MostPlayedList/SongPlaysNode.h"
 #include "../SongPlays/SongPlays.h"
 
 using std::shared_ptr;
@@ -34,6 +33,10 @@ public:
     int GetArtistId();
 
     const shared_ptr<MostPlayedListNode> &getPtrToListNode() const;
+
+    shared_ptr<SongPlaysNode> GetSongPlaysTree();
+
+    void SetSongPlaysTree(shared_ptr<SongPlaysNode> ptr);
 
     void SetPtrToLowestSongId(shared_ptr<SongPlaysNode> ptrToLowestSongId);
 };

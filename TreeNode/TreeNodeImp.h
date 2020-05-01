@@ -7,7 +7,6 @@
 
 
 #include <memory>
-#include "TreeNode.h"
 
 
 using std::shared_ptr;
@@ -48,7 +47,7 @@ void TreeNode<T>::SetHeight(int height) {
 }
 
 template<class T>
-T& TreeNode<T>::GetData() {
+T &TreeNode<T>::GetData() {
     return &this->data;
 }
 
@@ -79,18 +78,18 @@ StatusType TreeNode<T>::AddNode(const shared_ptr<TreeNode<T>> &node) {
 //check if should add at right
         if (this->GetKey() < node->GetKey()) {
             this->right = node;
-            node->SetFather(shared_ptr<TreeNode>(this));
+            node->SetFather(this->shared_from_this());
         }
 //check if should add at left
         else if (this->GetKey() > node->GetKey()) {
             this->left = node;
-            node->SetFather(shared_ptr<TreeNode>(this));
+            node->SetFather(this->shared_from_this());
         }
 //they both have the same key
         else {
             return FAILURE;
         }
-        node->SetHeight(1+max(node->left->GetHeight(), node->right->GetHeight()));
+        node->SetHeight(1 + max(node->left->GetHeight(), node->right->GetHeight()));
 
         //get BF
         int balance = GetBalance(node);
@@ -98,35 +97,35 @@ StatusType TreeNode<T>::AddNode(const shared_ptr<TreeNode<T>> &node) {
         //check which rotate we should perform if this node is not balanced
 
         //LL case
-        if(balance>1 && (node->GetKey() < node->left->GetKey())){
-            if(!RightRotate(node)){
+        if (balance > 1 && (node->GetKey() < node->left->GetKey())) {
+            if (!RightRotate(node)) {
                 return ALLOCATION_ERROR;
             }
         }
 
         //RR case
-        if(balance<-1 && (node->GetKey() > node->right->GetKey())){
-            if(!LeftRotate(node)){
+        if (balance < -1 && (node->GetKey() > node->right->GetKey())) {
+            if (!LeftRotate(node)) {
                 return ALLOCATION_ERROR;
             }
         }
 
         //LR case
-        if(balance>1 && (node->GetKey() > node->left->GetKey())){
-            if(!LeftRotate(node->GetLeft())){
+        if (balance > 1 && (node->GetKey() > node->left->GetKey())) {
+            if (!LeftRotate(node->GetLeft())) {
                 return ALLOCATION_ERROR;
             }
-            if(!RightRotate(node)){
+            if (!RightRotate(node)) {
                 return ALLOCATION_ERROR;
             }
         }
 
         //RL case
-        if(balance<-1 && (node->GetKey() < node->right->GetKey())){
-            if(!RightRotate(node->GetRight())){
+        if (balance < -1 && (node->GetKey() < node->right->GetKey())) {
+            if (!RightRotate(node->GetRight())) {
                 return ALLOCATION_ERROR;
             }
-            if(!LeftRotate(node)){
+            if (!LeftRotate(node)) {
                 return ALLOCATION_ERROR;
             }
         }
@@ -193,35 +192,35 @@ StatusType TreeNode<T>::RemoveNode(int key) {
         //in case this node is not balanced, there are 4 cases
 
         //LL rotate case
-        if (balance>1 && GetBalance(this->GetLeft())>=0) {
-            if(!RightRotate(shared_ptr<TreeNode>(this))) {
+        if (balance > 1 && GetBalance(this->GetLeft()) >= 0) {
+            if (!RightRotate(shared_ptr<TreeNode>(this))) {
                 return ALLOCATION_ERROR; // ????
             }
         }
 
         //LR case
-        if (balance>1 && GetBalance(this->left)<0) {
-            if(!LeftRotate(this->left)){
+        if (balance > 1 && GetBalance(this->left) < 0) {
+            if (!LeftRotate(this->left)) {
                 return ALLOCATION_ERROR;
             }
-            if(!RightRotate(shared_ptr<TreeNode>(this))){
+            if (!RightRotate(shared_ptr<TreeNode>(this))) {
                 return ALLOCATION_ERROR;
             }
         }
 
         //RR case
-        if (balance<-1 && GetBalance(this->right)<=0) {
-            if (!LeftRotate(shared_ptr<TreeNode>(this))){
+        if (balance < -1 && GetBalance(this->right) <= 0) {
+            if (!LeftRotate(shared_ptr<TreeNode>(this))) {
                 return ALLOCATION_ERROR;
             }
         }
 
         //RL case
-        if(balance<-1 && GetBalance(this->right)>0) {
-            if(!RightRotate(this->right)){
+        if (balance < -1 && GetBalance(this->right) > 0) {
+            if (!RightRotate(this->right)) {
                 return ALLOCATION_ERROR;
             }
-            if(!LeftRotate(shared_ptr<TreeNode>(this))){
+            if (!LeftRotate(shared_ptr<TreeNode>(this))) {
                 return ALLOCATION_ERROR;
             }
         }
@@ -252,6 +251,15 @@ int TreeNode<T>::CalcHeight(const shared_ptr<TreeNode<T>> &node) {
         return 0;
     }
     return node->height;
+}
+
+template<class T>
+shared_ptr<TreeNode<T>> TreeNode<T>::FindRoot() {
+    if (this->father == nullptr) {
+        return this;
+    }
+
+    return FindRoot(this->father);
 }
 
 template<class T>
@@ -288,7 +296,7 @@ shared_ptr<TreeNode<T>> TreeNode<T>::FindMin(shared_ptr<TreeNode<T>> node) {
 }
 
 template<class T>
-shared_ptr<TreeNode<T>> TreeNode<T>::LeftRotate(const shared_ptr<TreeNode<T>>& node) {
+shared_ptr<TreeNode<T>> TreeNode<T>::LeftRotate(const shared_ptr<TreeNode<T>> &node) {
     shared_ptr<TreeNode<T>> nodeRight = node->GetRight();
     shared_ptr<TreeNode<T>> LeftOfRight = nodeRight->GetLeft();
 
@@ -297,16 +305,16 @@ shared_ptr<TreeNode<T>> TreeNode<T>::LeftRotate(const shared_ptr<TreeNode<T>>& n
     node->right = LeftOfRight;
 
     //update heights
-    node->SetHeight(max(node->left->GetHeight(), node->right->GetHeight())+1);
+    node->SetHeight(max(node->left->GetHeight(), node->right->GetHeight()) + 1);
     nodeRight->SetHeight(max(nodeRight->left->GetHeight(),
-                             nodeRight->right->GetHeight())+1);
+                             nodeRight->right->GetHeight()) + 1);
 
     //return new root
     return nodeRight;
 }
 
 template<class T>
-shared_ptr<TreeNode<T>> TreeNode<T>::RightRotate(const shared_ptr<TreeNode<T>>& node) {
+shared_ptr<TreeNode<T>> TreeNode<T>::RightRotate(const shared_ptr<TreeNode<T>> &node) {
 
     shared_ptr<TreeNode<T>> nodeLeft = node->GetLeft();
     shared_ptr<TreeNode<T>> RightOfLeft = nodeLeft->GetRight();
@@ -316,9 +324,9 @@ shared_ptr<TreeNode<T>> TreeNode<T>::RightRotate(const shared_ptr<TreeNode<T>>& 
     node->left = RightOfLeft;
 
     //update heights
-    node->SetHeight(max(node->left->GetHeight(), node->right->GetHeight())+1);
+    node->SetHeight(max(node->left->GetHeight(), node->right->GetHeight()) + 1);
     nodeLeft->SetHeight(max(nodeLeft->left->GetHeight(),
-                            nodeLeft->right->GetHeight())+1);
+                            nodeLeft->right->GetHeight()) + 1);
     //return new root
     return nodeLeft;
 }
@@ -326,18 +334,16 @@ shared_ptr<TreeNode<T>> TreeNode<T>::RightRotate(const shared_ptr<TreeNode<T>>& 
 
 template<class T>
 shared_ptr<TreeNode<T>> TreeNode<T>::GetNextNode(const shared_ptr<TreeNode<T>> &node) {
-    if(node->right == nullptr){
+    if (node->right == nullptr) {
         return FindMin(node->right);
-    }
-
-    else{
+    } else {
         shared_ptr<TreeNode<T>> parent = node->GetFather();
-        while(parent!= nullptr){
-            if(parent->left == node){
+        while (parent != nullptr) {
+            if (parent->left == node) {
                 break;
             }
-            node=parent;
-            parent=node->father;
+            node = parent;
+            parent = node->father;
         }
         return parent;
     }
@@ -346,27 +352,54 @@ shared_ptr<TreeNode<T>> TreeNode<T>::GetNextNode(const shared_ptr<TreeNode<T>> &
 template<class T>
 void TreeNode<T>::DeleteTree(shared_ptr<TreeNode<T>> root) {
 
-    if(root==nullptr){
+    if (root == nullptr) {
         return;
     }
 
     //reached a leaf, can delete it
-    if(root->left == nullptr & root->right == nullptr){
+    if (root->left == nullptr & root->right == nullptr) {
         root.reset();
     }
 
     //remove left sub-tree
-    if(root->left != nullptr){
+    if (root->left != nullptr) {
         DeleteTree(root->GetLeft);
         root.GetLeft->reset();
     }
 
     //remove right sub-tree
-    if(root->right != nullptr){
+    if (root->right != nullptr) {
         DeleteTree(root->GetRight);
         root.GetRight()->reset();
     }
     root.reset();
+    return;
+}
+
+template<class T>
+void TreeNode<T>::DeleteTree() {
+
+    if (this == nullptr) {
+        return;
+    }
+
+    //reached a leaf, can delete it
+    if (this->left == nullptr && this->right == nullptr) {
+        //this.reset();
+    }
+
+    //remove left sub-tree
+    if (this->left != nullptr) {
+        DeleteTree(this->GetLeft);
+        //this->GetLeft->reset();
+    }
+
+    //remove right sub-tree
+    if (this->right != nullptr) {
+        DeleteTree(this->GetRight);
+        //this->GetRight();
+    }
+    //this.reset();
     return;
 
 }

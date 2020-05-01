@@ -5,13 +5,12 @@
 #ifndef WET1_TREENODE_H
 #define WET1_TREENODE_H
 
-#include <iostream>
 #include <memory>
 #include "../library1.h"
 
-using namespace std;
 using std::shared_ptr;
 using std::make_shared;
+using std::weak_ptr;
 
 template <class T>
 class TreeNode : public std::enable_shared_from_this<TreeNode<T>> {
@@ -19,7 +18,7 @@ protected:
     int key;
     int height = 0;
     T data;
-    shared_ptr<TreeNode<T>> father;
+    weak_ptr<TreeNode<T>> father;
     shared_ptr<TreeNode<T>> left;
     shared_ptr<TreeNode<T>> right;
 public:
@@ -42,6 +41,8 @@ public:
     StatusType AddNode(const shared_ptr<TreeNode<T>>& node);
 
     StatusType RemoveNode(int key);
+
+    virtual shared_ptr<TreeNode<T>> FindRoot();
 
     virtual shared_ptr<TreeNode<T>> GetFather();
 
@@ -68,6 +69,7 @@ public:
     shared_ptr<TreeNode<T>> GetNextNode(const shared_ptr<TreeNode<T>> &node);
 
     void DeleteTree (shared_ptr<TreeNode<T>> root);
+    void DeleteTree ();
 
 };
 
