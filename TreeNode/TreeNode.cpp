@@ -237,7 +237,7 @@ void TreeNode::SetFather(shared_ptr<TreeNode> newFather) {
     this->father = std::move(newFather);
 }
 
-int TreeNode::GetBalance(const shared_ptr<TreeNode>& node) {
+int TreeNode::GetBalance(const shared_ptr<TreeNode>&node) {
     if (node == nullptr)
         return 0;
     return (node->GetLeft())->height - (node->GetRight()->height);
