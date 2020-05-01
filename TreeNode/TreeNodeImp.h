@@ -46,8 +46,8 @@ void TreeNode<T>::SetHeight(int height) {
 }
 
 template<class T>
-T TreeNode<T>::GetData() {
-    return this->data;
+T& TreeNode<T>::GetData() {
+    return &this->data;
 }
 
 template<class T>

@@ -11,19 +11,17 @@
 class Artist {
 private:
     int artistId;
-    //Song *artistSongs;
+    unique_ptr<Song[]> artistSongs;
 public:
     Artist(int artistId, int numOfSongs);
 
     int GetArtistId();
 
-    int getArtistId() const;
+    void SetArtistId(int artistId);
 
-    void setArtistId(int artistId);
+    Song &operator[](int index);
 
-//    Song &operator[](int index);
-//
-//    Song operator[](int index) const;
+    Song operator[](int index) const;
 };
 
 typedef TreeNode<Artist> ArtistNode;

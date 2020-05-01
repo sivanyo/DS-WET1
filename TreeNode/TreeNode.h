@@ -35,7 +35,7 @@ public:
 
     void SetHeight(int height);
 
-    virtual T GetData();
+    virtual T& GetData();
 
     virtual void SetData(T data);
 

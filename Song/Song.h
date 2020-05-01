@@ -10,13 +10,23 @@
 #include "../ArtistPlays/ArtistPlays.h"
 
 class Song {
-public:
+private:
     int songId;
     int numberOfPlays = 0;
-    ArtistPlaysNode* ptrToArtistIdPlaysTree = nullptr;
-    SongPlaysNode* ptrToArtistsNode = nullptr;
-
+    shared_ptr<ArtistPlaysNode> ptrToArtistIdPlaysTree = nullptr;
+    shared_ptr<SongPlaysNode> ptrToSongNodeInPlaysTree = nullptr;
+public:
+    Song();
     Song(int songId);
+
+    int GetSongId();
+    void SetSongId(int id);
+
+    shared_ptr<ArtistPlaysNode> GetPtrToArtistNode();
+    void SetPtrToArtistNode(shared_ptr<ArtistPlaysNode> ptr);
+
+    shared_ptr<SongPlaysNode> GetPtrToSongNode();
+    void SetPtrToSongNode(shared_ptr<SongPlaysNode> ptr);
 };
 
 
