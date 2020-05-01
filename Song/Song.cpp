@@ -38,3 +38,15 @@ void Song::SetPtrToSongNode(shared_ptr<SongPlaysNode> ptr) {
 int Song::getNumberOfPlays() const {
     return this->numberOfPlays;
 }
+
+void Song::setNumberOfPlays(int numberOfPlays) {
+    this->numberOfPlays=numberOfPlays;
+}
+
+const shared_ptr<ArtistPlaysNode> &Song::getPtrToArtistIdPlaysTree() const {
+    return this->ptrToArtistIdPlaysTree;
+}
+
+const shared_ptr<SongPlaysNode> &Song::getPtrToSongNodeInPlaysTree() const {
+    return this->ptrToSongNodeInPlaysTree;
+}

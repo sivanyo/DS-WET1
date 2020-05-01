@@ -26,7 +26,7 @@ public:
 
     StatusType RemoveArtist(int artistId);
 
-    StatusType AddToSongCount(int artistId, int numOfSongs);
+    StatusType AddToSongCount(int artistId, int songID);
 
     StatusType NumberOfStreams(int artistId, int songID, int *streams);
 

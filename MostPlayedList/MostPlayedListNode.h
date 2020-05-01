@@ -46,6 +46,14 @@ public:
     void SetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysNode);
 
     shared_ptr<MostPlayedListNode> GetPrevious();
+
+    void setPrevious(const shared_ptr<MostPlayedListNode> &previous);
+
+    const shared_ptr<MostPlayedListNode> &getNext() const;
+
+    void setNext(const shared_ptr<MostPlayedListNode> &next);
+
+    int getNumberOfPlays() const;
 };
 
 

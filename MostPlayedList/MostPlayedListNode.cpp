@@ -57,6 +57,22 @@ shared_ptr<MostPlayedListNode> MostPlayedListNode::GetPrevious() {
     return this->previous;
 }
 
+void MostPlayedListNode::setPrevious(const shared_ptr<MostPlayedListNode> &previous) {
+    MostPlayedListNode::previous = previous;
+}
+
+const shared_ptr<MostPlayedListNode> &MostPlayedListNode::getNext() const {
+    return this->next;
+}
+
+void MostPlayedListNode::setNext(const shared_ptr<MostPlayedListNode> &next) {
+    MostPlayedListNode::next = next;
+}
+
+int MostPlayedListNode::getNumberOfPlays() const {
+    return this->numberOfPlays;
+}
+
 
 
 

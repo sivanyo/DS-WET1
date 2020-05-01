@@ -35,7 +35,8 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         }
     }
     // Creating artist node to store the tree of it's songs with 0 plays
-    shared_ptr<ArtistPlaysNode> artistNode = make_shared<ArtistPlaysNode>(artistId, ArtistPlays(artistId, this->mostPlayedList));
+    shared_ptr<ArtistPlaysNode> artistNode = make_shared<ArtistPlaysNode>(artistId,
+                                                                          ArtistPlays(artistId, this->mostPlayedList));
     // Create tree for songs of the new artist with 0 plays
     shared_ptr<SongPlaysNode> songNode = make_shared<SongPlaysNode>(0, SongPlays(0, artistId, this->mostPlayedList));
     // TODO: check that data transferred to the artistObj is saved properly
@@ -98,8 +99,30 @@ StatusType MusicManager::RemoveArtist(int artistId) {
     return INVALID_INPUT;
 }
 
-StatusType MusicManager::AddToSongCount(int artistId, int numOfSongs) {
-    return INVALID_INPUT;
+StatusType MusicManager::AddToSongCount(int artistId, int songID) {
+    shared_ptr<ArtistNode> node = this->artistTree->Find(artistId);
+    if (node == nullptr) {
+        return FAILURE;
+    }
+    if (node->GetData().GetNumberOfSongs() <= songID) {
+        return INVALID_INPUT;
+    }
+    int newNumOfPlays =node->GetData()[songID].getNumberOfPlays() + 1 ;
+    //update the number of streams at songArray
+    node->GetData()[songID].setNumberOfPlays(newNumOfPlays);
+
+    //getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list node
+    shared_ptr<SongPlaysNode> songNode = node->GetData()[songID].GetPtrToSongNode();
+    shared_ptr<ArtistPlaysNode> artistNode = node->GetData()[songID].getPtrToArtistIdPlaysTree();
+    shared_ptr<MostPlayedListNode> PlaysListNode = node->GetData()[songID].GetPtrToArtistNode()->GetData().getPtrToListNode();
+
+    //case in which there is a matching playsNode to this song
+    if(newNumOfPlays == PlaysListNode->getNext()->getNumberOfPlays()){
+
+    }
+
+    //case in which we need to add 
+    return SUCCESS;
 }
 
 StatusType MusicManager::NumberOfStreams(int artistId, int songID, int *streams) {

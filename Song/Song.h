@@ -30,11 +30,15 @@ public:
     int getNumberOfPlays() const;
 
     void setNumberOfPlays(int numberOfPlays);
+
+    const shared_ptr<ArtistPlaysNode> &getPtrToArtistIdPlaysTree() const;
+
+    const shared_ptr<SongPlaysNode> &getPtrToSongNodeInPlaysTree() const;
+
+
 };
 
-void Song::setNumberOfPlays(int numberOfPlays) {
-    Song::numberOfPlays = numberOfPlays;
-}
+
 
 
 #endif //WET1_SONG_H
