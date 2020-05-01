@@ -87,11 +87,46 @@ StatusType MusicManager::AddToSongCount(int artistId, int numOfSongs) {
 }
 
 StatusType MusicManager::NumberOfStreams(int artistId, int songID, int *streams) {
-    return INVALID_INPUT;
+    shared_ptr<ArtistNode> node = this->artistTree->Find(artistId);
+    if(node== nullptr){
+        return FAILURE;
+    }
+    if(node->GetData().GetNumberOfSongs()<=songID){
+        return INVALID_INPUT;
+    }
+    *streams = node->GetData()[songID].getNumberOfPlays();
+    return SUCCESS;
 }
 
 StatusType MusicManager::GetRecommendedSongs(int numOfSongs, int *artist, int *songs) {
-    return INVALID_INPUT;
+    if(numOfSongs>this->numberOfSongs){
+        return FAILURE;
+    }
+    shared_ptr<SongPlaysNode> RecommendedSong = this->ptrToMostRecommended->GetPtrToLowestSong();
+    shared_ptr<ArtistPlaysNode> RecommendedArtist = this->ptrToMostRecommended->GetPtrToLowestArtist();
+    int  i=0;
+    while(numOfSongs>0){
+        //finish printing all the songs in this tree, should move to next artist in line
+        if(RecommendedSong== nullptr){
+            RecommendedArtist=RecommendedArtist->GetNextNode(RecommendedArtist);
+            //finish printing all the songs with K plays, should move to previous node
+            if(RecommendedArtist== nullptr){
+                RecommendedSong=RecommendedSong->GetData().GetPtrToListNode()->GetPrevious()->GetPtrToLowestSong();
+                RecommendedArtist=RecommendedArtist->GetData().getPtrToListNode()->GetPrevious()->GetPtrToLowestArtist();
+            }
+            //should get ptr to lowest song node
+            else{
+                RecommendedSong=RecommendedArtist->GetData().GetPtrToLowestSongId();
+            }
+        }
+        artist[i] = RecommendedSong->GetData().GetArtistId();
+        songs[i] = RecommendedSong->GetData().GetSongId();
+
+        RecommendedSong=RecommendedSong->GetNextNode(RecommendedSong);
+        i++;
+        numOfSongs--;
+    }
+    return SUCCESS;
 }
 
 MusicManager::~MusicManager() {

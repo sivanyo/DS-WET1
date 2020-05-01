@@ -37,13 +37,15 @@ public:
 
     bool AddArtist(shared_ptr<ArtistPlaysNode> artistNode);
 
-    shared_ptr<ArtistPlaysNode> GetPtrToLowestArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode);
+    shared_ptr<ArtistPlaysNode> GetPtrToLowestArtist();
 
     void SetPtrToLowestArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode);
 
-    shared_ptr<ArtistPlaysNode> GetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysNode);
+    shared_ptr<SongPlaysNode> GetPtrToLowestSong();
 
     void SetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysNode);
+
+    shared_ptr<MostPlayedListNode> GetPrevious();
 };
 
 

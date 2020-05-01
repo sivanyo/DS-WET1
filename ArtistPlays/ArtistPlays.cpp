@@ -35,9 +35,11 @@ void ArtistPlays::SetPtrToLowestSongId(shared_ptr<SongPlaysNode> ptrToLowestSong
     this->ptrToLowestSongId = ptrToLowestSongId;
 }
 
-shared_ptr<MostPlayedListNode> ArtistPlays::GetPtrToListNode() {
-    return ptrToListNode;
+
+const shared_ptr<MostPlayedListNode> &ArtistPlays::getPtrToListNode() const {
+    return this->ptrToListNode;
 }
+
 
 void ArtistPlays::SetPtrToListNode(shared_ptr<MostPlayedListNode> ptr) {
     ptrToListNode.reset();

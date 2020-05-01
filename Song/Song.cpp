@@ -34,3 +34,7 @@ shared_ptr<SongPlaysNode> Song::GetPtrToSongNode() {
 void Song::SetPtrToSongNode(shared_ptr<SongPlaysNode> ptr) {
     ptrToSongNodeInPlaysTree = ptr;
 }
+
+int Song::getNumberOfPlays() const {
+    return this->numberOfPlays;
+}

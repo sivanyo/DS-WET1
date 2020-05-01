@@ -27,7 +27,15 @@ public:
 
     shared_ptr<SongPlaysNode> GetPtrToSongNode();
     void SetPtrToSongNode(shared_ptr<SongPlaysNode> ptr);
+
+    int getNumberOfPlays() const;
+
+    void setNumberOfPlays(int numberOfPlays);
 };
+
+void Song::setNumberOfPlays(int numberOfPlays) {
+    Song::numberOfPlays = numberOfPlays;
+}
 
 
 #endif //WET1_SONG_H

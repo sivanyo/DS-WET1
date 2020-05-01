@@ -27,7 +27,7 @@ bool MostPlayedListNode::AddArtist(shared_ptr<ArtistPlaysNode> artistNode) {
     }
 }
 
-shared_ptr<ArtistPlaysNode> MostPlayedListNode::GetPtrToLowestArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode) {
+shared_ptr<ArtistPlaysNode> MostPlayedListNode::GetPtrToLowestArtist() {
     return shared_ptr<ArtistPlaysNode>();
 }
 
@@ -35,9 +35,6 @@ void MostPlayedListNode::SetPtrToLowestArtist(shared_ptr<ArtistPlaysNode> artist
 
 }
 
-shared_ptr<ArtistPlaysNode> MostPlayedListNode::GetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysNode) {
-    return shared_ptr<ArtistPlaysNode>();
-}
 
 void MostPlayedListNode::SetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysNode) {
 
@@ -55,5 +52,12 @@ MostPlayedListNode::MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedList
     this->previous = previous;
     this->next = next;
 }
+
+shared_ptr<MostPlayedListNode> MostPlayedListNode::GetPrevious() {
+    return this->previous;
+}
+
+
+
 
 

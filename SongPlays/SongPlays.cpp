@@ -8,15 +8,15 @@ SongPlays::SongPlays(int songId, int artistId, shared_ptr<MostPlayedListNode> pt
                                                                                                ptrToListNode(ptrToListNode) {}
 
 int SongPlays::GetSongId() const {
-    return songId;
+    return this->songId;
 }
 
 int SongPlays::GetNumberOfPlays() const {
-    return numberOfPlays;
+    return this.numberOfPlays;
 }
 
 int SongPlays::GetArtistId() const {
-    return artistId;
+    return this.artistId;
 }
 
 void SongPlays::IncrementNumberOfPlays() {
