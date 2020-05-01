@@ -38,7 +38,7 @@ public:
 
     virtual void SetData(T data);
 
-    StatusType AddNode(const shared_ptr<TreeNode<T>>& node);
+    StatusType AddNode(shared_ptr<TreeNode<T>> node);
 
     StatusType RemoveNode(int key);
 

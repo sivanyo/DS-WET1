@@ -72,7 +72,7 @@ shared_ptr<TreeNode<T>> TreeNode<T>::GetRight() {
 }
 
 template<class T>
-StatusType TreeNode<T>::AddNode(const shared_ptr<TreeNode<T>> &node) {
+StatusType TreeNode<T>::AddNode(shared_ptr<TreeNode<T>> node) {
 //adding the node
     if (this->GetRight() == nullptr && this->GetLeft() == nullptr) {
 //check if should add at right

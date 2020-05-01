@@ -56,6 +56,8 @@ public:
     int getNumberOfPlays() const;
 
     const shared_ptr<ArtistPlaysNode> &getArtistPlaysTree() const;
+
+    void setPtrToLowestArtistId(shared_ptr<ArtistPlaysNode> ptrToLowestArtistId);
 };
 
 

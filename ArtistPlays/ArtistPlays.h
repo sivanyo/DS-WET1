@@ -39,6 +39,8 @@ public:
     void SetSongPlaysTree(shared_ptr<SongPlaysNode> ptr);
 
     void SetPtrToLowestSongId(shared_ptr<SongPlaysNode> ptrToLowestSongId);
+
+    void SetPtrToListNode(shared_ptr<MostPlayedListNode> ptr);
 };
 
 typedef TreeNode<ArtistPlays> ArtistPlaysNode;
