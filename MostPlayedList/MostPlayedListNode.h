@@ -54,6 +54,8 @@ public:
     void setNext(const shared_ptr<MostPlayedListNode> &next);
 
     int getNumberOfPlays() const;
+
+    const shared_ptr<ArtistPlaysNode> &getArtistPlaysTree() const;
 };
 
 

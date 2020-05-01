@@ -107,7 +107,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
     if (node->GetData().GetNumberOfSongs() <= songID) {
         return INVALID_INPUT;
     }
-    int newNumOfPlays =node->GetData()[songID].getNumberOfPlays() + 1 ;
+    int newNumOfPlays = node->GetData()[songID].getNumberOfPlays() + 1;
     //update the number of streams at songArray
     node->GetData()[songID].setNumberOfPlays(newNumOfPlays);
 
@@ -116,9 +116,14 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
     shared_ptr<ArtistPlaysNode> artistNode = node->GetData()[songID].getPtrToArtistIdPlaysTree();
     shared_ptr<MostPlayedListNode> PlaysListNode = node->GetData()[songID].GetPtrToArtistNode()->GetData().getPtrToListNode();
 
-    //case in which there is a matching playsNode to this song
-    if(newNumOfPlays == PlaysListNode->getNext()->getNumberOfPlays()){
+    SongPlaysNode newSongNode = SongPlaysNode(songID, songNode->GetData());
 
+    //case in which there is a matching playsNode to this song
+    if (newNumOfPlays == PlaysListNode->getNext()->getNumberOfPlays()) {
+        //there is not matching artistTree to this node
+        if(PlaysListNode->getArtistPlaysTree()->Find(artistId)== nullptr){
+            ArtistPlaysNode newArtistNode = ArtistPlaysNode(artistId, artistNode->GetData());
+        }
     }
 
     //case in which we need to add 

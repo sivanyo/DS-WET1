@@ -73,6 +73,10 @@ int MostPlayedListNode::getNumberOfPlays() const {
     return this->numberOfPlays;
 }
 
+const shared_ptr<ArtistPlaysNode> &MostPlayedListNode::getArtistPlaysTree() const {
+    this->getArtistPlaysTree();
+}
+
 
 
 
