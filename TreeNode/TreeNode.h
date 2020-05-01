@@ -65,6 +65,10 @@ public:
 
     int GetBalance(const shared_ptr<TreeNode> node);
 
+    shared_ptr<TreeNode<T>> GetNextNode(const shared_ptr<TreeNode<T>> &node);
+
+    void DeleteTree (shared_ptr<TreeNode<T>> root);
+
 };
 
 #include "TreeNodeImp.h"

@@ -7,6 +7,8 @@
 
 
 #include <memory>
+#include "TreeNode.h"
+
 
 using std::shared_ptr;
 using std::make_shared;
@@ -319,6 +321,54 @@ shared_ptr<TreeNode<T>> TreeNode<T>::RightRotate(const shared_ptr<TreeNode<T>>& 
                             nodeLeft->right->GetHeight())+1);
     //return new root
     return nodeLeft;
+}
+
+
+template<class T>
+shared_ptr<TreeNode<T>> TreeNode<T>::GetNextNode(const shared_ptr<TreeNode<T>> &node) {
+    if(node->right == nullptr){
+        return FindMin(node->right);
+    }
+
+    else{
+        shared_ptr<TreeNode<T>> parent = node->GetFather();
+        while(parent!= nullptr){
+            if(parent->left == node){
+                break;
+            }
+            node=parent;
+            parent=node->father;
+        }
+        return parent;
+    }
+}
+
+template<class T>
+void TreeNode<T>::DeleteTree(shared_ptr<TreeNode<T>> root) {
+
+    if(root==nullptr){
+        return;
+    }
+
+    //reached a leaf, can delete it
+    if(root->left == nullptr & root->right == nullptr){
+        root.reset();
+    }
+
+    //remove left sub-tree
+    if(root->left != nullptr){
+        DeleteTree(root->GetLeft);
+        root.GetLeft->reset();
+    }
+
+    //remove right sub-tree
+    if(root->right != nullptr){
+        DeleteTree(root->GetRight);
+        root.GetRight()->reset();
+    }
+    root.reset();
+    return;
+
 }
 
 
