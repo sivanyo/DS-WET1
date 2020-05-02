@@ -73,6 +73,7 @@ public:
     void DeleteTree (shared_ptr<TreeNode<T>> root);
     void DeleteTree ();
 
+    T GetDataReal();
 };
 
 #include "TreeNodeImp.h"

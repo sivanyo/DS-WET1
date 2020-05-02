@@ -12,17 +12,17 @@ bool MostPlayedListNode::AddArtist(shared_ptr<ArtistPlaysNode> artistNode) {
     if (ptrToLowestArtistId) {
         // There are already artists stored in this linked list
         this->artistPlaysTree->AddNode(artistNode);
-        if (this->ptrToLowestArtistId->GetData().GetArtistId() > artistNode->GetData().GetArtistId()) {
+        if (this->ptrToLowestArtistId->GetDataReal().GetArtistId() > artistNode->GetDataReal().GetArtistId()) {
             this->ptrToLowestArtistId.reset();
             this->ptrToLowestArtistId = artistNode;
             this->ptrToLowestSongId.reset();
-            this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
+            this->ptrToLowestSongId = artistNode->GetDataReal().GetPtrToLowestSongId();
         }
         return true;
     } else {
         this->artistPlaysTree = artistNode;
         this->ptrToLowestArtistId = artistNode;
-        this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
+        this->ptrToLowestSongId = artistNode->GetDataReal().GetPtrToLowestSongId();
         return true;
     }
 }
@@ -75,8 +75,8 @@ int MostPlayedListNode::getNumberOfPlays() const {
     return this->numberOfPlays;
 }
 
-const shared_ptr<ArtistPlaysNode> &MostPlayedListNode::getArtistPlaysTree() const {
-    this->artistPlaysTree;
+shared_ptr<ArtistPlaysNode> MostPlayedListNode::getArtistPlaysTree() {
+    return this->artistPlaysTree;
 }
 
 void MostPlayedListNode::setPtrToLowestArtistId(shared_ptr<ArtistPlaysNode> ptrToLowestArtistId) {

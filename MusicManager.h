@@ -7,8 +7,8 @@
 
 
 #include "library1.h"
-#include "ArtistTree/ArtistNode.h"
 #include "MostPlayedList/MostPlayedListNode.h"
+#include "Artist/Artist.h"
 
 using std::shared_ptr;
 

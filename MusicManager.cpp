@@ -19,7 +19,7 @@ MusicManager::MusicManager() {
 
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     shared_ptr<ArtistNode> artist = make_shared<ArtistNode>(artistId, Artist(artistId, numOfSongs));
-    Artist &artistObj = artist->GetData();
+    auto artistObj = artist->GetData();
     if (numberOfArtists == 0) {
         // Create node of first artist in artist tree
         this->artistTree = artist;

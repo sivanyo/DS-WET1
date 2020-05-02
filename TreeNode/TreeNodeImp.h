@@ -7,11 +7,12 @@
 
 
 #include <memory>
+#include <math.h>
 #include "TreeNode.h"
-
 
 using std::shared_ptr;
 using std::make_shared;
+using std::max;
 
 template<class T>
 TreeNode<T>::TreeNode(int key, T data) : key(key), data(data), father(nullptr), left(nullptr), right(nullptr) {
@@ -50,6 +51,11 @@ void TreeNode<T>::SetHeight(int height) {
 template<class T>
 T &TreeNode<T>::GetData() {
     return &this->data;
+}
+
+template<class T>
+T TreeNode<T>::GetDataReal() {
+    return this->data;
 }
 
 template<class T>
@@ -254,9 +260,15 @@ int TreeNode<T>::CalcHeight(const shared_ptr<TreeNode<T>> &node) {
     return node->height;
 }
 
+template <typename T>
+bool is_uninitialized(std::weak_ptr<T> const& weak) {
+    using wt = std::weak_ptr<T>;
+    return !weak.owner_before(wt{}) && !wt{}.owner_before(weak);
+}
+
 template<class T>
 shared_ptr<TreeNode<T>> TreeNode<T>::FindRoot() {
-    if (this->father == nullptr) {
+    if (is_uninitialized(this->father)) {
         return this;
     }
 
