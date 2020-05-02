@@ -56,9 +56,11 @@ public:
 
     void SetFather (shared_ptr<TreeNode<T>> newFather);
 
-    shared_ptr<TreeNode<T>> FindMin(shared_ptr<TreeNode<T>> node);
+    bool IsOnlyRoot();
 
-    shared_ptr<TreeNode<T>> FindMax(shared_ptr<TreeNode<T>>node);
+    shared_ptr<TreeNode<T>> FindMin();
+
+    shared_ptr<TreeNode<T>> FindMax();
 
     static shared_ptr<TreeNode> LeftRotate (const shared_ptr<TreeNode>&node);
 

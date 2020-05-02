@@ -45,6 +45,7 @@ shared_ptr<SongPlaysNode> ArtistPlays::GetSongPlaysTree() {
 }
 
 void ArtistPlays::SetSongPlaysTree(shared_ptr<SongPlaysNode> ptr) {
+    SongPlaysTree.reset();
     SongPlaysTree = ptr;
 }
 

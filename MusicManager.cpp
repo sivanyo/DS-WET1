@@ -49,7 +49,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         songNode = make_shared<SongPlaysNode>(i, SongPlays(i, artistId, this->mostPlayedList));
         artistObj[i].SetPtrToSongNode(songNode);
         songsTree->AddNode(songNode);
-        if (i != numOfSongs -1) {
+        if (i != numOfSongs - 1) {
             songNode.reset();
         }
     }
@@ -73,9 +73,9 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
  * Flow of remove artist:
  * check if an artist with that ID exists,
  * go over all songs of that artist (in songs array from Artist object)
- * for each song, go to the pointer for the artistPlaysNode, delete the tree the node is pointing to
- * (that is the tree of songs of that artist with that number of plays) during this time if a song is removed, use
- * , use the pointer saved in ArtistPlaysNode
+ * for each song, go to the pointer for the artistPlaysNode, delete the node
+ * Go to the list from the pointer in the ArtistPlaysNode and change the pointers of the lowest to next lowest arist ID
+ * and his lowest song ID
  * to go to the list node and delete that artist from the tree stored in the node
  * return SUCCESS
  * @param artistId
@@ -97,16 +97,28 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         shared_ptr<SongPlaysNode> songPlaysTree = artistPlays->GetData().GetSongPlaysTree();
         // Removing the song from the tree
         songPlaysTree->RemoveNode(artistObj[i].GetSongId());
+
+        if (artistPlays->GetData().GetSongPlaysTree()->IsOnlyRoot()) {
+            artistPlays->GetData().SetSongPlaysTree(nullptr);
+        }
         shared_ptr<MostPlayedListNode> list = artistPlays->GetData().getPtrToListNode();
         if (list->GetPtrToLowestArtist() == artistPlays) {
             // The artist we are currently removing is the one with the lowest ID for this number of plays
             // Setting a new pointer to the artist with a higher ID;
             list->setPtrToLowestArtistId(artistPlays->GetFather());
-            list.setptrto
+            // Setting a new pointer to the song of this artist with the lowest ID
+            list->SetPtrToLowestSong(list->GetPtrToLowestSong()->FindMin());
         }
+        // Removing unnecessary references to shared_ptrs
+        artistPlays.reset();
+        songPlaysTree.reset();
+        list.reset();
+        artistObj[i].SetPtrToSongNode(nullptr);
+        artistObj[i].SetPtrToArtistNode(nullptr);
     }
+    // Removing unnecessary references to shared_ptrs
     artist.reset();
-    return INVALID_INPUT;
+    return SUCCESS;
 }
 
 StatusType MusicManager::AddToSongCount(int artistId, int songID) {

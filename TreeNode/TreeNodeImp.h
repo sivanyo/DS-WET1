@@ -7,6 +7,7 @@
 
 
 #include <memory>
+#include "TreeNode.h"
 
 
 using std::shared_ptr;
@@ -178,7 +179,7 @@ StatusType TreeNode<T>::RemoveNode(int key) {
         }
             //with two children case
         else {
-            shared_ptr<TreeNode<T>>(temp) = FindMin(shared_ptr<TreeNode<T>>(this));
+            shared_ptr<TreeNode<T>>(temp) = FindMin();
             this->SetKey(temp->GetKey()); //Copy the inorder successor's data to this node
             this->GetRight()->RemoveNode(temp->GetKey()); //Delete the inorder successor
         }
@@ -276,23 +277,23 @@ int TreeNode<T>::GetBalance(shared_ptr<TreeNode<T>> node) {
 }
 
 template<class T>
-shared_ptr<TreeNode<T>> TreeNode<T>::FindMax(shared_ptr<TreeNode<T>> node) {
-    if (node == nullptr)
+shared_ptr<TreeNode<T>> TreeNode<T>::FindMax() {
+    if (this == nullptr)
         return nullptr;
-    else if (node->GetLeft() == nullptr)
-        return node;
+    else if (this->GetRight() == nullptr)
+        return this;
     else
-        return FindMin(node->GetLeft());
+        return FindMax(this->GetRight());
 }
 
 template<class T>
-shared_ptr<TreeNode<T>> TreeNode<T>::FindMin(shared_ptr<TreeNode<T>> node) {
-    if (node == nullptr)
+shared_ptr<TreeNode<T>> TreeNode<T>::FindMin() {
+    if (this == nullptr)
         return nullptr;
-    else if (node->GetRight() == nullptr)
-        return node;
+    else if (this->GetLeft() == nullptr)
+        return this;
     else
-        return FindMax(node->GetRight());
+        return FindMin(this->GetLeft());
 }
 
 template<class T>
@@ -402,6 +403,11 @@ void TreeNode<T>::DeleteTree() {
     //this.reset();
     return;
 
+}
+
+template<class T>
+bool TreeNode<T>::IsOnlyRoot() {
+    return this->GetRight() == nullptr && this->GetLeft() == nullptr;
 }
 
 
