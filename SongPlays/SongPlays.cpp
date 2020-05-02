@@ -3,6 +3,7 @@
 //
 
 #include "SongPlays.h"
+#include "../Song/Song.h"
 
 SongPlays::SongPlays(int songId, int artistId, shared_ptr<MostPlayedListNode> ptrToListNode) : songId(songId), artistId(artistId),
                                                                                                ptrToListNode(ptrToListNode) {}
@@ -12,11 +13,11 @@ int SongPlays::GetSongId() const {
 }
 
 int SongPlays::GetNumberOfPlays() const {
-    return this.numberOfPlays;
+    return this->numberOfPlays;
 }
 
 int SongPlays::GetArtistId() const {
-    return this.artistId;
+    return this->artistId;
 }
 
 void SongPlays::IncrementNumberOfPlays() {
