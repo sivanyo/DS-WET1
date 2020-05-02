@@ -77,6 +77,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
  * Go to the list from the pointer in the ArtistPlaysNode and change the pointers of the lowest to next lowest arist ID
  * and his lowest song ID
  * to go to the list node and delete that artist from the tree stored in the node
+ * need to check if this artist is the last one in this linked list node
  * return SUCCESS
  * @param artistId
  * @return
@@ -91,6 +92,7 @@ StatusType MusicManager::RemoveArtist(int artistId) {
     }
     Artist &artistObj = artist->GetData();
     for (int i = 0; i < artistObj.GetNumberOfSongs(); ++i) {
+        bool songTreeNowEmpty = false;
         // Getting pointer to the artist node of the current song in the linked list with songNumberOfPlays plays
         shared_ptr<ArtistPlaysNode> artistPlays = artistObj[i].GetPtrToArtistNode();
         // Getting the song plays tree where the current song is
@@ -98,7 +100,9 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         // Removing the song from the tree
         songPlaysTree->RemoveNode(artistObj[i].GetSongId());
 
+        // FIXME: Assuming that remove Node leaves the root intact as the only member of the tree
         if (artistPlays->GetData().GetSongPlaysTree()->IsOnlyRoot()) {
+            songTreeNowEmpty = true;
             artistPlays->GetData().SetSongPlaysTree(nullptr);
         }
         shared_ptr<MostPlayedListNode> list = artistPlays->GetData().getPtrToListNode();
@@ -112,6 +116,11 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         // Removing unnecessary references to shared_ptrs
         artistPlays.reset();
         songPlaysTree.reset();
+        if (list->getArtistPlaysTree()->IsOnlyRoot() && songTreeNowEmpty) {
+            // The artist tree for this node is empty, meaning the node is now empty and can be removed
+            list->GetPrevious()->setNext(list->getNext());
+            list->getNext()->setPrevious(list->GetPrevious());
+        }
         list.reset();
         artistObj[i].SetPtrToSongNode(nullptr);
         artistObj[i].SetPtrToArtistNode(nullptr);
