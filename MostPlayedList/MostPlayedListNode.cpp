@@ -4,6 +4,8 @@
 
 #include "MostPlayedListNode.h"
 
+#include <utility>
+
 MostPlayedListNode::MostPlayedListNode(int numOfPlays) {
     this->numberOfPlays = numOfPlays;
 }
@@ -28,36 +30,36 @@ bool MostPlayedListNode::AddArtist(shared_ptr<ArtistPlaysNode> artistNode) {
 }
 
 shared_ptr<ArtistPlaysNode> MostPlayedListNode::GetPtrToLowestArtist() {
-    return shared_ptr<ArtistPlaysNode>();
+    return this->ptrToLowestArtistId;
 }
 
 void MostPlayedListNode::SetPtrToLowestArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode) {
-
+    this->ptrToLowestArtistId = (artistPlaysNode);
 }
 
 
 void MostPlayedListNode::SetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysNode) {
-
+    this->ptrToLowestSongId=(songPlaysNode);
 }
 
 
 MostPlayedListNode::MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous) {
     this->numberOfPlays = numOfPlays;
-    this->previous = previous;
+    this->previous = (previous);
     this->next = nullptr;
 }
 
 MostPlayedListNode::MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous, shared_ptr<MostPlayedListNode> next) {
     this->numberOfPlays = numOfPlays;
-    this->previous = previous;
-    this->next = next;
+    this->previous = (previous);
+    this->next = (next);
 }
 
 shared_ptr<MostPlayedListNode> MostPlayedListNode::GetPrevious() {
     return this->previous;
 }
 
-void MostPlayedListNode::setPrevious(const shared_ptr<MostPlayedListNode> &previous) {
+void MostPlayedListNode::setPrevious(shared_ptr<MostPlayedListNode> previous) {
     MostPlayedListNode::previous = previous;
 }
 
@@ -65,7 +67,7 @@ const shared_ptr<MostPlayedListNode> &MostPlayedListNode::getNext() const {
     return this->next;
 }
 
-void MostPlayedListNode::setNext(const shared_ptr<MostPlayedListNode> &next) {
+void MostPlayedListNode::setNext(shared_ptr<MostPlayedListNode> next) {
     MostPlayedListNode::next = next;
 }
 
@@ -74,14 +76,14 @@ int MostPlayedListNode::getNumberOfPlays() const {
 }
 
 const shared_ptr<ArtistPlaysNode> &MostPlayedListNode::getArtistPlaysTree() const {
-    this->getArtistPlaysTree();
+    this->artistPlaysTree;
 }
 
 void MostPlayedListNode::setPtrToLowestArtistId(shared_ptr<ArtistPlaysNode> ptrToLowestArtistId) {
-    MostPlayedListNode::ptrToLowestArtistId = ptrToLowestArtistId;
+    MostPlayedListNode::ptrToLowestArtistId = (ptrToLowestArtistId);
 }
 
-
-
-
+shared_ptr<SongPlaysNode> MostPlayedListNode::GetPtrToLowestSong() {
+    return this->ptrToLowestSongId;
+}
 

@@ -16,9 +16,9 @@ private:
     shared_ptr<SongPlaysNode> ptrToSongNodeInPlaysTree = nullptr;
 public:
     Song();
-    Song(int songId);
+    explicit Song(int songId);
 
-    int GetSongId();
+    int GetSongId() const;
     void SetSongId(int id);
 
     shared_ptr<ArtistPlaysNode> GetPtrToArtistNode();
