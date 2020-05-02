@@ -109,7 +109,6 @@ StatusType MusicManager::RemoveArtist(int artistId) {
     return INVALID_INPUT;
 }
 
-//todo :: fix most recommended ptr-s
 StatusType MusicManager::AddToSongCount(int artistId, int songID) {
     shared_ptr<ArtistNode> node = this->artistTree->Find(artistId);
     if (node == nullptr) {
@@ -133,58 +132,85 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
     //case in which there is a matching playsNode to this song
     if (newNumOfPlays == PlaysListNode->getNext()->getNumberOfPlays()) {
         //there is not matching artistTree to this node
-        if (PlaysListNode->getArtistPlaysTree()->Find(artistId) == nullptr) {
+        if (PlaysListNode->getNext()->getArtistPlaysTree()->Find(artistId) == nullptr) {
             ArtistPlaysNode newArtistNode = ArtistPlaysNode(artistId, artistNode->GetData());
             shared_ptr<ArtistPlaysNode> newPtrToArtistNode = make_shared<ArtistPlaysNode>(newArtistNode);
-            PlaysListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
+            PlaysListNode->getNext()->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
             newPtrToArtistNode->GetData().GetSongPlaysTree()->AddNode(newPtrToSongNode);
-            //we have a new lowest artistID
+            node->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
+            //we have a new lowest artistID, and new lowet songID
             if (PlaysListNode->GetPtrToLowestArtist()->GetData().GetArtistId() > artistId) {
                 PlaysListNode->setPtrToLowestArtistId(newPtrToArtistNode);
-            }
-            //we have a new lowest songID
-            if (PlaysListNode->GetPtrToLowestSong()->GetData().GetSongId() > songID) {
                 PlaysListNode->SetPtrToLowestSong(newPtrToSongNode);
-                //todo - change in artistPlays too
+                //this is the last playsListNode, so it contains the most recommended songs
+                if (PlaysListNode->getNext() == nullptr) {
+                    this->ptrToMostRecommended = PlaysListNode;
+                }
             }
+            node->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
         }
             //a matching artistTree is already exist
         else {
-            PlaysListNode->getArtistPlaysTree()->Find(artistId)->GetData().GetSongPlaysTree()->AddNode(newPtrToSongNode);
+            PlaysListNode->getArtistPlaysTree()->Find(artistId)->GetData().GetSongPlaysTree()->AddNode(
+                    newPtrToSongNode);
+            node->GetData().operator[](songID).SetPtrToArtistNode(PlaysListNode->getArtistPlaysTree()->Find(artistId));
             //we have a new lowest songID
-            if (PlaysListNode->GetPtrToLowestSong()->GetData().GetSongId() > songID) {
-                PlaysListNode->SetPtrToLowestSong(newPtrToSongNode);
-                //todo - change in artistPlays too
+            if (PlaysListNode->getArtistPlaysTree()->Find(
+                    artistId)->GetData().GetPtrToLowestSongId()->GetData().GetSongId() > songID) {
+                PlaysListNode->getArtistPlaysTree()->Find(artistId)->GetData().SetPtrToLowestSongId(newPtrToSongNode);
+                //this is the last playsListNode, so it contains the most recommended songs
+                if (PlaysListNode->getNext() == nullptr) {
+                    this->ptrToMostRecommended = PlaysListNode;
+                }
             }
         }
     }
-        //need to create new SongsPlayNode, it will always be after the cuurent node
+        //need to create new SongsPlayNode, it will always be after the current node
     else {
         MostPlayedListNode newPlayListNode = MostPlayedListNode(newNumOfPlays, PlaysListNode, PlaysListNode->getNext());
         shared_ptr<MostPlayedListNode> newPtrToListNode = make_shared<MostPlayedListNode>(newPlayListNode);
+        //that was the last link in the list, now we have a new one
+        if (PlaysListNode->getNext() == nullptr) {
+            this->ptrToMostRecommended = newPtrToListNode;
+        } else {
+            PlaysListNode->getNext()->setPrevious(newPtrToListNode);
+        }
         PlaysListNode->setNext(newPtrToListNode);
         ArtistPlaysNode newArtistNode = ArtistPlaysNode(artistId, artistNode->GetData());
         shared_ptr<ArtistPlaysNode> newPtrToArtistNode = make_shared<ArtistPlaysNode>(newArtistNode);
         PlaysListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
         newPtrToArtistNode->GetData().GetSongPlaysTree()->AddNode(newPtrToSongNode);
-        //we have a new most recommended song
-        if (newPtrToListNode->getNext() == nullptr) {
-            this->ptrToMostRecommended = newPtrToListNode;
-            newPlayListNode.SetPtrToLowestSong(newPtrToSongNode);
-            newPlayListNode.setPtrToLowestArtistId(newPtrToArtistNode);
-            //todo - change in artistPlays too
+        PlaysListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
+        newPlayListNode.SetPtrToLowestSong(newPtrToSongNode);
+        newPlayListNode.setPtrToLowestArtistId(newPtrToArtistNode);
+        newPtrToArtistNode->GetData().SetPtrToLowestSongId(newPtrToSongNode);
+        node->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
+    }
+
+    //the song was alone in the artistPlaysTree, we  need to delete the artistPlaysTree
+    if (songNode->GetRight() == nullptr && songNode->GetLeft() == nullptr && songNode->GetFather() == nullptr) {
+        //the artist is alone in the MostPlaysListNode we need to remove the link
+        if (artistNode->GetRight() == nullptr && artistNode->GetLeft() == nullptr &&
+            artistNode->GetFather() == nullptr) {
+            artistNode->RemoveNode(songID);
+            PlaysListNode->getArtistPlaysTree()->DeleteTree(artistNode);
+            PlaysListNode->GetPrevious()->setNext(PlaysListNode->getNext());
+            if (PlaysListNode->getNext() != nullptr) {
+                PlaysListNode->getNext()->setPrevious(PlaysListNode->GetPrevious());
+            }
+            PlaysListNode.reset();
+        }
+            //there are more artists in this artistsPlaysNode
+        else {
+            artistNode->RemoveNode(songID);
+            PlaysListNode->getArtistPlaysTree()->RemoveNode(artistId);
         }
     }
-    //need to remove the prev songNode and artistNode
-    if (PlaysListNode->GetPtrToLowestArtist()->GetData().GetArtistId() == artistId) {
-        PlaysListNode->setPtrToLowestArtistId(artistNode->GetNextNode(artistNode));
+        //there are more songs in the ArtistsPlaysTree
+    else {
+        artistNode->RemoveNode(songID);
     }
-    PlaysListNode->getArtistPlaysTree()->RemoveNode(artistId);
-    if (PlaysListNode->GetPtrToLowestSong()->GetData().GetSongId() == songID) {
-        PlaysListNode->SetPtrToLowestSong(songNode->GetNextNode(songNode));
-    }
-    PlaysListNode->getArtistPlaysTree()->GetData().GetSongPlaysTree()->RemoveNode(songID);
-
+    node->GetData().operator[](songID).SetPtrToSongNode(newPtrToSongNode);
     return SUCCESS;
 }
 

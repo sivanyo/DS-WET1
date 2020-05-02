@@ -11,7 +11,7 @@ Song::Song(int songId) {
     this->songId = songId;
 }
 
-int Song::GetSongId() {
+int Song::GetSongId() const {
     return songId;
 }
 

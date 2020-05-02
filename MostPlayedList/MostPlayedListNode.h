@@ -27,7 +27,7 @@ private:
 
 public:
     // Create the first node in the list (0 plays)
-    MostPlayedListNode(int numOfPlays);
+    explicit MostPlayedListNode(int numOfPlays);
 
     // Create a new node with a new highest number of plays
     MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous);
@@ -47,11 +47,11 @@ public:
 
     shared_ptr<MostPlayedListNode> GetPrevious();
 
-    void setPrevious(const shared_ptr<MostPlayedListNode> &previous);
+    void setPrevious(shared_ptr<MostPlayedListNode> previous);
 
     const shared_ptr<MostPlayedListNode> &getNext() const;
 
-    void setNext(const shared_ptr<MostPlayedListNode> &next);
+    void setNext(shared_ptr<MostPlayedListNode> next);
 
     int getNumberOfPlays() const;
 

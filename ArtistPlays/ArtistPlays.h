@@ -23,7 +23,7 @@ private:
     shared_ptr<SongPlaysNode> ptrToLowestSongId;
     shared_ptr<MostPlayedListNode> ptrToListNode;
 public:
-    ArtistPlays(int artistId);
+    explicit ArtistPlays(int artistId);
     ArtistPlays(int artistId, shared_ptr<MostPlayedListNode> ptrToListNode);
     ArtistPlays(int artistId, shared_ptr<SongPlaysNode> ptrToSongPlaysTree, shared_ptr<SongPlaysNode> ptrToLowestSongId,
                     shared_ptr<MostPlayedListNode> ptrToListNode);
