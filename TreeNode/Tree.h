@@ -17,6 +17,62 @@ using std::weak_ptr;
 
 // TODO: sivan remembers in binary(carry), to change the names of these template vars
 
+class Tree {
+protected:
+    // A pointer to the root `node` of the tree. If this is null, then the tree is empty.
+    shared_ptr<Node<K, V>> root;
+public:
+
+    void insert(const K &key, const V &value);
+
+    /**
+     * Adds a new key-value pair to the tree and returns a pointer to it
+     * @param key The key
+     * @param value The value associated with the key
+     * @return A shared_ptr to the node in the tree
+     */
+    shared_ptr<Node<K, V>> insertGetBack(const K &key, const V &value);
+
+    /**
+     * Find a node with the given key and return a pointer to it
+     * @param key The key of the node to get
+     * @return A shared_ptr to the node in the tree
+     */
+    shared_ptr<Node<K, V>> getNode(const K &key);
+
+    // Find the value associated with a given key. Returns an `optional` struct since the key isn't
+    // guaranteed to be present in the tree.
+    V get(const K &key) const;
+
+    // Check if a node exists in the tree with a given value. Returns true if it does, false
+    // otherwise.
+    bool exists(const K &key) const;
+
+    // Remove node from the tree with given key. Doesn't matter if the node isn't there.
+    void remove(const K &key);
+
+    // After deletion retrace from this node back to the root, check for imbalance and correct it.
+    // The balance_factor_change argument indicates which side the child of the subtree root had
+    // a child removed.
+    void _retrace_deletion(shared_ptr<Node<K, V>> subtree_root, int balance_factor_change);
+
+    // Perform a left rotation to rebablance a subtree rooted at old_subtree_root, returning
+    // a pointer to the new root of the subtree.
+    shared_ptr<Node<K, V>> _left_rotate(shared_ptr<Node<K, V>> old_subtree_root);
+
+    // Perform a right rotation to rebablance a subtree rooted at old_subtree_root, returning
+    // a pointer to the new root of the subtree.
+    shared_ptr<Node<K, V>> _right_rotate(shared_ptr<Node<K, V>> old_subtree_root);
+
+    // Perform a left-right rotation to rebablance a subtree rooted at old_subtree_root, returning
+    // a pointer to the new root of the subtree.
+    shared_ptr<Node<K, V>> _left_right_rotate(shared_ptr<Node<K, V>> old_subtree_root);
+
+    // Perform a right-left rotation to rebablance a subtree rooted at old_subtree_root, returning
+    // a pointer to the new root of the subtree.
+    shared_ptr<Node<K, V>> _right_left_rotate(shared_ptr<Node<K, V>> old_subtree_root);
+};
+
 template<typename K, class V>
 class Node {
 public:
@@ -63,63 +119,6 @@ public:
 
     // After insertion retrace from this node back to the root, check for imbalance and correct it.
     static void _retrace_insertion(shared_ptr<Node<K, V>> inserted_node);
-
-    class Tree {
-    protected:
-        // A pointer to the root `node` of the tree. If this is null, then the tree is empty.
-        shared_ptr<Node<K, V>> root;
-    public:
-
-        void insert(const K &key, const V &value);
-
-        /**
-         * Adds a new key-value pair to the tree and returns a pointer to it
-         * @param key The key
-         * @param value The value associated with the key
-         * @return A shared_ptr to the node in the tree
-         */
-        shared_ptr<Node<K, V>> insertGetBack(const K &key, const V &value);
-
-        /**
-         * Find a node with the given key and return a pointer to it
-         * @param key The key of the node to get
-         * @return A shared_ptr to the node in the tree
-         */
-        shared_ptr<Node<K, V>> getNode(const K &key);
-
-        // Find the value associated with a given key. Returns an `optional` struct since the key isn't
-        // guaranteed to be present in the tree.
-        V get(const K &key) const;
-
-        // Check if a node exists in the tree with a given value. Returns true if it does, false
-        // otherwise.
-        bool exists(const K &key) const;
-
-        // Remove node from the tree with given key. Doesn't matter if the node isn't there.
-        void remove(const K &key);
-
-        // After deletion retrace from this node back to the root, check for imbalance and correct it.
-        // The balance_factor_change argument indicates which side the child of the subtree root had
-        // a child removed.
-        void _retrace_deletion(shared_ptr<Node<K, V>> subtree_root, int balance_factor_change);
-
-        // Perform a left rotation to rebablance a subtree rooted at old_subtree_root, returning
-        // a pointer to the new root of the subtree.
-        shared_ptr<Node<K, V>> _left_rotate(shared_ptr<Node<K, V>> old_subtree_root);
-
-        // Perform a right rotation to rebablance a subtree rooted at old_subtree_root, returning
-        // a pointer to the new root of the subtree.
-        shared_ptr<Node<K, V>> _right_rotate(shared_ptr<Node<K, V>> old_subtree_root);
-
-        // Perform a left-right rotation to rebablance a subtree rooted at old_subtree_root, returning
-        // a pointer to the new root of the subtree.
-        shared_ptr<Node<K, V>> _left_right_rotate(shared_ptr<Node<K, V>> old_subtree_root);
-
-        // Perform a right-left rotation to rebablance a subtree rooted at old_subtree_root, returning
-        // a pointer to the new root of the subtree.
-        shared_ptr<Node<K, V>> _right_left_rotate(shared_ptr<Node<K, V>> old_subtree_root);
-    };
-
 };
 
 /**

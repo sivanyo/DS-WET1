@@ -6,6 +6,7 @@
 #define WET1_ARTIST_H
 
 #include <memory>
+#include "../TreeNode/Tree.h"
 #include "../Song/Song.h"
 
 using std::unique_ptr;
@@ -28,7 +29,5 @@ public:
 
     Song operator[](int index) const;
 };
-
-typedef AvlTree<int, Artist> ArtistNode;
 
 #endif //WET1_ARTIST_H

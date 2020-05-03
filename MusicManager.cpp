@@ -3,7 +3,7 @@
 //
 
 #include <memory>
-#include "TreeNode/TreeNode.h"
+#include "TreeNode/Tree.h"
 #include "Artist/Artist.h"
 #include "MusicManager.h"
 
