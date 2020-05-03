@@ -5,11 +5,7 @@
 #ifndef WET1_SONGPLAYS_H
 #define WET1_SONGPLAYS_H
 
-#include <memory>
 #include "../TreeNode/TreeNode.h"
-
-using std::shared_ptr;
-using std::make_shared;
 
 class MostPlayedListNode;
 
@@ -18,21 +14,25 @@ private:
     int songId;
     int numberOfPlays = 0;
     int artistId;
-    shared_ptr<MostPlayedListNode> ptrToListNode;
+    MostPlayedListNode *ptrToListNode;
 public:
-    SongPlays(int songId, int artistId, shared_ptr<MostPlayedListNode> ptrToListNode);
+    SongPlays(int songId, int artistId, MostPlayedListNode *ptrToListNode);
 
-    int GetSongId() const;
+    int getSongId() const;
 
-    int GetNumberOfPlays() const;
+    int getArtistId() const;
 
-    int GetArtistId() const;
+    int getNumberOfPlays() const;
 
-    void IncrementNumberOfPlays();
+    void setNumberOfPlays(int numberOfPlays);
 
-    shared_ptr<MostPlayedListNode> GetPtrToListNode();
+    void incrementNumberOfPlays();
 
-    void SetPtrToListNode(shared_ptr<MostPlayedListNode> listNode);
+    MostPlayedListNode *getPtrToListNode() const;
+
+    void setPtrToListNode(MostPlayedListNode *ptr);
+
+
 };
 
 typedef TreeNode<SongPlays> SongPlaysNode;

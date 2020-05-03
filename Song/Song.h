@@ -12,33 +12,31 @@ class Song {
 private:
     int songId;
     int numberOfPlays = 0;
-    shared_ptr<ArtistPlaysNode> ptrToArtistIdPlaysTree = nullptr;
-    shared_ptr<SongPlaysNode> ptrToSongNodeInPlaysTree = nullptr;
+    ArtistPlaysNode *ptrToArtistIdPlaysTree = nullptr;
+    SongPlaysNode *ptrToSongNodeInPlaysTree = nullptr;
 public:
     Song();
+
     explicit Song(int songId);
 
-    int GetSongId() const;
+    int getSongId() const;
+
     void SetSongId(int id);
-
-    shared_ptr<ArtistPlaysNode> GetPtrToArtistNode();
-    void SetPtrToArtistNode(shared_ptr<ArtistPlaysNode> ptr);
-
-    shared_ptr<SongPlaysNode> GetPtrToSongNode();
-    void SetPtrToSongNode(shared_ptr<SongPlaysNode> ptr);
 
     int getNumberOfPlays() const;
 
-    void setNumberOfPlays(int numberOfPlays);
+    void setNumberOfPlays(int plays);
 
-    const shared_ptr<ArtistPlaysNode> &getPtrToArtistIdPlaysTree() const;
+    void incrementNumberOfPlays();
 
-    const shared_ptr<SongPlaysNode> &getPtrToSongNodeInPlaysTree() const;
+    ArtistPlaysNode *getPtrToArtistIdPlaysTree() const;
 
+    void setPtrToArtistIdPlaysTree(ArtistPlaysNode *ptr);
 
+    SongPlaysNode *getPtrToSongNodeInPlaysTree() const;
+
+    void setPtrToSongNodeInPlaysTree(SongPlaysNode *ptr);
 };
-
-
 
 
 #endif //WET1_SONG_H

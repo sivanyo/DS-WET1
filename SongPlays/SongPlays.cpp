@@ -5,30 +5,33 @@
 #include "SongPlays.h"
 #include "../Song/Song.h"
 
-SongPlays::SongPlays(int songId, int artistId, shared_ptr<MostPlayedListNode> ptrToListNode) : songId(songId), artistId(artistId),
-                                                                                               ptrToListNode(ptrToListNode) {}
+SongPlays::SongPlays(int songId, int artistId, MostPlayedListNode *ptrToListNode) :
+        songId(songId), artistId(artistId), ptrToListNode(ptrToListNode) {}
 
-int SongPlays::GetSongId() const {
-    return this->songId;
+int SongPlays::getSongId() const {
+    return songId;
 }
 
-int SongPlays::GetNumberOfPlays() const {
-    return this->numberOfPlays;
+int SongPlays::getArtistId() const {
+    return artistId;
 }
 
-int SongPlays::GetArtistId() const {
-    return this->artistId;
+int SongPlays::getNumberOfPlays() const {
+    return numberOfPlays;
 }
 
-void SongPlays::IncrementNumberOfPlays() {
+void SongPlays::setNumberOfPlays(int numberOfPlays) {
+    SongPlays::numberOfPlays = numberOfPlays;
+}
+
+void SongPlays::incrementNumberOfPlays() {
     this->numberOfPlays++;
 }
 
-shared_ptr<MostPlayedListNode> SongPlays::GetPtrToListNode() {
-    return this->ptrToListNode;
+MostPlayedListNode *SongPlays::getPtrToListNode() const {
+    return ptrToListNode;
 }
 
-void SongPlays::SetPtrToListNode(shared_ptr<MostPlayedListNode> listNode) {
-    this->ptrToListNode.reset();
-    this->ptrToListNode = listNode;
+void SongPlays::setPtrToListNode(MostPlayedListNode *ptr) {
+    ptrToListNode = ptr;
 }

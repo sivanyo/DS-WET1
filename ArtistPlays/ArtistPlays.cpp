@@ -6,51 +6,39 @@
 
 ArtistPlays::ArtistPlays(int artistId) : artistId(artistId) {}
 
-ArtistPlays::ArtistPlays(int artistId, shared_ptr<SongPlaysNode> ptrToSongPlaysTree, shared_ptr<SongPlaysNode> ptrToLowestSongId,
-                         shared_ptr<MostPlayedListNode> ptrToListNode) {
-    this->artistId = artistId;
-    this->SongPlaysTree = ptrToSongPlaysTree;
-    this->ptrToLowestSongId = ptrToLowestSongId;
-    this->ptrToListNode = ptrToListNode;
+ArtistPlays::ArtistPlays(int artistId, MostPlayedListNode *ptrToListNode) : artistId(artistId), ptrToListNode(ptrToListNode) {
+
 }
 
-ArtistPlays::ArtistPlays(int artistId, shared_ptr<MostPlayedListNode> ptrToListNode) : artistId(artistId), ptrToListNode(ptrToListNode) {
+ArtistPlays::ArtistPlays(int artistId, SongPlaysNode *SongPlaysTree, SongPlaysNode *ptrToLowestSongId, MostPlayedListNode *ptrToListNode)
+        : artistId(artistId), SongPlaysTree(SongPlaysTree), ptrToLowestSongId(ptrToLowestSongId), ptrToListNode(ptrToListNode) {
+
 }
 
-int ArtistPlays::GetArtistId() {
+int ArtistPlays::getArtistId() const {
     return this->artistId;
 }
 
-const shared_ptr<SongPlaysNode> &ArtistPlays::GetPtrToLowestSongId() const {
-    return ptrToLowestSongId;
-}
-
-//void ArtistPlays::SetPtrToLowestSongId(const shared_ptr<SongPlaysNode> &ptrToLowestSongId) {
-//    this->ptrToLowestSongId.reset();
-//    this->ptrToLowestSongId = ptrToLowestSongId;
-//}
-
-void ArtistPlays::SetPtrToLowestSongId(shared_ptr<SongPlaysNode> ptrToLowestSongId) {
-    this->ptrToLowestSongId.reset();
-    this->ptrToLowestSongId = ptrToLowestSongId;
-}
-
-
-const shared_ptr<MostPlayedListNode> &ArtistPlays::getPtrToListNode() const {
-    return this->ptrToListNode;
-}
-
-shared_ptr<SongPlaysNode> ArtistPlays::GetSongPlaysTree() {
+SongPlaysNode *ArtistPlays::getSongPlaysTree() const {
     return SongPlaysTree;
 }
 
-void ArtistPlays::SetSongPlaysTree(shared_ptr<SongPlaysNode> ptr) {
-    SongPlaysTree.reset();
-    SongPlaysTree = ptr;
+void ArtistPlays::setSongPlaysTree(SongPlaysNode *songPlaysTree) {
+    SongPlaysTree = songPlaysTree;
 }
 
+SongPlaysNode *ArtistPlays::getPtrToLowestSongId() const {
+    return ptrToLowestSongId;
+}
 
-void ArtistPlays::SetPtrToListNode(shared_ptr<MostPlayedListNode> ptr) {
-    ptrToListNode.reset();
-    ptrToListNode = ptr;
+void ArtistPlays::setPtrToLowestSongId(SongPlaysNode *ptrToLowestSongId) {
+    ArtistPlays::ptrToLowestSongId = ptrToLowestSongId;
+}
+
+MostPlayedListNode *ArtistPlays::getPtrToListNode() const {
+    return ptrToListNode;
+}
+
+void ArtistPlays::setPtrToListNode(MostPlayedListNode *ptrToListNode) {
+    ArtistPlays::ptrToListNode = ptrToListNode;
 }

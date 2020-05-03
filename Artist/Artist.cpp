@@ -4,27 +4,28 @@
 
 #include "Artist.h"
 
-Artist::Artist(int artistId, int numOfSongs): artistId(artistId), numberOfSongs(numOfSongs) {
+Artist::Artist(int artistId, int numOfSongs) : artistId(artistId), numberOfSongs(numOfSongs) {
     if (numOfSongs != 0) {
-        this->artistSongs = unique_ptr<Song[]>(new Song[numOfSongs]);
-        for (int i = 0; i < numOfSongs; ++i) {
-            artistSongs[i].SetSongId(i);
+        this->artistSongs = new Song[numOfSongs];
+        if (this->artistSongs) {
+            for (int i = 0; i < numOfSongs; ++i) {
+                artistSongs[i].SetSongId(i);
+            }
         }
     }
 }
 
-int Artist::GetArtistId() {
-    return this->artistId;
+int Artist::getArtistId() const {
+    return artistId;
 }
 
-void Artist::SetArtistId(int artistId) {
-    Artist::artistId = artistId;
+void Artist::setArtistId(int id) {
+    artistId = id;
 }
 
-int Artist::GetNumberOfSongs() {
+int Artist::getNumberOfSongs() const {
     return numberOfSongs;
 }
-
 
 Song &Artist::operator[](int index) {
     return artistSongs[index];
@@ -33,3 +34,8 @@ Song &Artist::operator[](int index) {
 Song Artist::operator[](int index) const {
     return artistSongs[index];
 }
+
+Artist::~Artist() {
+    delete this->artistSongs;
+}
+

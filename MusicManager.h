@@ -14,9 +14,9 @@ using std::shared_ptr;
 
 class MusicManager {
 private:
-    shared_ptr<ArtistNode> artistTree;
-    shared_ptr<MostPlayedListNode> mostPlayedList;
-    shared_ptr<MostPlayedListNode> ptrToMostRecommended;
+    ArtistNode* artistTree;
+    MostPlayedListNode* mostPlayedList;
+    MostPlayedListNode* ptrToMostRecommended;
     int numberOfArtists = 0;
     int numberOfSongs = 0;
 public:

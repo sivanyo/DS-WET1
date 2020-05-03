@@ -11,7 +11,7 @@ Song::Song(int songId) {
     this->songId = songId;
 }
 
-int Song::GetSongId() const {
+int Song::getSongId() const {
     return songId;
 }
 
@@ -19,34 +19,30 @@ void Song::SetSongId(int id) {
     songId = id;
 }
 
-shared_ptr<ArtistPlaysNode> Song::GetPtrToArtistNode() {
-    return this->ptrToArtistIdPlaysTree;
-}
-
-void Song::SetPtrToArtistNode(shared_ptr<ArtistPlaysNode> ptr) {
-    ptrToArtistIdPlaysTree = ptr;
-}
-
-shared_ptr<SongPlaysNode> Song::GetPtrToSongNode() {
-    return this->ptrToSongNodeInPlaysTree;
-}
-
-void Song::SetPtrToSongNode(shared_ptr<SongPlaysNode> ptr) {
-    ptrToSongNodeInPlaysTree = ptr;
-}
-
 int Song::getNumberOfPlays() const {
     return this->numberOfPlays;
 }
 
-void Song::setNumberOfPlays(int numberOfPlays) {
-    this->numberOfPlays=numberOfPlays;
+void Song::setNumberOfPlays(int plays) {
+    this->numberOfPlays = plays;
 }
 
-const shared_ptr<ArtistPlaysNode> &Song::getPtrToArtistIdPlaysTree() const {
-    return this->ptrToArtistIdPlaysTree;
+void Song::incrementNumberOfPlays() {
+    numberOfPlays++;
 }
 
-const shared_ptr<SongPlaysNode> &Song::getPtrToSongNodeInPlaysTree() const {
-    return this->ptrToSongNodeInPlaysTree;
+ArtistPlaysNode *Song::getPtrToArtistIdPlaysTree() const {
+    return ptrToArtistIdPlaysTree;
+}
+
+void Song::setPtrToArtistIdPlaysTree(ArtistPlaysNode *ptr) {
+    ptrToArtistIdPlaysTree = ptr;
+}
+
+SongPlaysNode *Song::getPtrToSongNodeInPlaysTree() const {
+    return ptrToSongNodeInPlaysTree;
+}
+
+void Song::setPtrToSongNodeInPlaysTree(SongPlaysNode *ptr) {
+    ptrToSongNodeInPlaysTree = ptr;
 }

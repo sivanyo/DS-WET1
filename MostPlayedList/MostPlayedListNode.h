@@ -5,59 +5,54 @@
 #ifndef WET1_MOSTPLAYEDLISTNODE_H
 #define WET1_MOSTPLAYEDLISTNODE_H
 
-#include <memory>
 #include "../ArtistPlays/ArtistPlays.h"
 #include "../SongPlays/SongPlays.h"
 
-using std::shared_ptr;
-using std::make_shared;
-
 typedef TreeNode<ArtistPlays> ArtistPlaysNode;
-
-//typedef TreeNode<SongPlays> SongPlaysNode;
 
 class MostPlayedListNode {
 private:
     int numberOfPlays;
-    shared_ptr<ArtistPlaysNode> artistPlaysTree;
-    shared_ptr<ArtistPlaysNode> ptrToLowestArtistId;
-    shared_ptr<SongPlaysNode> ptrToLowestSongId;
-    shared_ptr<MostPlayedListNode> previous;
-    shared_ptr<MostPlayedListNode> next;
+    ArtistPlaysNode* artistPlaysTree = nullptr;
+    ArtistPlaysNode* ptrToLowestArtistId = nullptr;
+    SongPlaysNode* ptrToLowestSongId = nullptr;
+    MostPlayedListNode* previous = nullptr;
+    MostPlayedListNode* next = nullptr;
 
 public:
     // Create the first node in the list (0 plays)
     explicit MostPlayedListNode(int numOfPlays);
 
     // Create a new node with a new highest number of plays
-    MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous);
+    MostPlayedListNode(int numOfPlays, MostPlayedListNode* previous);
 
     // Create a new node with a number of plays between to values (1<2<3)
-    MostPlayedListNode(int numOfPlays, shared_ptr<MostPlayedListNode> previous, shared_ptr<MostPlayedListNode> next);
+    MostPlayedListNode(int numOfPlays, MostPlayedListNode* previous, MostPlayedListNode* next);
 
-    bool AddArtist(shared_ptr<ArtistPlaysNode> artistNode);
+    ArtistPlaysNode *getArtistPlaysTree() const;
 
-    shared_ptr<ArtistPlaysNode> GetPtrToLowestArtist();
+    void setArtistPlaysTree(ArtistPlaysNode *artistPlaysTree);
 
-    void SetPtrToLowestArtist(shared_ptr<ArtistPlaysNode> artistPlaysNode);
+    bool AddArtist(ArtistPlaysNode* artistNode);
 
-    shared_ptr<SongPlaysNode> GetPtrToLowestSong();
 
-    void SetPtrToLowestSong(shared_ptr<SongPlaysNode> songPlaysNode);
+    ArtistPlaysNode *getPtrToLowestArtistId() const;
 
-    shared_ptr<MostPlayedListNode> GetPrevious();
+    void setPtrToLowestArtistId(ArtistPlaysNode *ptr);
 
-    void setPrevious(shared_ptr<MostPlayedListNode> previous);
+    SongPlaysNode *getPtrToLowestSongId() const;
 
-    const shared_ptr<MostPlayedListNode> &getNext() const;
+    void setPtrToLowestSongId(SongPlaysNode *ptr);
 
-    void setNext(shared_ptr<MostPlayedListNode> next);
+    MostPlayedListNode *getPrevious() const;
 
-    int getNumberOfPlays() const;
+    void setPrevious(MostPlayedListNode *previous);
 
-    shared_ptr<ArtistPlaysNode> getArtistPlaysTree();
+    MostPlayedListNode *getNext() const;
 
-    void setPtrToLowestArtistId(shared_ptr<ArtistPlaysNode> ptrToLowestArtistId);
+    void setNext(MostPlayedListNode *next);
+
+    ~MostPlayedListNode();
 };
 
 

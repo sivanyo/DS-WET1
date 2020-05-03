@@ -5,28 +5,27 @@
 #ifndef WET1_ARTIST_H
 #define WET1_ARTIST_H
 
-#include <memory>
 #include "../Song/Song.h"
-
-using std::unique_ptr;
 
 class Artist {
 private:
     int artistId;
     int numberOfSongs;
-    unique_ptr<Song[]> artistSongs;
+    Song* artistSongs;
 public:
     Artist(int artistId, int numOfSongs);
 
-    int GetArtistId();
+    int getArtistId() const;
 
-    void SetArtistId(int artistId);
+    void setArtistId(int id);
 
-    int GetNumberOfSongs();
+    int getNumberOfSongs() const;
 
     Song &operator[](int index);
 
     Song operator[](int index) const;
+
+    ~Artist();
 };
 
 typedef TreeNode<Artist> ArtistNode;

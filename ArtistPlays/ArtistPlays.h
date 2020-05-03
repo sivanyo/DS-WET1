@@ -5,12 +5,8 @@
 #ifndef WET1_ARTISTPLAYS_H
 #define WET1_ARTISTPLAYS_H
 
-#include <memory>
 #include "../TreeNode/TreeNode.h"
 #include "../SongPlays/SongPlays.h"
-
-using std::shared_ptr;
-using std::make_shared;
 
 //class SongPlaysNode;
 
@@ -19,28 +15,28 @@ class MostPlayedListNode;
 class ArtistPlays {
 private:
     int artistId;
-    shared_ptr<SongPlaysNode> SongPlaysTree;
-    shared_ptr<SongPlaysNode> ptrToLowestSongId;
-    shared_ptr<MostPlayedListNode> ptrToListNode;
+    SongPlaysNode* SongPlaysTree = nullptr;
+    SongPlaysNode* ptrToLowestSongId = nullptr;
+    MostPlayedListNode* ptrToListNode = nullptr;
 public:
     explicit ArtistPlays(int artistId);
-    ArtistPlays(int artistId, shared_ptr<MostPlayedListNode> ptrToListNode);
-    ArtistPlays(int artistId, shared_ptr<SongPlaysNode> ptrToSongPlaysTree, shared_ptr<SongPlaysNode> ptrToLowestSongId,
-                    shared_ptr<MostPlayedListNode> ptrToListNode);
+    ArtistPlays(int artistId, MostPlayedListNode* ptrToListNode);
+    ArtistPlays(int artistId, SongPlaysNode* SongPlaysTree, SongPlaysNode* ptrToLowestSongId,
+                    MostPlayedListNode* ptrToListNode);
 
-    const shared_ptr<SongPlaysNode> &GetPtrToLowestSongId() const;
+    int getArtistId() const;
 
-    int GetArtistId();
+    SongPlaysNode *getSongPlaysTree() const;
 
-    const shared_ptr<MostPlayedListNode> &getPtrToListNode() const;
+    void setSongPlaysTree(SongPlaysNode *songPlaysTree);
 
-    shared_ptr<SongPlaysNode> GetSongPlaysTree();
+    SongPlaysNode *getPtrToLowestSongId() const;
 
-    void SetSongPlaysTree(shared_ptr<SongPlaysNode> ptr);
+    void setPtrToLowestSongId(SongPlaysNode *ptrToLowestSongId);
 
-    void SetPtrToLowestSongId(shared_ptr<SongPlaysNode> ptrToLowestSongId);
+    MostPlayedListNode *getPtrToListNode() const;
 
-    void SetPtrToListNode(shared_ptr<MostPlayedListNode> ptr);
+    void setPtrToListNode(MostPlayedListNode *ptrToListNode);
 };
 
 typedef TreeNode<ArtistPlays> ArtistPlaysNode;
