@@ -18,6 +18,8 @@ using std::shared_ptr;
 using std::make_shared;
 using std::weak_ptr;
 
+struct node;
+
 // TODO: cleanup this file
 
 // Set DBG true to enable detailed output.
@@ -33,24 +35,7 @@ using std::weak_ptr;
 // The value type (V) can be anything.
 template<typename K, typename V>
 class AvlTree {
-public:
 
-    // Add a key-value pair to the tree.
-    //   K& key: The key.
-    //   T& value: The value associated with the key.
-    void insert(const K &key, const V &value);
-
-
-    // Find the value associated with a given key. Returns an `optional` struct since the key isn't
-    // guaranteed to be present in the tree.
-    V get(const K &key) const;
-
-    // Check if a node exists in the tree with a given value. Returns true if it does, false
-    // otherwise.
-    bool exists(const K &key) const;
-
-    // Remove node from the tree with given key. Doesn't matter if the node isn't there.
-    void remove(const K &key);
 
 protected:
 
@@ -129,6 +114,39 @@ protected:
     // Perform a right-left rotation to rebablance a subtree rooted at old_subtree_root, returning
     // a pointer to the new root of the subtree.
     shared_ptr<node> _right_left_rotate(shared_ptr<node> old_subtree_root);
+
+public:
+
+    // Add a key-value pair to the tree.
+    //   K& key: The key.
+    //   T& value: The value associated with the key.
+    void insert(const K &key, const V &value);
+
+    /**
+     * Adds a new key-value pair to the tree and returns a pointer to it
+     * @param key The key
+     * @param value The value associated with the key
+     * @return A shared_ptr to the node in the tree
+     */
+    shared_ptr<node> insertGetBack(const K &key, const V &value);
+
+    /**
+     * Find a node with the given key and return a pointer to it
+     * @param key The key of the node to get
+     * @return A shared_ptr to the node in the tree
+     */
+    shared_ptr<node> getNode(const K &key);
+
+    // Find the value associated with a given key. Returns an `optional` struct since the key isn't
+    // guaranteed to be present in the tree.
+    V get(const K &key) const;
+
+    // Check if a node exists in the tree with a given value. Returns true if it does, false
+    // otherwise.
+    bool exists(const K &key) const;
+
+    // Remove node from the tree with given key. Doesn't matter if the node isn't there.
+    void remove(const K &key);
 };
 
 
@@ -156,6 +174,31 @@ void AvlTree<K, V>::insert(const K &key, const V &value) {
     }
 }
 
+// Insert a node with a given key.
+template<typename K, typename V>
+shared_ptr<typename AvlTree<K, V>::node> AvlTree<K, V>::insertGetBack(const K &key, const V &value) {
+    shared_ptr<node> target = _node_search(key);
+    if (!target) {    // Base case, we have an empty tree, the inserted node is the new root.
+        root = make_shared<node>(key, value, nullptr);
+        return root;
+    } else if (target->key == key)  // The key exists already, we update its value.
+    {
+        target->value = value;
+        return target;
+    } else if (target->key > key)  // new node is left child
+    {
+        target->left_child = make_shared<node>(key, value, target);
+        _retrace_insertion(target->left_child);
+        return target->left_child;
+
+    } else // new node is right child
+    {
+        target->right_child = make_shared<node>(key, value, target);
+        _retrace_insertion(target->right_child);
+        return target->right_child;
+    }
+}
+
 // Get (maybe) a node with a given key.
 template<typename K, typename V>
 V AvlTree<K, V>::get(const K &key) const {
@@ -164,6 +207,14 @@ V AvlTree<K, V>::get(const K &key) const {
         return V(found_node->value);
     // TODO: fix this
     return;
+}
+
+template<typename K, typename V>
+shared_ptr<typename AvlTree<K, V>::node> AvlTree<K, V>::getNode(const K &key) {
+    shared_ptr<node> found_node = _node_search(key);
+    if (found_node && (key == found_node->key))
+        return found_node;
+    return nullptr;
 }
 
 // Check if a key exists in the tree.
@@ -250,6 +301,7 @@ void AvlTree<K, V>::remove(const K &key) {
     }
 }
 
+// TODO: we probably need to open this function up to the MusicManager class
 // Find a node with given key; returning null if there are no nodes, a pointer to the would-be
 // parent if the node doesn't exist, or a pointer to the node itself if it does.
 template<typename K, typename V>

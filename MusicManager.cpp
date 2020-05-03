@@ -22,7 +22,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
 //    auto artistObj = artist->GetData();
     if (numberOfArtists == 0) {
         // Create node of first artist in artist tree
-        this->artistTree->insert(artistId, Artist(artistId, numOfSongs));
+        shared_ptr<node> test = this->artistTree->insertGetBack(artistId, Artist(artistId, numOfSongs));
         // Create node of songs with 0 plays in linked list
         this->mostPlayedList = make_shared<MostPlayedListNode>(MostPlayedListNode(0));
         // Node with 0 plays in now the "most played" node
@@ -30,34 +30,38 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     } else {
         // We already have artists in the system
         // Adding node with the new artist to the existing artist tree
-        if (this->artistTree->AddNode(artist) == FAILURE) {
-            artist.reset();
-            return FAILURE;
-        }
+        this->artistTree->insert(artistId, Artist(artistId, numOfSongs));
     }
+    // Adding the new artist to the list node for 0 plays.
+    //this->mostPlayedList->getArtistPlaysTree()->insert(artistId, ArtistPlays(artistId, this->mostPlayedList));
+
     // Creating artist node to store the tree of it's songs with 0 plays
-    shared_ptr<ArtistPlaysNode> artistNode = make_shared<ArtistPlaysNode>(artistId,
-                                                                          ArtistPlays(artistId, this->mostPlayedList));
+    //ArtistPlaysNode tree = AvlTree<int, ArtistPlays>;
+    shared_ptr<ArtistPlaysNode> artistNode = make_shared<ArtistPlaysNode>(ArtistPlaysNode());
     // Create tree for songs of the new artist with 0 plays
-    shared_ptr<SongPlaysNode> songNode = make_shared<SongPlaysNode>(0, SongPlays(0, artistId, this->mostPlayedList));
-    // TODO: check that data transferred to the artistObj is saved properly
-    artistObj[0].SetPtrToSongNode(songNode);
-    shared_ptr<SongPlaysNode> songsTree = songNode;
-    songNode.reset();
-    for (int i = 1; i < numOfSongs; ++i) {
-        songNode = make_shared<SongPlaysNode>(i, SongPlays(i, artistId, this->mostPlayedList));
-        artistObj[i].SetPtrToSongNode(songNode);
-        songsTree->AddNode(songNode);
+    shared_ptr<SongPlaysNode> songTree = make_shared<SongPlaysNode>(SongPlaysNode());
+    // Creating the song tree for this artist
+    for (int i = 0; i < numOfSongs; ++i) {
+        songTree->insert(i, SongPlays(i, artistId, this->mostPlayedList));
+        //songTree = make_shared<SongPlaysNode>(i, SongPlays(i, artistId, this->mostPlayedList));
+        artistObj[i].SetPtrToSongNode(songTree);
+        songsTree->AddNode(songTree);
         if (i != numOfSongs - 1) {
-            songNode.reset();
+            songTree.reset();
         }
     }
+    //0, SongPlays(0, artistId, this->mostPlayedList));
+    // TODO: check that data transferred to the artistObj is saved properly
+    artistObj[0].SetPtrToSongNode(songTree);
+    shared_ptr<SongPlaysNode> songsTree = songTree;
+    songTree.reset();
+
     // Updating artistNode to store the pointer to the artist song with the lowest Id (currently 0)
     ArtistPlays &aPlays = artistNode->GetData();
     // Storing the root of artist songs tree in the ArtistPlaysNode
     // TODO: update in document that we're using this function which takes log(m) instructions in the worst case
-    aPlays.SetSongPlaysTree(songNode->FindRoot());
-    songNode.reset();
+    aPlays.SetSongPlaysTree(songTree->FindRoot());
+    songTree.reset();
     aPlays.SetPtrToLowestSongId(songsTree->Find(0));
     // Adding the new artist along with it's songs tree to the most played list
     this->mostPlayedList->AddArtist(artistNode);

@@ -12,7 +12,7 @@
 using std::shared_ptr;
 using std::make_shared;
 
-typedef TreeNode<ArtistPlays> ArtistPlaysNode;
+typedef AvlTree<int, ArtistPlays> ArtistPlaysNode;
 
 //typedef TreeNode<SongPlays> SongPlaysNode;
 
