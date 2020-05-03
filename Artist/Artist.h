@@ -29,6 +29,6 @@ public:
     Song operator[](int index) const;
 };
 
-typedef TreeNode<Artist> ArtistNode;
+typedef AvlTree<int, Artist> ArtistNode;
 
 #endif //WET1_ARTIST_H

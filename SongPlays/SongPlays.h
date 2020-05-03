@@ -6,7 +6,7 @@
 #define WET1_SONGPLAYS_H
 
 #include <memory>
-#include "../TreeNode/TreeNode.h"
+#include "../TreeNode/AvlTree.h"
 
 using std::shared_ptr;
 using std::make_shared;
@@ -35,7 +35,7 @@ public:
     void SetPtrToListNode(shared_ptr<MostPlayedListNode> listNode);
 };
 
-typedef TreeNode<SongPlays> SongPlaysNode;
+typedef AvlTree<int, SongPlays> SongPlaysNode;
 
 
 #endif //WET1_SONGPLAYS_H

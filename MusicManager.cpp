@@ -18,12 +18,11 @@ MusicManager::MusicManager() {
 }
 
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
-    shared_ptr<ArtistNode> artist = make_shared<ArtistNode>(artistId, Artist(artistId, numOfSongs));
-    auto artistObj = artist->GetData();
+    //shared_ptr<ArtistNode> artist = make_shared<ArtistNode>(artistId, Artist(artistId, numOfSongs));
+//    auto artistObj = artist->GetData();
     if (numberOfArtists == 0) {
         // Create node of first artist in artist tree
-        this->artistTree = artist;
-        artist.reset();
+        this->artistTree->insert(artistId, Artist(artistId, numOfSongs));
         // Create node of songs with 0 plays in linked list
         this->mostPlayedList = make_shared<MostPlayedListNode>(MostPlayedListNode(0));
         // Node with 0 plays in now the "most played" node
