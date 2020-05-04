@@ -58,10 +58,12 @@ public:
     TreeNode *GetRight() const {
         return this->right;
     }
+
     void SetFather(TreeNode *father) {
         this->fathe = father;
     }
-    TreeNode* GetFather() const {
+
+    TreeNode *GetFather() const {
         return this->father;
     }
 };
@@ -94,6 +96,13 @@ public:
 
     void RotateRight(TreeNode<T> *root);
 
+    StatusType RemoveNode(TreeNode<T>, int key);
+
+    TreeNode<T> FindMax(TreeNode<T> node);
+
+    TreeNode<T> FindMin(TreeNode<T> node);
+
+    TreeNode<T> GetNextNode(const TreeNode<T> &node)
 };
 
 template<class T>
@@ -196,7 +205,7 @@ int Tree<T>::BalanceFactor(TreeNode<T> *root) const {
 
 template<class T>
 void Tree<T>::RotateLeft(TreeNode<T> *root) {
-    TreeNode <T> *newroot = root->GetRight();
+    TreeNode<T> *newroot = root->GetRight();
     root->SetRight(newroot->GetLeft());
     newroot->SetLeft(root);
 
@@ -218,25 +227,136 @@ void Tree<T>::RotateLeft(TreeNode<T> *root) {
 template<class T>
 void Tree<T>::RotateRight(TreeNode<T> *root) {
     // Rotate node
-    TreeNode <T> *newroot = root->GetLeft();
-    root->SetLeft(newroot->GetRight());
-    newroot->SetRight(root);
+    TreeNode<T> *newRoot = root->GetLeft();
+    root->SetLeft(newRoot->GetRight());
+    newRoot->SetRight(root);
 
     // Adjust tree
     if (root->GetParent() == nullptr) {
-        root = newroot;
-        newroot->SetParent(nullptr);
+        root = newRoot;
+        newRoot->SetParent(nullptr);
     } else {
         if (root->GetParent()->GetLeft() == root) {
-            root->GetParent()->SetLeft(newroot);
+            root->GetParent()->SetLeft(newRoot);
         } else {
-            root->GetParent()->SetRight(newroot);
+            root->GetParent()->SetRight(newRoot);
         }
-        newroot->SetParent(root->GetParent());
+        newRoot->SetParent(root->GetParent());
     }
 
-    root->SetParent(newroot);
+    root->SetParent(newRoot);
 
+}
+
+template<class T>
+StatusType Tree<T>::RemoveNode(TreeNode<T> root, int key) {
+    //no matching key
+    if (root.getKey() != key && root.GetRight() == nullptr && root.GetLeft() == nullptr) {
+        return FAILURE;
+    }
+
+    if (key < root.getKey()) {
+        root->left = deleteNode(root->left, key);
+    } else if (key > root.getKey()) {
+        root->right = deleteNode(root->right, key);
+    }
+
+        // if key is same as root's key, then This is the node to be deleted
+    else {
+        // node with only one child or no child
+        if ((root->left == nullptr) || (root->right == nullptr)) {
+            TreeNode<T> *temp = (root->left ? root->left : root->right);
+            // No child case
+            if (temp == nullptr) {
+                temp = root;
+                root = nullptr;
+            } else// One child case
+                *root = *temp; // Copy the contents of the non-empty child
+            delete temp;
+        } else {
+            // node with two children: Get the inorder
+            // successor (smallest in the right subtree)
+            TreeNode<T> *temp = FindMin(root.GetRight());
+
+            // Copy the inorder successor's data to this node
+            root.setKey(temp->getKey());
+            root.setData(temp->GetData());
+
+            // Delete the inorder successor
+            root->right = deleteNode(root->right, temp->key);
+        }
+    }
+
+    //update heights
+    root->height = 1 + max(height(root->left),
+                           height(root->right));
+
+    //get BF
+    int balance = getBalance(root);
+
+    // If this node becomes unbalanced, then there are 4 cases
+    // LL Case
+    if (balance > 1 &&
+        getBalance(root->left) >= 0)
+        return rightRotate(root);
+
+    // LR Case
+    if (balance > 1 &&
+        getBalance(root->left) < 0) {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
+    // RR Case
+    if (balance < -1 &&
+        getBalance(root->right) <= 0)
+        return leftRotate(root);
+
+    // RL Case
+    if (balance < -1 &&
+        getBalance(root->right) > 0) {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
+    return SUCCESS;
+}
+
+template<class T>
+TreeNode<T> Tree<T>::FindMax(TreeNode<T> node) {
+    if (node == nullptr)
+        return nullptr;
+    else if (node->GetLeft() == nullptr)
+        return node;
+    else
+        return FindMin(node->GetLeft());
+}
+
+template<class T>
+TreeNode<T> Tree<T>::FindMin(TreeNode<T> node) {
+    if (node == nullptr)
+        return nullptr;
+    else if (node->GetRight() == nullptr)
+        return node;
+    else
+        return FindMax(node->GetRight());
+}
+
+template<class T>
+TreeNode<T> Tree<T>::GetNextNode(const TreeNode<T> &node) {
+    if (node->right == nullptr) {
+        return FindMin(node->right);
+    } else {
+        TreeNode<T> parent = node->GetFather();
+        while (parent != nullptr) {
+            if (parent->left == node) {
+                break;
+            }
+            node = parent;
+            parent = node->father;
+        }
+        return parent;
+    }
 }
 
 
