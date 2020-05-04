@@ -10,13 +10,11 @@
 #include "MostPlayedList/MostPlayedListNode.h"
 #include "Artist/Artist.h"
 
-using std::shared_ptr;
-
 class MusicManager {
 private:
-    ArtistNode* artistTree;
-    MostPlayedListNode* mostPlayedList;
-    MostPlayedListNode* ptrToMostRecommended;
+    ArtistTree artistTree;
+    MostPlayedListNode *mostPlayedList;
+    MostPlayedListNode *ptrToMostRecommended;
     int numberOfArtists = 0;
     int numberOfSongs = 0;
 public:

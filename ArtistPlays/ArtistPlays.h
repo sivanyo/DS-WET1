@@ -5,7 +5,7 @@
 #ifndef WET1_ARTISTPLAYS_H
 #define WET1_ARTISTPLAYS_H
 
-#include "../TreeNode/TreeNode.h"
+#include "../TreeNode/Tree.h"
 #include "../SongPlays/SongPlays.h"
 
 //class SongPlaysNode;

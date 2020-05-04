@@ -6,6 +6,7 @@
 #define WET1_ARTIST_H
 
 #include "../Song/Song.h"
+#include "../TreeNode/Tree.h"
 
 class Artist {
 private:
@@ -29,5 +30,6 @@ public:
 };
 
 typedef TreeNode<Artist> ArtistNode;
+typedef Tree<Artist> ArtistTree;
 
 #endif //WET1_ARTIST_H

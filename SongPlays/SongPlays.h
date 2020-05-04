@@ -5,7 +5,7 @@
 #ifndef WET1_SONGPLAYS_H
 #define WET1_SONGPLAYS_H
 
-#include "../TreeNode/TreeNode.h"
+#include "../TreeNode/Tree.h"
 
 class MostPlayedListNode;
 
@@ -36,6 +36,7 @@ public:
 };
 
 typedef TreeNode<SongPlays> SongPlaysNode;
+typedef Tree<SongPlays> SongPlaysTree;
 
 
 #endif //WET1_SONGPLAYS_H

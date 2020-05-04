@@ -9,11 +9,12 @@
 #include "../SongPlays/SongPlays.h"
 
 typedef TreeNode<ArtistPlays> ArtistPlaysNode;
+typedef Tree<ArtistPlaysNode> ArtistPlaysTree;
 
 class MostPlayedListNode {
 private:
     int numberOfPlays;
-    ArtistPlaysNode* artistPlaysTree = nullptr;
+    ArtistPlaysTree* artistPlaysTree = nullptr;
     ArtistPlaysNode* ptrToLowestArtistId = nullptr;
     SongPlaysNode* ptrToLowestSongId = nullptr;
     MostPlayedListNode* previous = nullptr;

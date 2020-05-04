@@ -2,7 +2,6 @@
 // Created by Mor on 26/04/2020.
 //
 
-#include "TreeNode/TreeNode.h"
 #include "Artist/Artist.h"
 #include "MusicManager.h"
 
@@ -11,23 +10,26 @@
 
 MusicManager::MusicManager() {
     this->numberOfArtists = 0;
+    this->artistTree = ArtistTree();
 }
 
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     if (numberOfArtists == 0) {
-        this->artistTree = new ArtistNode(artistId, Artist(artistId, numOfSongs));
-        if (!this->artistTree) {
+        if (this->artistTree.Find(this->artistTree.GetRoot(), artistId) == nullptr) {
             return FAILURE;
+        }
+        if (this->artistTree.Insert(artistId, Artist(artistId, numOfSongs)) != SUCCESS) {
+            return ALLOCATION_ERROR;
         }
         this->mostPlayedList = new MostPlayedListNode(0);
         if (!this->mostPlayedList) {
-            delete this->artistTree;
+            this->artistTree.
             return FAILURE
         }
         this->ptrToMostRecommended = this->mostPlayedList;
     } else {
         // TODO: need to get result from this and act accordingly
-        this->artistTree->AddNode(new ArtistNode(artistId, Artist(artistId, numOfSongs)));
+        this->artistTree->(new ArtistNode(artistId, Artist(artistId, numOfSongs)));
     }
     // Creating artist node to store the tree of it's songs with 0 plays
     ArtistPlaysNode* artistNode = new ArtistPlaysNode(artistId, ArtistPlays(artistId, this->mostPlayedList);

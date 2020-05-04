@@ -9,6 +9,7 @@
 //balanced AVL TREE
 
 #include <iostream>
+#include "../library1.h"
 
 template<class T>
 class TreeNode {
@@ -70,7 +71,7 @@ class Tree {
 private:
     void InsertNode(TreeNode<T> *root, TreeNode<T> *ins);
 
-    void DeleteNode(TreeNode<T> *node);
+    void DeleteTree(TreeNode<T> *node);
 
     TreeNode<T> *root;
 
@@ -79,7 +80,7 @@ public:
 
     ~Tree();
 
-    bool Insert(int key, const T &value);
+    StatusType Insert(int key, const T &value);
 
     TreeNode<T> *GetRoot() const { return this->root; }
 
@@ -98,32 +99,32 @@ public:
 template<class T>
 Tree<T>::~Tree() {
     if (root) {
-        DeleteNode(root);
+        DeleteTree(root);
     }
 }
 
 template<class T>
-void Tree<T>::DeleteNode(TreeNode<T> *node) {
+void Tree<T>::DeleteTree(TreeNode<T> *node) {
     if (node) {
-        DeleteNode(node->GetLeft());
-        DeleteNode(node->GetRight());
+        DeleteTree(node->GetLeft());
+        DeleteTree(node->GetRight());
         delete node; // Post Order Deletion
     }
 }
 
 template<class T>
-bool Tree<T>::Insert(int key, const T &value) {
+StatusType Tree<T>::Insert(int key, const T &value) {
     auto *new_node = new(std::nothrow) TreeNode<T>(key, value);
 
     if (!new_node)
-        return true; // Out of memory
+        return FAILURE; // Out of memory
 
     if (!root) // emptyTree
         root = new_node;
     else
         InsertNode(root, new_node);
 
-    return false;
+    return SUCCESS;
 }
 
 template<class T>
@@ -131,14 +132,14 @@ void Tree<T>::InsertNode(TreeNode<T> *root, TreeNode<T> *ins) {
     // Binary Search Tree insertion algorithm
     if (ins->Getkey() < root->Getkey()) {
         if (root->GetLeft()) // If there is a left child, keep searching
-            InsertAVLNode(root->GetLeft(), ins);
+            InsertNode(root->GetLeft(), ins);
         else { // Found the right spot
             root->SetLeft(ins);
             ins->SetParent(root);
         }
     } else {
         if (root->GetRight()) // If there is a right child, keep searching
-            InsertAVLNode(root->GetRight(), ins);
+            InsertNode(root->GetRight(), ins);
         else {// Found the right spot
             root->SetRight(ins);
             ins->SetParent(root);
