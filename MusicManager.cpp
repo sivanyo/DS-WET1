@@ -5,9 +5,6 @@
 #include "Artist/Artist.h"
 #include "MusicManager.h"
 
-//class SongPlays;
-//typedef TreeNode<SongPlays> SongPlaysNode;
-
 MusicManager::MusicManager() {
     this->numberOfArtists = 0;
     this->artistTree = ArtistTree();
@@ -15,24 +12,40 @@ MusicManager::MusicManager() {
 
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     if (numberOfArtists == 0) {
+        // Inserting the new artist to our Artist tree
+        Artist* tempArtist = new Artist(artistId, numOfSongs);
+        if (!tempArtist) {
+            return ALLOCATION_ERROR;
+        }
+        if (this->artistTree.Insert(artistId, tempArtist) != SUCCESS) {
+            delete tempArtist;
+            return ALLOCATION_ERROR;
+        }
+        // TODO: in some cases removal MIGHT cause memory leaks, need to make sure.
+        this->mostPlayedList = new MostPlayedListNode(0);
+        if (!this->mostPlayedList) {
+            this->artistTree.Remove(artistId);
+            return FAILURE;
+        }
+        this->ptrToMostRecommended = this->mostPlayedList;
+    } else {
         if (this->artistTree.Find(this->artistTree.GetRoot(), artistId) == nullptr) {
             return FAILURE;
         }
         if (this->artistTree.Insert(artistId, Artist(artistId, numOfSongs)) != SUCCESS) {
             return ALLOCATION_ERROR;
         }
-        this->mostPlayedList = new MostPlayedListNode(0);
-        if (!this->mostPlayedList) {
-            this->artistTree.
-            return FAILURE
-        }
-        this->ptrToMostRecommended = this->mostPlayedList;
-    } else {
-        // TODO: need to get result from this and act accordingly
-        this->artistTree->(new ArtistNode(artistId, Artist(artistId, numOfSongs)));
     }
     // Creating artist node to store the tree of it's songs with 0 plays
-    ArtistPlaysNode* artistNode = new ArtistPlaysNode(artistId, ArtistPlays(artistId, this->mostPlayedList);
+    ArtistPlays aPlays = ArtistPlays(artistId, this->mostPlayedList);
+    SongPlaysTree *songsTree = new SongPlaysTree();
+    if (!songsTree) {
+        if (numberOfArtists == 0) {
+            delete this->mostPlayedList;
+        }
+        this->artistTree.Remove(this->artistTree.GetRoot(), artistId);
+    }
+    ArtistPlaysNode *artistNode = new ArtistPlaysNode(artistId, ArtistPlays(artistId, this->mostPlayedList);
     if (!artistNode) {
         if (numberOfArtists == 0) {
             delete this->mostPlayedList;
@@ -41,16 +54,16 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         this->artistTree->RemoveNode(artistId);
     }
     // Create tree for songs of the new artist with 0 plays
-    SongPlaysNode* songNode = new SongPlaysNode(0, SongPlays(0, artistId, this->mostPlayedList));
+    SongPlaysNode *songNode = new SongPlaysNode(0, SongPlays(0, artistId, this->mostPlayedList));
     // TODO: maybe need to check allocations here
-    ArtistNode* artist = this->artistTree->Find(artistId);
+    ArtistNode *artist = this->artistTree->Find(artistId);
     // Storing the root of artist songs tree in the ArtistPlaysNode
     artistNode->GetData().setSongPlaysTree(songNode);
     // Updating artistNode to store the pointer to the artist song with the lowest Id (currently 0)
     artistNode->GetData().setPtrToLowestSongId(songNode);
     artist->GetData()[0].setPtrToSongNodeInPlaysTree(songNode);
     for (int i = 1; i < numOfSongs; ++i) {
-        SongPlaysNode* extraNode =new SongPlaysNode(i, SongPlays(i, artist, this->mostPlayedList));
+        SongPlaysNode *extraNode = new SongPlaysNode(i, SongPlays(i, artist, this->mostPlayedList));
         songNode->AddNode(extraNode);
         artist->GetData()[i].setPtrToSongNodeInPlaysTree(extraNode);
     }
@@ -80,7 +93,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
 
 // TODO: add function to most played list - RemoveArtistFromListById(int artistId)
 StatusType MusicManager::RemoveArtist(int artistId) {
-    shared_ptr<ArtistNode> artist = artistTree->Find(artistId);
+    shared_ptr <ArtistNode> artist = artistTree->Find(artistId);
     if (numberOfArtists == 0 || !artist) {
         // There are no artists so this counts as a case where no artist with the input ID exists
         return FAILURE;
@@ -89,9 +102,9 @@ StatusType MusicManager::RemoveArtist(int artistId) {
     for (int i = 0; i < artistObj.GetNumberOfSongs(); ++i) {
         bool songTreeNowEmpty = false;
         // Getting pointer to the artist node of the current song in the linked list with songNumberOfPlays plays
-        shared_ptr<ArtistPlaysNode> artistPlays = artistObj[i].GetPtrToArtistNode();
+        shared_ptr <ArtistPlaysNode> artistPlays = artistObj[i].GetPtrToArtistNode();
         // Getting the song plays tree where the current song is
-        shared_ptr<SongPlaysNode> songPlaysTree = artistPlays->GetData().GetSongPlaysTree();
+        shared_ptr <SongPlaysNode> songPlaysTree = artistPlays->GetData().GetSongPlaysTree();
         // Removing the song from the tree
         songPlaysTree->RemoveNode(artistObj[i].getSongId());
 
@@ -100,7 +113,7 @@ StatusType MusicManager::RemoveArtist(int artistId) {
             songTreeNowEmpty = true;
             artistPlays->GetData().SetSongPlaysTree(nullptr);
         }
-        shared_ptr<MostPlayedListNode> list = artistPlays->GetData().getPtrToListNode();
+        shared_ptr <MostPlayedListNode> list = artistPlays->GetData().getPtrToListNode();
         if (list->GetPtrToLowestArtist() == artistPlays) {
             // The artist we are currently removing is the one with the lowest ID for this number of plays
             // Setting a new pointer to the artist with a higher ID;
@@ -126,7 +139,7 @@ StatusType MusicManager::RemoveArtist(int artistId) {
 }
 
 StatusType MusicManager::AddToSongCount(int artistId, int songID) {
-    shared_ptr<ArtistNode> node = this->artistTree->Find(artistId);
+    shared_ptr <ArtistNode> node = this->artistTree->Find(artistId);
     if (node == nullptr) {
         return FAILURE;
     }
@@ -138,19 +151,19 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
     node->GetData()[songID].setNumberOfPlays(newNumOfPlays);
 
     //getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list node
-    shared_ptr<SongPlaysNode> songNode = node->GetData()[songID].GetPtrToSongNode();
-    shared_ptr<ArtistPlaysNode> artistNode = node->GetData()[songID].getPtrToArtistIdPlaysTree();
-    shared_ptr<MostPlayedListNode> PlaysListNode = node->GetData()[songID].GetPtrToArtistNode()->GetData().getPtrToListNode();
+    shared_ptr <SongPlaysNode> songNode = node->GetData()[songID].GetPtrToSongNode();
+    shared_ptr <ArtistPlaysNode> artistNode = node->GetData()[songID].getPtrToArtistIdPlaysTree();
+    shared_ptr <MostPlayedListNode> PlaysListNode = node->GetData()[songID].GetPtrToArtistNode()->GetData().getPtrToListNode();
 
     SongPlaysNode newSongNode = SongPlaysNode(songID, songNode->GetData());
-    shared_ptr<SongPlaysNode> newPtrToSongNode = make_shared<SongPlaysNode>(newSongNode);
+    shared_ptr <SongPlaysNode> newPtrToSongNode = make_shared<SongPlaysNode>(newSongNode);
 
     //case in which there is a matching playsNode to this song
     if (newNumOfPlays == PlaysListNode->getNext()->getNumberOfPlays()) {
         //there is not matching artistTree to this node
         if (PlaysListNode->getNext()->getArtistPlaysTree()->Find(artistId) == nullptr) {
             ArtistPlaysNode newArtistNode = ArtistPlaysNode(artistId, artistNode->GetData());
-            shared_ptr<ArtistPlaysNode> newPtrToArtistNode = make_shared<ArtistPlaysNode>(newArtistNode);
+            shared_ptr <ArtistPlaysNode> newPtrToArtistNode = make_shared<ArtistPlaysNode>(newArtistNode);
             PlaysListNode->getNext()->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
             newPtrToArtistNode->GetData().GetSongPlaysTree()->AddNode(newPtrToSongNode);
             node->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
@@ -184,7 +197,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         //need to create new SongsPlayNode, it will always be after the current node
     else {
         MostPlayedListNode newPlayListNode = MostPlayedListNode(newNumOfPlays, PlaysListNode, PlaysListNode->getNext());
-        shared_ptr<MostPlayedListNode> newPtrToListNode = make_shared<MostPlayedListNode>(newPlayListNode);
+        shared_ptr <MostPlayedListNode> newPtrToListNode = make_shared<MostPlayedListNode>(newPlayListNode);
         //that was the last link in the list, now we have a new one
         if (PlaysListNode->getNext() == nullptr) {
             this->ptrToMostRecommended = newPtrToListNode;
@@ -193,7 +206,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         }
         PlaysListNode->setNext(newPtrToListNode);
         ArtistPlaysNode newArtistNode = ArtistPlaysNode(artistId, artistNode->GetData());
-        shared_ptr<ArtistPlaysNode> newPtrToArtistNode = make_shared<ArtistPlaysNode>(newArtistNode);
+        shared_ptr <ArtistPlaysNode> newPtrToArtistNode = make_shared<ArtistPlaysNode>(newArtistNode);
         PlaysListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
         newPtrToArtistNode->GetData().GetSongPlaysTree()->AddNode(newPtrToSongNode);
         PlaysListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
@@ -231,7 +244,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 }
 
 StatusType MusicManager::NumberOfStreams(int artistId, int songID, int *streams) {
-    shared_ptr<ArtistNode> node = this->artistTree->Find(artistId);
+    shared_ptr <ArtistNode> node = this->artistTree->Find(artistId);
     if (node == nullptr) {
         return FAILURE;
     }
@@ -246,8 +259,8 @@ StatusType MusicManager::GetRecommendedSongs(int numOfSongs, int *artist, int *s
     if (numOfSongs > this->numberOfSongs) {
         return FAILURE;
     }
-    shared_ptr<SongPlaysNode> RecommendedSong = this->ptrToMostRecommended->GetPtrToLowestSong();
-    shared_ptr<ArtistPlaysNode> RecommendedArtist = this->ptrToMostRecommended->GetPtrToLowestArtist();
+    shared_ptr <SongPlaysNode> RecommendedSong = this->ptrToMostRecommended->GetPtrToLowestSong();
+    shared_ptr <ArtistPlaysNode> RecommendedArtist = this->ptrToMostRecommended->GetPtrToLowestArtist();
     int i = 0;
     while (numOfSongs > 0) {
         //finish printing all the songs in this tree, should move to next artist in line

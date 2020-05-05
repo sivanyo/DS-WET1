@@ -15,12 +15,12 @@ MostPlayedListNode::MostPlayedListNode(int numOfPlays, MostPlayedListNode *previ
         numberOfPlays(numOfPlays), previous(previous), next(next) {
 }
 
-ArtistPlaysNode *MostPlayedListNode::getArtistPlaysTree() const {
+ArtistPlaysTree *MostPlayedListNode::getArtistPlaysTree() const {
     return artistPlaysTree;
 }
 
-void MostPlayedListNode::setArtistPlaysTree(ArtistPlaysNode *artistPlaysTree) {
-    MostPlayedListNode::artistPlaysTree = artistPlaysTree;
+void MostPlayedListNode::setArtistPlaysTree(ArtistPlaysTree *ptr) {
+    MostPlayedListNode::artistPlaysTree = ptr;
 }
 
 ArtistPlaysNode *MostPlayedListNode::getPtrToLowestArtistId() const {
@@ -43,18 +43,19 @@ MostPlayedListNode *MostPlayedListNode::getPrevious() const {
     return previous;
 }
 
-void MostPlayedListNode::setPrevious(MostPlayedListNode *previous) {
-    MostPlayedListNode::previous = previous;
+void MostPlayedListNode::setPrevious(MostPlayedListNode *ptr) {
+    MostPlayedListNode::previous = ptr;
 }
 
 MostPlayedListNode *MostPlayedListNode::getNext() const {
     return next;
 }
 
-void MostPlayedListNode::setNext(MostPlayedListNode *next) {
-    MostPlayedListNode::next = next;
+void MostPlayedListNode::setNext(MostPlayedListNode *ptr) {
+    MostPlayedListNode::next = ptr;
 }
 
+// TODO: later
 bool MostPlayedListNode::AddArtist(ArtistPlaysNode *artistNode) {
     if (ptrToLowestArtistId) {
         // There are already artists stored in this linked list

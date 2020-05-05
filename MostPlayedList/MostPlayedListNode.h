@@ -8,34 +8,30 @@
 #include "../ArtistPlays/ArtistPlays.h"
 #include "../SongPlays/SongPlays.h"
 
-typedef TreeNode<ArtistPlays> ArtistPlaysNode;
-typedef Tree<ArtistPlaysNode> ArtistPlaysTree;
-
 class MostPlayedListNode {
 private:
     int numberOfPlays;
-    ArtistPlaysTree* artistPlaysTree = nullptr;
-    ArtistPlaysNode* ptrToLowestArtistId = nullptr;
-    SongPlaysNode* ptrToLowestSongId = nullptr;
-    MostPlayedListNode* previous = nullptr;
-    MostPlayedListNode* next = nullptr;
+    ArtistPlaysTree *artistPlaysTree = nullptr;
+    ArtistPlaysNode *ptrToLowestArtistId = nullptr;
+    SongPlaysNode *ptrToLowestSongId = nullptr;
+    MostPlayedListNode *previous = nullptr;
+    MostPlayedListNode *next = nullptr;
 
 public:
     // Create the first node in the list (0 plays)
     explicit MostPlayedListNode(int numOfPlays);
 
     // Create a new node with a new highest number of plays
-    MostPlayedListNode(int numOfPlays, MostPlayedListNode* previous);
+    MostPlayedListNode(int numOfPlays, MostPlayedListNode *previous);
 
     // Create a new node with a number of plays between to values (1<2<3)
-    MostPlayedListNode(int numOfPlays, MostPlayedListNode* previous, MostPlayedListNode* next);
+    MostPlayedListNode(int numOfPlays, MostPlayedListNode *previous, MostPlayedListNode *next);
 
-    ArtistPlaysNode *getArtistPlaysTree() const;
+    ArtistPlaysTree *getArtistPlaysTree() const;
 
-    void setArtistPlaysTree(ArtistPlaysNode *artistPlaysTree);
+    void setArtistPlaysTree(ArtistPlaysTree *ptr);
 
-    bool AddArtist(ArtistPlaysNode* artistNode);
-
+    bool AddArtist(ArtistPlaysNode *artistNode);
 
     ArtistPlaysNode *getPtrToLowestArtistId() const;
 
@@ -47,11 +43,11 @@ public:
 
     MostPlayedListNode *getPrevious() const;
 
-    void setPrevious(MostPlayedListNode *previous);
+    void setPrevious(MostPlayedListNode *ptr);
 
     MostPlayedListNode *getNext() const;
 
-    void setNext(MostPlayedListNode *next);
+    void setNext(MostPlayedListNode *ptr);
 
     ~MostPlayedListNode();
 };

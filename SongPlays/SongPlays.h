@@ -24,7 +24,7 @@ public:
 
     int getNumberOfPlays() const;
 
-    void setNumberOfPlays(int numberOfPlays);
+    void setNumberOfPlays(int plays);
 
     void incrementNumberOfPlays();
 

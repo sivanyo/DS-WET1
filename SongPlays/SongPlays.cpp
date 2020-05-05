@@ -3,7 +3,6 @@
 //
 
 #include "SongPlays.h"
-#include "../Song/Song.h"
 
 SongPlays::SongPlays(int songId, int artistId, MostPlayedListNode *ptrToListNode) :
         songId(songId), artistId(artistId), ptrToListNode(ptrToListNode) {}
@@ -20,8 +19,8 @@ int SongPlays::getNumberOfPlays() const {
     return numberOfPlays;
 }
 
-void SongPlays::setNumberOfPlays(int numberOfPlays) {
-    SongPlays::numberOfPlays = numberOfPlays;
+void SongPlays::setNumberOfPlays(int plays) {
+    SongPlays::numberOfPlays = plays;
 }
 
 void SongPlays::incrementNumberOfPlays() {

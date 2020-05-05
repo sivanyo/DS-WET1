@@ -12,7 +12,7 @@ class Artist {
 private:
     int artistId;
     int numberOfSongs;
-    Song* artistSongs;
+    Song *artistSongs;
 public:
     Artist(int artistId, int numOfSongs);
 
