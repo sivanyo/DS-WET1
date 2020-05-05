@@ -298,6 +298,8 @@ public:
 
     StatusType Insert(int key, T *value);
 
+    TreeNode<T> *InsertGetNode(int key, T *value);
+
     StatusType Remove(int key);
 
     int Height(TreeNode<T> *root) const;
@@ -343,6 +345,23 @@ StatusType Tree<T>::Insert(int key, T *value) {
         InsertNode(root, nNode);
     }
     return SUCCESS;
+}
+
+template<class T>
+TreeNode<T>* Tree<T>::InsertGetNode(int key, T *value) {
+    TreeNode<T> *nNode = new TreeNode<T>(key, value);
+
+    if (!nNode) {
+        return nullptr;
+    }
+
+    if (!root) {
+        // Tree is empty, setting new node as first node
+        root = nNode;
+    } else {
+        InsertNode(root, nNode);
+    }
+    return nNode;
 }
 
 template<class T>

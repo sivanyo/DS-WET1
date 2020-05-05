@@ -24,26 +24,62 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         // TODO: in some cases removal MIGHT cause memory leaks, need to make sure.
         this->mostPlayedList = new MostPlayedListNode(0);
         if (!this->mostPlayedList) {
+            // removal from tree should delete the data.
             this->artistTree.Remove(artistId);
-            return FAILURE;
+            return ALLOCATION_ERROR;
         }
+        ArtistPlaysTree * tempPlaysTree = new ArtistPlaysTree();
+        if (!tempArtist) {
+            delete this->mostPlayedList;
+            // removal from tree should delete the data.
+            this->artistTree.Remove(artistId);
+            return ALLOCATION_ERROR;
+        }
+        this->mostPlayedList->setArtistPlaysTree(tempPlaysTree);
         this->ptrToMostRecommended = this->mostPlayedList;
     } else {
-        if (this->artistTree.Find(this->artistTree.GetRoot(), artistId) == nullptr) {
+        if (this->artistTree.Find(artistId) != nullptr) {
+            // There already exists an artist with this ID
             return FAILURE;
         }
-        if (this->artistTree.Insert(artistId, Artist(artistId, numOfSongs)) != SUCCESS) {
+        Artist* tempArtist = new Artist(artistId, numOfSongs);
+        if (!tempArtist) {
+            return ALLOCATION_ERROR;
+        }
+        if (this->artistTree.Insert(artistId, tempArtist) != SUCCESS) {
+            delete tempArtist;
             return ALLOCATION_ERROR;
         }
     }
-    // Creating artist node to store the tree of it's songs with 0 plays
-    ArtistPlays aPlays = ArtistPlays(artistId, this->mostPlayedList);
+    // Creating ArtistPlaysNode to save ArtistSongsTree
+    ArtistPlaysNode *artistPlays = this->mostPlayedList->getArtistPlaysTree()->InsertGetNode(artistId, )
+    // Creating song plays tree, to insert artist songs into
     SongPlaysTree *songsTree = new SongPlaysTree();
     if (!songsTree) {
         if (numberOfArtists == 0) {
             delete this->mostPlayedList;
         }
-        this->artistTree.Remove(this->artistTree.GetRoot(), artistId);
+        this->artistTree.Remove(artistId);
+        return ALLOCATION_ERROR;
+    }
+    // retrieving new artist from artist tree to update his song pointers
+    ArtistNode *artistNode = this->artistTree.Find(artistId);
+    Artist* artist = artistNode->getValue();
+    for (int i = 0; i < numOfSongs; ++i) {
+        SongPlays* plays = new SongPlays(i, artistId, this->mostPlayedList);
+        if (!plays) {
+            delete songsTree;
+            if (numberOfArtists == 0) {
+                delete this->mostPlayedList;
+            }
+            this->artistTree.Remove(artistId);
+            return ALLOCATION_ERROR;
+        }
+        Song *tempSong = artist->operator[](i);
+        SongPlaysNode* tempSongNode = songsTree->InsertGetNode(i, plays);
+        tempSong->setPtrToSongNodeInPlaysTree(tempSongNode);
+        tempSong->setPtrToArtistIdPlaysTree()
+
     }
     ArtistPlaysNode *artistNode = new ArtistPlaysNode(artistId, ArtistPlays(artistId, this->mostPlayedList);
     if (!artistNode) {

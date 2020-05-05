@@ -6,10 +6,10 @@
 
 Artist::Artist(int artistId, int numOfSongs) : artistId(artistId), numberOfSongs(numOfSongs) {
     if (numOfSongs != 0) {
-        this->artistSongs = new Song[numOfSongs];
+        this->artistSongs = new Song *[numOfSongs];
         if (this->artistSongs) {
             for (int i = 0; i < numOfSongs; ++i) {
-                artistSongs[i].SetSongId(i);
+                artistSongs[i] = new Song(i);
             }
         }
     }
@@ -27,15 +27,18 @@ int Artist::getNumberOfSongs() const {
     return numberOfSongs;
 }
 
-Song &Artist::operator[](int index) {
+Song *&Artist::operator[](int index) {
     return artistSongs[index];
 }
 
-Song Artist::operator[](int index) const {
+Song *Artist::operator[](int index) const {
     return artistSongs[index];
 }
 
 Artist::~Artist() {
+    for (int i = 0; i < numberOfSongs; ++i) {
+        delete this->artistSongs[i];
+    }
     delete this->artistSongs;
 }
 
