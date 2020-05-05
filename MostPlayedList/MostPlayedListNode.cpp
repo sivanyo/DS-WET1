@@ -57,21 +57,22 @@ void MostPlayedListNode::setNext(MostPlayedListNode *ptr) {
 
 // TODO: later
 bool MostPlayedListNode::AddArtist(ArtistPlaysNode *artistNode) {
-    if (ptrToLowestArtistId) {
-        // There are already artists stored in this linked list
-        this->artistPlaysTree->AddNode(artistNode);
-        if (this->ptrToLowestArtistId->GetData().getArtistId() > artistNode->GetData().getArtistId()) {
-            this->ptrToLowestArtistId = artistNode;
-            this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
-        }
-        return true;
-    } else {
-        // There are no artists in this linked list, just add the new artist
-        this->artistPlaysTree = artistNode;
-        this->ptrToLowestArtistId = artistNode;
-        this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
-        return true;
-    }
+//    if (ptrToLowestArtistId) {
+//        // There are already artists stored in this linked list
+//        this->artistPlaysTree->AddNode(artistNode);
+//        if (this->ptrToLowestArtistId->GetData().getArtistId() > artistNode->GetData().getArtistId()) {
+//            this->ptrToLowestArtistId = artistNode;
+//            this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
+//        }
+//        return true;
+//    } else {
+//        // There are no artists in this linked list, just add the new artist
+//        this->artistPlaysTree = artistNode;
+//        this->ptrToLowestArtistId = artistNode;
+//        this->ptrToLowestSongId = artistNode->GetData().GetPtrToLowestSongId();
+//        return true;
+//    }
+    return true;
 }
 
 MostPlayedListNode::~MostPlayedListNode() {

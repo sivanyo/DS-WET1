@@ -13,8 +13,8 @@
 class MusicManager {
 private:
     ArtistTree artistTree;
-    MostPlayedListNode *mostPlayedList;
-    MostPlayedListNode *ptrToMostRecommended;
+    MostPlayedListNode *mostPlayedList = nullptr;
+    MostPlayedListNode *ptrToMostRecommended = nullptr;
     int numberOfArtists = 0;
     int numberOfSongs = 0;
 public:

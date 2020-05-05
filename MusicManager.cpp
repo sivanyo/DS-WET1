@@ -13,7 +13,7 @@ MusicManager::MusicManager() {
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     if (numberOfArtists == 0) {
         // Inserting the new artist to our Artist tree
-        Artist* tempArtist = new Artist(artistId, numOfSongs);
+        Artist *tempArtist = new Artist(artistId, numOfSongs);
         if (!tempArtist) {
             return ALLOCATION_ERROR;
         }
@@ -28,7 +28,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
             this->artistTree.Remove(artistId);
             return ALLOCATION_ERROR;
         }
-        ArtistPlaysTree * tempPlaysTree = new ArtistPlaysTree();
+        ArtistPlaysTree *tempPlaysTree = new ArtistPlaysTree();
         if (!tempArtist) {
             delete this->mostPlayedList;
             // removal from tree should delete the data.
@@ -42,7 +42,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
             // There already exists an artist with this ID
             return FAILURE;
         }
-        Artist* tempArtist = new Artist(artistId, numOfSongs);
+        Artist *tempArtist = new Artist(artistId, numOfSongs);
         if (!tempArtist) {
             return ALLOCATION_ERROR;
         }
@@ -51,9 +51,26 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
             return ALLOCATION_ERROR;
         }
     }
-    // Creating ArtistPlaysNode to save ArtistSongsTree
-    ArtistPlaysNode *artistPlays = this->mostPlayedList->getArtistPlaysTree()->InsertGetNode(artistId, )
-    // Creating song plays tree, to insert artist songs into
+    // Creating ArtistPlays object to store in ArtistPlaysNode
+    ArtistPlays *artistPlays = new ArtistPlays(artistId, this->mostPlayedList);
+    if (!artistPlays) {
+        if (numberOfArtists == 0) {
+            delete this->mostPlayedList;
+        }
+        this->artistTree.Remove(artistId);
+        return ALLOCATION_ERROR;
+    }
+    // Creating ArtistPlaysNode object to store SongTree
+    ArtistPlaysNode *artistPlaysNode = this->mostPlayedList->getArtistPlaysTree()->InsertGetNode(artistId, artistPlays);
+    if (!artistPlaysNode) {
+        if (numberOfArtists == 0) {
+            delete this->mostPlayedList;
+        }
+        this->artistTree.Remove(artistId);
+        delete artistPlays;
+        return ALLOCATION_ERROR;
+    }
+    // Creating SongPlaysTree, to store SongPlaysNode
     SongPlaysTree *songsTree = new SongPlaysTree();
     if (!songsTree) {
         if (numberOfArtists == 0) {
@@ -64,9 +81,10 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     }
     // retrieving new artist from artist tree to update his song pointers
     ArtistNode *artistNode = this->artistTree.Find(artistId);
-    Artist* artist = artistNode->getValue();
+    Artist *artist = artistNode->getValue();
+    SongPlaysNode *lowestIdSongNode;
     for (int i = 0; i < numOfSongs; ++i) {
-        SongPlays* plays = new SongPlays(i, artistId, this->mostPlayedList);
+        SongPlays *plays = new SongPlays(i, artistId, this->mostPlayedList);
         if (!plays) {
             delete songsTree;
             if (numberOfArtists == 0) {
@@ -75,38 +93,35 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
             this->artistTree.Remove(artistId);
             return ALLOCATION_ERROR;
         }
+
         Song *tempSong = artist->operator[](i);
-        SongPlaysNode* tempSongNode = songsTree->InsertGetNode(i, plays);
-        tempSong->setPtrToSongNodeInPlaysTree(tempSongNode);
-        tempSong->setPtrToArtistIdPlaysTree()
-
-    }
-    ArtistPlaysNode *artistNode = new ArtistPlaysNode(artistId, ArtistPlays(artistId, this->mostPlayedList);
-    if (!artistNode) {
-        if (numberOfArtists == 0) {
-            delete this->mostPlayedList;
-            delete this->artistTree;
+        SongPlaysNode *tempSongNode = songsTree->InsertGetNode(i, plays);
+        if (i == 0 ){
+            // This is the song with the lowest ID, saving in case we need to update the lowest song ID pointer
+            lowestIdSongNode = tempSongNode;
         }
-        this->artistTree->RemoveNode(artistId);
-    }
-    // Create tree for songs of the new artist with 0 plays
-    SongPlaysNode *songNode = new SongPlaysNode(0, SongPlays(0, artistId, this->mostPlayedList));
-    // TODO: maybe need to check allocations here
-    ArtistNode *artist = this->artistTree->Find(artistId);
-    // Storing the root of artist songs tree in the ArtistPlaysNode
-    artistNode->GetData().setSongPlaysTree(songNode);
-    // Updating artistNode to store the pointer to the artist song with the lowest Id (currently 0)
-    artistNode->GetData().setPtrToLowestSongId(songNode);
-    artist->GetData()[0].setPtrToSongNodeInPlaysTree(songNode);
-    for (int i = 1; i < numOfSongs; ++i) {
-        SongPlaysNode *extraNode = new SongPlaysNode(i, SongPlays(i, artist, this->mostPlayedList));
-        songNode->AddNode(extraNode);
-        artist->GetData()[i].setPtrToSongNodeInPlaysTree(extraNode);
+        // Saving inside every song of this artist, the pointer to the node of that song in the artist Songs tree
+        tempSong->setPtrToSongNodeInPlaysTree(tempSongNode);
+        // Saving inside every song of this artist, the pointer to the node of that artist in the linked list
+        tempSong->setPtrToArtistIdPlaysTree(artistPlaysNode);
+
     }
 
-    // TODO: update in document that we're using this function which takes log(m) instructions in the worst case
-    // Adding the new artist along with it's songs tree to the most played list
-    this->mostPlayedList->AddArtist(artistNode);
+    if (this->mostPlayedList->getPtrToLowestArtistId()) {
+        if (this->mostPlayedList->getPtrToLowestArtistId()->getKey() > artistId) {
+            // The newly added artist has an ID that's lower than the current lowest artist ID,
+            // updating pointers in linked list.
+            this->mostPlayedList->setPtrToLowestArtistId(artistPlaysNode);
+            this->mostPlayedList->setPtrToLowestSongId(lowestIdSongNode);
+        }
+    } else {
+        // The newly added artist is the first artist so his ID is the lowest,
+        // updating pointers in linked list.
+        this->mostPlayedList->setPtrToLowestArtistId(artistPlaysNode);
+        this->mostPlayedList->setPtrToLowestSongId(lowestIdSongNode);
+    }
+
+
     this->numberOfSongs += numOfSongs;
     this->numberOfArtists++;
     return SUCCESS;
@@ -129,13 +144,16 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
 
 // TODO: add function to most played list - RemoveArtistFromListById(int artistId)
 StatusType MusicManager::RemoveArtist(int artistId) {
-    shared_ptr <ArtistNode> artist = artistTree->Find(artistId);
-    if (numberOfArtists == 0 || !artist) {
+    ArtistNode * artistNode = artistTree.Find(artistId);
+    if (numberOfArtists == 0 || !artistNode) {
         // There are no artists so this counts as a case where no artist with the input ID exists
         return FAILURE;
     }
-    Artist &artistObj = artist->GetData();
-    for (int i = 0; i < artistObj.GetNumberOfSongs(); ++i) {
+    Artist *artist = artistNode->getValue();
+    for (int i = 0; i < artist->getNumberOfSongs(); ++i) {
+        Song *tempSong = artist->operator[](i);
+        MostPlayedListNode* node = tempSong->getPtrToArtistIdPlaysTree()->getValue()->getPtrToListNode();
+        node->getArtistPlaysTree()->Remove(artistId);
         bool songTreeNowEmpty = false;
         // Getting pointer to the artist node of the current song in the linked list with songNumberOfPlays plays
         shared_ptr <ArtistPlaysNode> artistPlays = artistObj[i].GetPtrToArtistNode();

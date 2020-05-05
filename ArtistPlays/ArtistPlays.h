@@ -8,15 +8,13 @@
 #include "../TreeNode/Tree.h"
 #include "../SongPlays/SongPlays.h"
 
-typedef Tree<SongPlays> SongPlaysTree;
-
 class MostPlayedListNode;
 
 
 class ArtistPlays {
 private:
     int artistId;
-    SongPlaysTree *SongPlaysTree = nullptr;
+    Tree<SongPlays> *SongPlaysTree = nullptr;
     SongPlaysNode *ptrToLowestSongId = nullptr;
     MostPlayedListNode *ptrToListNode = nullptr;
 public:
@@ -31,9 +29,9 @@ public:
 
     int getArtistId() const;
 
-    ::SongPlaysTree *getSongPlaysTree() const;
+    Tree<SongPlays> *getSongPlaysTree() const;
 
-    void setSongPlaysTree(::SongPlaysTree *songPlaysTree);
+    void setSongPlaysTree(Tree<SongPlays> *songPlaysTree);
 
     SongPlaysNode *getPtrToLowestSongId() const;
 

@@ -31,11 +31,11 @@ void Song::incrementNumberOfPlays() {
     numberOfPlays++;
 }
 
-ArtistPlaysTree *Song::getPtrToArtistIdPlaysTree() const {
+ArtistPlaysNode *Song::getPtrToArtistIdPlaysTree() const {
     return ptrToArtistIdPlaysTree;
 }
 
-void Song::setPtrToArtistIdPlaysTree(ArtistPlaysTree *ptr) {
+void Song::setPtrToArtistIdPlaysTree(ArtistPlaysNode *ptr) {
     ptrToArtistIdPlaysTree = ptr;
 }
 

@@ -12,7 +12,7 @@ class Song {
 private:
     int songId;
     int numberOfPlays = 0;
-    ArtistPlaysTree *ptrToArtistIdPlaysTree = nullptr;
+    ArtistPlaysNode *ptrToArtistIdPlaysTree = nullptr;
     SongPlaysNode *ptrToSongNodeInPlaysTree = nullptr;
 public:
     Song();
@@ -29,9 +29,9 @@ public:
 
     void incrementNumberOfPlays();
 
-    ArtistPlaysTree *getPtrToArtistIdPlaysTree() const;
+    ArtistPlaysNode *getPtrToArtistIdPlaysTree() const;
 
-    void setPtrToArtistIdPlaysTree(ArtistPlaysTree *ptr);
+    void setPtrToArtistIdPlaysTree(ArtistPlaysNode *ptr);
 
     SongPlaysNode *getPtrToSongNodeInPlaysTree() const;
 
