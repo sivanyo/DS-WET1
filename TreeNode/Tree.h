@@ -6,10 +6,8 @@
 #define WET1_TREE_H
 
 #include <iostream>
-#include "../library1.h"
-
-#include <iostream>
 #include <algorithm>
+#include "../library1.h"
 
 using std::max;
 
