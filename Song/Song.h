@@ -8,12 +8,15 @@
 
 #include "../ArtistPlays/ArtistPlays.h"
 
+class ArtistPlays;
+class SongPlays;
+
 class Song {
 private:
     int songId;
     int numberOfPlays = 0;
     TreeNode<ArtistPlays> *ptrToArtistIdPlaysTree = nullptr;
-    SongPlaysNode *ptrToSongNodeInPlaysTree = nullptr;
+    TreeNode<SongPlays> *ptrToSongNodeInPlaysTree = nullptr;
 public:
     Song();
 
@@ -29,13 +32,13 @@ public:
 
     void incrementNumberOfPlays();
 
-    ArtistPlaysNode *getPtrToArtistIdPlaysTree() const;
+    TreeNode<ArtistPlays> *getPtrToArtistIdPlaysTree() const;
 
-    void setPtrToArtistIdPlaysTree(ArtistPlaysNode *ptr);
+    void setPtrToArtistIdPlaysTree(TreeNode<ArtistPlays> *ptr);
 
-    SongPlaysNode *getPtrToSongNodeInPlaysTree() const;
+    TreeNode<SongPlays> *getPtrToSongNodeInPlaysTree() const;
 
-    void setPtrToSongNodeInPlaysTree(SongPlaysNode *ptr);
+    void setPtrToSongNodeInPlaysTree(TreeNode<SongPlays> *ptr);
 };
 
 

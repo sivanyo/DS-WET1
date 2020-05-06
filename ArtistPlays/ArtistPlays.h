@@ -9,20 +9,20 @@
 #include "../SongPlays/SongPlays.h"
 
 class MostPlayedListNode;
-
+class SongPlays;
 
 class ArtistPlays {
 private:
     int artistId;
     Tree<SongPlays> *SongPlaysTree = nullptr;
-    SongPlaysNode *ptrToLowestSongId = nullptr;
+    TreeNode<SongPlays> *ptrToLowestSongId = nullptr;
     MostPlayedListNode *ptrToListNode = nullptr;
 public:
     explicit ArtistPlays(int artistId);
 
     ArtistPlays(int artistId, MostPlayedListNode *ptrToListNode);
 
-    ArtistPlays(int artistId, ::SongPlaysTree *SongPlaysTree, SongPlaysNode *ptrToLowestSongId,
+    ArtistPlays(int artistId, Tree<SongPlays> *SongPlaysTree, TreeNode<SongPlays> *ptrToLowestSongId,
                 MostPlayedListNode *ptrToListNode);
 
     ~ArtistPlays();
@@ -33,9 +33,9 @@ public:
 
     void setSongPlaysTree(Tree<SongPlays> *songPlaysTree);
 
-    SongPlaysNode *getPtrToLowestSongId() const;
+    TreeNode<SongPlays> *getPtrToLowestSongId() const;
 
-    void setPtrToLowestSongId(SongPlaysNode *ptr);
+    void setPtrToLowestSongId(TreeNode<SongPlays> *ptr);
 
     MostPlayedListNode *getPtrToListNode() const;
 
