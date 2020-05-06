@@ -5,9 +5,8 @@
 #include "Artist/Artist.h"
 #include "MusicManager.h"
 
-MusicManager::MusicManager() {
-    this->numberOfArtists = 0;
-    this->artistTree = ArtistTree();
+MusicManager::MusicManager() : artistTree(new ArtistTree()), mostPlayedList(nullptr),
+                               ptrToMostRecommended(nullptr), numberOfArtists(0), numberOfSongs(0) {
 }
 
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
@@ -17,7 +16,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         if (!tempArtist) {
             return ALLOCATION_ERROR;
         }
-        if (this->artistTree.Insert(artistId, tempArtist) != SUCCESS) {
+        if (this->artistTree->Insert(artistId, tempArtist) != SUCCESS) {
             delete tempArtist;
             return ALLOCATION_ERROR;
         }
@@ -25,14 +24,14 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
             this->mostPlayedList = new MostPlayedListNode(0);
             if (!this->mostPlayedList) {
                 // removal from tree should delete the data.
-                this->artistTree.Remove(artistId);
+                this->artistTree->Remove(artistId);
                 return ALLOCATION_ERROR;
             }
             this->ptrToMostRecommended = this->mostPlayedList;
             ArtistPlaysTree *tempPlaysTree = new ArtistPlaysTree();
             if (!tempArtist) {
                 // removal from tree should delete the data.
-                this->artistTree.Remove(artistId);
+                this->artistTree->Remove(artistId);
                 return ALLOCATION_ERROR;
             }
             this->mostPlayedList->setArtistPlaysTree(tempPlaysTree);
@@ -41,13 +40,13 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
             ArtistPlaysTree *tempPlaysTree = new ArtistPlaysTree();
             if (!tempArtist) {
                 // removal from tree should delete the data.
-                this->artistTree.Remove(artistId);
+                this->artistTree->Remove(artistId);
                 return ALLOCATION_ERROR;
             }
             this->mostPlayedList->setArtistPlaysTree(tempPlaysTree);
         }
     } else {
-        if (this->artistTree.Find(artistId) != nullptr) {
+        if (this->artistTree->Find(artistId) != nullptr) {
             // There already exists an artist with this ID
             return FAILURE;
         }
@@ -55,7 +54,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         if (!tempArtist) {
             return ALLOCATION_ERROR;
         }
-        if (this->artistTree.Insert(artistId, tempArtist) != SUCCESS) {
+        if (this->artistTree->Insert(artistId, tempArtist) != SUCCESS) {
             delete tempArtist;
             return ALLOCATION_ERROR;
         }
@@ -66,7 +65,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         if (numberOfArtists == 0) {
             delete this->mostPlayedList;
         }
-        this->artistTree.Remove(artistId);
+        this->artistTree->Remove(artistId);
         return ALLOCATION_ERROR;
     }
     // Creating ArtistPlaysNode object to store SongTree
@@ -75,7 +74,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         if (numberOfArtists == 0) {
             delete this->mostPlayedList;
         }
-        this->artistTree.Remove(artistId);
+        this->artistTree->Remove(artistId);
         delete artistPlays;
         return ALLOCATION_ERROR;
     }
@@ -85,11 +84,12 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         if (numberOfArtists == 0) {
             delete this->mostPlayedList;
         }
-        this->artistTree.Remove(artistId);
+        this->artistTree->Remove(artistId);
         return ALLOCATION_ERROR;
     }
+    artistPlaysNode->getValue()->setSongPlaysTree(songsTree);
     // retrieving new artist from artist tree to update his song pointers
-    ArtistNode *artistNode = this->artistTree.Find(artistId);
+    ArtistNode *artistNode = this->artistTree->Find(artistId);
     Artist *artist = artistNode->getValue();
     SongPlaysNode *lowestIdSongNode;
     for (int i = 0; i < numOfSongs; ++i) {
@@ -99,7 +99,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
             if (numberOfArtists == 0) {
                 delete this->mostPlayedList;
             }
-            this->artistTree.Remove(artistId);
+            this->artistTree->Remove(artistId);
             return ALLOCATION_ERROR;
         }
 
@@ -139,7 +139,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
 }
 
 StatusType MusicManager::RemoveArtist(int artistId) {
-    ArtistNode *artistNode = artistTree.Find(artistId);
+    ArtistNode *artistNode = artistTree->Find(artistId);
     if (numberOfArtists == 0 || !artistNode) {
         // There are no artists so this counts as a case where no artist with the input ID exists
         return FAILURE;
@@ -163,15 +163,16 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         delete songTree;
         // Marking as deleted to avoid invalid delete.
         songTree = nullptr;
-        // Removing the artist from the list
-        node->getArtistPlaysTree()->Remove(artistId);
+        node->setArtistPlaysTree(nullptr);
         if (node->getPtrToLowestArtistId()->getKey() == artistPlaysNode->getKey()) {
             // The artist we are currently removing is the one with the lowest ID for this number of plays
             // Setting a new pointer to the artist with a higher ID;
-            node->setPtrToLowestArtistId(artistPlaysNode->getParent());
+            node->setPtrToLowestArtistId(artistPlaysNode->getNext());
             // Setting a new pointer to the song of this artist with the lowest ID
             node->setPtrToLowestSongId(node->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
         }
+        // Removing the artist from the list
+        node->getArtistPlaysTree()->Remove(artistId);
         if (node->getArtistPlaysTree()->IsEmpty() && node->getNumberOfPlays() != 0) {
             // The artist tree for this node is now empty, meaning the node is now pointless and can be removed
             node->getPrevious()->setNext(node->getNext());
@@ -183,12 +184,12 @@ StatusType MusicManager::RemoveArtist(int artistId) {
     numberOfSongs -= artist->getNumberOfSongs();
     // Removing artist from total artist count.
     numberOfArtists--;
-    artistTree.Remove(artistId);
+    artistTree->Remove(artistId);
     return SUCCESS;
 }
 
 StatusType MusicManager::AddToSongCount(int artistId, int songID) {
-    ArtistNode *artistNode = this->artistTree.Find(artistId);
+    ArtistNode *artistNode = this->artistTree->Find(artistId);
     if (artistNode == nullptr) {
         return FAILURE;
     }
@@ -365,7 +366,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         //the artist is alone in the MostPlaysListNode we need to remove the link
         if (artistPlaysNode->getRight() == nullptr && artistPlaysNode->getLeft() == nullptr &&
             artistPlaysNode->getParent() == nullptr) {
-            artistTree.Remove(songID);
+            artistTree->Remove(songID);
             playsListNode->getPrevious()->setNext(playsListNode->getNext());
             if (playsListNode->getNext() != nullptr) {
                 playsListNode->getNext()->setPrevious(playsListNode->getPrevious());
@@ -375,7 +376,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         }
             //there are more artists in this artistsPlaysNode
         else {
-            artistTree.Remove(songID);
+            artistTree->Remove(songID);
             playsListNode->getArtistPlaysTree()->Remove(artistId);
         }
     }
@@ -383,7 +384,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 }
 
 StatusType MusicManager::NumberOfStreams(int artistId, int songID, int *streams) {
-    ArtistNode *node = this->artistTree.Find(artistId);
+    ArtistNode *node = this->artistTree->Find(artistId);
     if (node == nullptr) {
         return FAILURE;
     }
@@ -426,8 +427,12 @@ StatusType MusicManager::GetRecommendedSongs(int numOfSongs, int *artist, int *s
 }
 
 MusicManager::~MusicManager() {
-    //delete this->artistTree;
-    delete this->mostPlayedList;
+    if (this->artistTree) {
+        delete this->artistTree;
+    }
+    if (this->mostPlayedList) {
+        delete this->mostPlayedList;
+    }
 }
 
 StatusType MusicManager::addSongAtEndOfList(int newNumOfPlays, MostPlayedListNode *playsListNode, SongPlays *songPlays,

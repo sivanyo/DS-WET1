@@ -51,17 +51,21 @@ void SongPlays::DeleteSongPlaysNode(TreeNode<SongPlays>* songNode) {
     if (songNode->getLeft()) {
         DeleteSongPlaysNode(songNode->getLeft());
         delete songNode->getLeft();
+        songNode->setLeft(nullptr);
     }
     if (songNode->getRight()) {
         DeleteSongPlaysNode(songNode->getRight());
         delete songNode->getRight();
+        songNode->setRight(nullptr);
     }
     SongPlays *temp = songNode->getValue();
     // Marking the current song as deleted, so we know not to try and delete it again
-    temp->setNumberOfPlays(-1);
+    temp->getPtrToSong()->setNumberOfPlays(-1);
+    //temp->setNumberOfPlays(-1);
     if (songNode->getParent() == nullptr) {
         // This is the root of the tree so there is no one else who will try and delete it's contents, need to delete on our own
         // to avoid leak
         delete songNode->getValue();
+        songNode->removeValue();
     }
 }

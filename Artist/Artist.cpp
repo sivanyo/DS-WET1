@@ -36,10 +36,7 @@ Song *Artist::operator[](int index) const {
 }
 
 Artist::~Artist() {
-    for (int i = 0; i < numberOfSongs; ++i) {
-        delete this->artistSongs[i];
-    }
-    delete this->artistSongs;
+    delete[] this->artistSongs;
 }
 
 void Artist::setNumberOfSongs(int newNum) {
