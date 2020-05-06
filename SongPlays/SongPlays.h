@@ -31,6 +31,8 @@ public:
 
     void incrementNumberOfPlays();
 
+    void DecrementNumberOfPlays();
+
     MostPlayedListNode *getPtrToListNode() const;
 
     void setPtrToListNode(MostPlayedListNode *ptr);

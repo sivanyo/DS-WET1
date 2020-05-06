@@ -27,6 +27,10 @@ void SongPlays::incrementNumberOfPlays() {
     this->numberOfPlays++;
 }
 
+void SongPlays::DecrementNumberOfPlays() {
+    this->numberOfPlays--;
+}
+
 MostPlayedListNode *SongPlays::getPtrToListNode() const {
     return ptrToListNode;
 }

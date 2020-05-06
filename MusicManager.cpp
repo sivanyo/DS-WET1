@@ -189,118 +189,235 @@ StatusType MusicManager::RemoveArtist(int artistId) {
 }
 
 StatusType MusicManager::AddToSongCount(int artistId, int songID) {
-    ArtistNode *node = this->artistTree.Find(artistId);
-    if (node == nullptr) {
+    ArtistNode *artistNode = this->artistTree.Find(artistId);
+    if (artistNode == nullptr) {
         return FAILURE;
     }
-    if (node->getValue()->getNumberOfSongs() <= songID) {
+    if (artistNode->getValue()->getNumberOfSongs() <= songID) {
         return INVALID_INPUT;
     }
-    int newNumOfPlays = node->getValue()->operator[](songID)->getNumberOfPlays() + 1;
-    //update the number of streams at songArray
-    node->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+    int newNumOfPlays = artistNode->getValue()->operator[](songID)->getNumberOfPlays() + 1;
+    // update the number of streams at songArray
+    artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
 
-    //getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list node
-    SongPlaysNode *songNode = node->getValue()->operator[](songID)->getPtrToSongNodeInPlaysTree();
-    ArtistPlaysNode *artistNode = node->getValue()->operator[](songID)->getPtrToArtistIdPlaysTree();
-    MostPlayedListNode *PlaysListNode = artistNode->getValue()->getPtrToListNode();
-    //save the value of the node for the next insert action
-    SongPlays *value = songNode->getValue();
+    // getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list artistNode
+    SongPlaysNode *songNode = artistNode->getValue()->operator[](songID)->getPtrToSongNodeInPlaysTree();
+    ArtistPlaysNode *artistPlaysNode = artistNode->getValue()->operator[](songID)->getPtrToArtistIdPlaysTree();
+    MostPlayedListNode *playsListNode = artistPlaysNode->getValue()->getPtrToListNode();
+    // save the value of the artistNode for the next insert action
+    SongPlays *oSongPlays = songNode->getValue();
+    SongPlays *songPlays = new SongPlays(songID, artistId, nullptr);
+    if (!songPlays) {
+        newNumOfPlays--;
+        artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+        return ALLOCATION_ERROR;
+    }
+    songPlays->setNumberOfPlays(newNumOfPlays);
+    songPlays->incrementNumberOfPlays();
 
 
-    //we need to add the song at the end of the linked list
-    if (PlaysListNode->isNextNullptr()) {
-        MostPlayedListNode *newPlayListNode = new MostPlayedListNode(newNumOfPlays, PlaysListNode, nullptr);
+    // we need to add the song at the end of the linked list
+    if (playsListNode->isNextNullptr()) {
+        MostPlayedListNode *newPlayListNode = new MostPlayedListNode(newNumOfPlays, playsListNode, nullptr);
         if (!newPlayListNode) {
+            // Rolling back changes to number of plays
+            songPlays->DecrementNumberOfPlays();
+            newNumOfPlays--;
+            artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
             return ALLOCATION_ERROR;
         }
-        ArtistPlaysTree *nArtistTree = new ArtistPlaysTree;
+        ArtistPlaysTree *nArtistTree = new ArtistPlaysTree();
+        if (!nArtistTree) {
+            // Rolling back changes to number of plays
+            songPlays->DecrementNumberOfPlays();
+            newNumOfPlays--;
+            artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+            delete newPlayListNode;
+            return ALLOCATION_ERROR;
+        }
         ArtistPlays *nArtist = new ArtistPlays(artistId, newPlayListNode);
         if (!nArtist) {
+            // Rolling back changes to number of plays
+            songPlays->DecrementNumberOfPlays();
+            newNumOfPlays--;
+            artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+            delete nArtistTree;
             delete newPlayListNode;
             return ALLOCATION_ERROR;
         }
-        ArtistPlaysNode *newPtrToArtistNode = PlaysListNode->getNext()->getArtistPlaysTree()->InsertGetNode(
+        ArtistPlaysNode *newPtrToArtistNode = newPlayListNode->getArtistPlaysTree()->InsertGetNode(
                 artistId, nArtist);
-        SongPlaysTree *nSong = new SongPlaysTree();
-        if (!nSong) {
+        if (!newPtrToArtistNode) {
+            // Rolling back changes to number of plays
+            songPlays->DecrementNumberOfPlays();
+            newNumOfPlays--;
+            artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
             delete nArtist;
+            delete nArtistTree;
             delete newPlayListNode;
             return ALLOCATION_ERROR;
         }
-        nSong->Insert(songID, value);
-        nArtist->setSongPlaysTree(nSong);
-        this->ptrToMostRecommended = mostPlayedList;
-        node->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtist);
-
-
-    } else {
-
+        SongPlaysTree *nSongTree = new SongPlaysTree();
+        if (!nSongTree) {
+            // Rolling back changes to number of plays
+            songPlays->DecrementNumberOfPlays();
+            newNumOfPlays--;
+            artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+            delete newPtrToArtistNode;
+            delete nArtist;
+            delete nArtistTree;
+            delete newPlayListNode;
+            return ALLOCATION_ERROR;
+        }
+        SongPlaysNode *nSongNode = nSongTree->InsertGetNode(songID, songPlays);
+        if (!nSongNode) {
+            // Rolling back changes to number of plays
+            songPlays->DecrementNumberOfPlays();
+            newNumOfPlays--;
+            artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+            delete nSongTree;
+            delete newPtrToArtistNode;
+            delete nArtist;
+            delete nArtistTree;
+            delete newPlayListNode;
+            return ALLOCATION_ERROR;
+        }
+        nArtist->setSongPlaysTree(nSongTree);
+        this->ptrToMostRecommended = newPlayListNode;
+        artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(newPtrToArtistNode);
+        artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
+        nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
+        playsListNode->setNext(newPlayListNode);
+        newPlayListNode->setPrevious(playsListNode);
+    } else if (playsListNode->getNext()->getNumberOfPlays() == newNumOfPlays) {
+        MostPlayedListNode *nextNode = playsListNode->getNext();
+        ArtistPlaysNode *artistPlaysNode = nextNode->getArtistPlaysTree()->Find(artistId);
+        if (artistPlaysNode) {
+            // This artist already has songs with this number of plays.
+            SongPlaysNode *nSongNode = artistPlaysNode->getValue()->getSongPlaysTree()->InsertGetNode(songID, songPlays);
+            if (!nSongNode) {
+                // Rolling back changes to number of plays
+                songPlays->DecrementNumberOfPlays();
+                newNumOfPlays--;
+                artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+                return ALLOCATION_ERROR;
+            }
+            artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(artistPlaysNode);
+            artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
+            nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
+            if (nextNode->getPtrToLowestSongId()->getKey() > songID) {
+                nextNode->setPtrToLowestSongId(nSongNode);
+                artistPlaysNode->getValue()->setPtrToLowestSongId(nSongNode);
+            }
+        } else {
+            // This artist doesn't have any songs with this number of plays,
+            // need to add him and then add his songs.
+            ArtistPlays *nArtistPlays = new ArtistPlays(artistId, nextNode);
+            if (!nArtistPlays) {
+                // Rolling back changes to number of plays
+                songPlays->DecrementNumberOfPlays();
+                newNumOfPlays--;
+                artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+                return ALLOCATION_ERROR;
+            }
+            ArtistPlaysNode *nArtistPlaysNode = nextNode->getArtistPlaysTree()->InsertGetNode(artistId, nArtistPlays);
+            if (!nArtistPlaysNode) {
+                // Rolling back changes to number of plays
+                songPlays->DecrementNumberOfPlays();
+                newNumOfPlays--;
+                artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+                delete nArtistPlays;
+                return ALLOCATION_ERROR;
+            }
+            SongPlaysTree *nSongTree = new SongPlaysTree();
+            if (!nSongTree) {
+                // Rolling back changes to number of plays
+                songPlays->DecrementNumberOfPlays();
+                newNumOfPlays--;
+                artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+                delete nArtistPlays;
+                nextNode->getArtistPlaysTree()->Remove(artistId);
+                return ALLOCATION_ERROR;
+            }
+            SongPlaysNode *nSongNode = artistPlaysNode->getValue()->getSongPlaysTree()->InsertGetNode(songID, songPlays);
+            if (!nSongNode) {
+                // Rolling back changes to number of plays
+                songPlays->DecrementNumberOfPlays();
+                newNumOfPlays--;
+                artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+            }
+            artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(artistPlaysNode);
+            artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
+            nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
+            if (nextNode->getPtrToLowestSongId()->getKey() > songID) {
+                nextNode->setPtrToLowestSongId(nSongNode);
+                artistPlaysNode->getValue()->setPtrToLowestSongId(nSongNode);
+            }
+        }
         //case in which there is a matching playsNode to this song
-        if (newNumOfPlays == PlaysListNode->getNext()->getNumberOfPlays()) {
-            //there is not matching artistTree to this node
-            if (PlaysListNode->getNext()->getArtistPlaysTree()->Find(artistId) == nullptr) {
-                ArtistPlays *nArtist = new ArtistPlays(artistId, PlaysListNode->getNext());
-                ArtistPlaysNode *newPtrToArtistNode = PlaysListNode->getNext()->getArtistPlaysTree()->InsertGetNode(
+        if (newNumOfPlays == playsListNode->getNext()->getNumberOfPlays()) {
+            //there is not matching artistTree to this artistNode
+            if (playsListNode->getNext()->getArtistPlaysTree()->Find(artistId) == nullptr) {
+                ArtistPlays *nArtist = new ArtistPlays(artistId, playsListNode->getNext());
+                ArtistPlaysNode *newPtrToArtistNode = playsListNode->getNext()->getArtistPlaysTree()->InsertGetNode(
                         artistId, nArtist);
             }
-            node->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
+            artistNode->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
         }
             //a matching artistTree is already exist
         else {
-            PlaysListNode->getArtistPlaysTree()->Find(artistId)->GetData().GetSongPlaysTree()->AddNode(
+            playsListNode->getArtistPlaysTree()->Find(artistId)->GetData().GetSongPlaysTree()->AddNode(
                     newPtrToSongNode);
-            node->GetData().operator[](songID).SetPtrToArtistNode(PlaysListNode->getArtistPlaysTree()->Find(artistId));
+            artistNode->GetData().operator[](songID).SetPtrToArtistNode(playsListNode->getArtistPlaysTree()->Find(artistId));
             //we have a new lowest songID
-            if (PlaysListNode->getArtistPlaysTree()->Find(
+            if (playsListNode->getArtistPlaysTree()->Find(
                     artistId)->GetData().GetPtrToLowestSongId()->GetData().GetSongId() > songID) {
-                PlaysListNode->getArtistPlaysTree()->Find(artistId)->GetData().SetPtrToLowestSongId(newPtrToSongNode);
+                playsListNode->getArtistPlaysTree()->Find(artistId)->GetData().SetPtrToLowestSongId(newPtrToSongNode);
                 //this is the last playsListNode, so it contains the most recommended songs
-                if (PlaysListNode->getNext() == nullptr) {
-                    this->ptrToMostRecommended = PlaysListNode;
+                if (playsListNode->getNext() == nullptr) {
+                    this->ptrToMostRecommended = playsListNode;
                 }
             }
         }
-    }
-        //need to create new SongsPlayNode, it will always be after the current node
-    else {
-        MostPlayedListNode newPlayListNode = MostPlayedListNode(newNumOfPlays, PlaysListNode, PlaysListNode->getNext());
+    } else {
+        //need to create new SongsPlayNode, it will always be after the current artistNode
+        MostPlayedListNode newPlayListNode = MostPlayedListNode(newNumOfPlays, playsListNode, playsListNode->getNext());
         shared_ptr <MostPlayedListNode> newPtrToListNode = make_shared<MostPlayedListNode>(newPlayListNode);
         //that was the last link in the list, now we have a new one
-        if (PlaysListNode->getNext() == nullptr) {
+        if (playsListNode->getNext() == nullptr) {
             this->ptrToMostRecommended = newPtrToListNode;
         } else {
-            PlaysListNode->getNext()->setPrevious(newPtrToListNode);
+            playsListNode->getNext()->setPrevious(newPtrToListNode);
         }
-        PlaysListNode->setNext(newPtrToListNode);
-        ArtistPlaysNode newArtistNode = ArtistPlaysNode(artistId, artistNode->GetData());
+        playsListNode->setNext(newPtrToListNode);
+        ArtistPlaysNode newArtistNode = ArtistPlaysNode(artistId, artistPlaysNode->GetData());
         shared_ptr <ArtistPlaysNode> newPtrToArtistNode = make_shared<ArtistPlaysNode>(newArtistNode);
-        PlaysListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
+        playsListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
         newPtrToArtistNode->GetData().GetSongPlaysTree()->AddNode(newPtrToSongNode);
-        PlaysListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
+        playsListNode->getArtistPlaysTree()->AddNode(newPtrToArtistNode);
         newPlayListNode.SetPtrToLowestSong(newPtrToSongNode);
         newPlayListNode.setPtrToLowestArtistId(newPtrToArtistNode);
         newPtrToArtistNode->GetData().SetPtrToLowestSongId(newPtrToSongNode);
-        node->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
+        artistNode->GetData().operator[](songID).SetPtrToArtistNode(newPtrToArtistNode);
     }
 
     //the song was alone in the artistPlaysTree, we  need to delete the artistPlaysTree
     if (songNode->GetRight() == nullptr && songNode->GetLeft() == nullptr && songNode->GetFather() == nullptr) {
         //the artist is alone in the MostPlaysListNode we need to remove the link
-        if (artistNode->GetRight() == nullptr && artistNode->GetLeft() == nullptr &&
-            artistNode->GetFather() == nullptr) {
-            artistNode->RemoveNode(songID);
-            PlaysListNode->getArtistPlaysTree()->DeleteTree(artistNode);
-            PlaysListNode->GetPrevious()->setNext(PlaysListNode->getNext());
-            if (PlaysListNode->getNext() != nullptr) {
-                PlaysListNode->getNext()->setPrevious(PlaysListNode->GetPrevious());
+        if (artistPlaysNode->GetRight() == nullptr && artistPlaysNode->GetLeft() == nullptr &&
+            artistPlaysNode->GetFather() == nullptr) {
+            artistPlaysNode->RemoveNode(songID);
+            playsListNode->getArtistPlaysTree()->DeleteTree(artistPlaysNode);
+            playsListNode->GetPrevious()->setNext(playsListNode->getNext());
+            if (playsListNode->getNext() != nullptr) {
+                playsListNode->getNext()->setPrevious(playsListNode->GetPrevious());
             }
-            PlaysListNode.reset();
+            playsListNode.reset();
         }
             //there are more artists in this artistsPlaysNode
         else {
-            artistNode->RemoveNode(songID);
-            PlaysListNode->getArtistPlaysTree()->RemoveNode(artistId);
+            artistPlaysNode->RemoveNode(songID);
+            playsListNode->getArtistPlaysTree()->RemoveNode(artistId);
         }
         return SUCCESS;
     }
