@@ -155,7 +155,7 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         MostPlayedListNode *node = tempSong->getPtrToArtistIdPlaysTree()->getValue()->getPtrToListNode();
         // Getting the Artist Plays Node of the current song
         ArtistPlaysNode *artistPlaysNode = tempSong->getPtrToArtistIdPlaysTree();
-        // Getting the songs tree where the current song is stroed
+        // Getting the songs tree where the current song is stored
         SongPlaysTree *songTree = artistPlaysNode->getValue()->getSongPlaysTree();
         // Deleting all nodes from the song plays tree, and marking the songs in the Song array as deleted
         SongPlays::DeleteSongPlaysNode(songTree->GetRoot());
@@ -166,40 +166,25 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         // Removing the artist from the list
         node->getArtistPlaysTree()->Remove(artistId);
         bool songTreeNowEmpty = false;
-        // Getting pointer to the artist node of the current song in the linked list with songNumberOfPlays plays
-        shared_ptr <ArtistPlaysNode> artistPlays = artistObj[i].GetPtrToArtistNode();
-        // Getting the song plays tree where the current song is
-        shared_ptr <SongPlaysNode> songPlaysTree = artistPlays->GetData().GetSongPlaysTree();
-        // Removing the song from the tree
-        songPlaysTree->RemoveNode(artistObj[i].getSongId());
-
-        // FIXME: Assuming that remove Node leaves the root intact as the only member of the tree
-        if (artistPlays->GetData().GetSongPlaysTree()->IsOnlyRoot()) {
-            songTreeNowEmpty = true;
-            artistPlays->GetData().SetSongPlaysTree(nullptr);
-        }
-        shared_ptr <MostPlayedListNode> list = artistPlays->GetData().getPtrToListNode();
-        if (list->GetPtrToLowestArtist() == artistPlays) {
+        if (node->getPtrToLowestArtistId()->getKey() == artistPlaysNode->getKey()) {
             // The artist we are currently removing is the one with the lowest ID for this number of plays
             // Setting a new pointer to the artist with a higher ID;
-            list->setPtrToLowestArtistId(artistPlays->GetFather());
+            node->setPtrToLowestArtistId(artistPlaysNode->getParent());
             // Setting a new pointer to the song of this artist with the lowest ID
-            list->SetPtrToLowestSong(list->GetPtrToLowestSong()->FindMin());
+            node->setPtrToLowestSongId(node->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
         }
-        // Removing unnecessary references to shared_ptrs
-        artistPlays.reset();
-        songPlaysTree.reset();
-        if (list->getArtistPlaysTree()->IsOnlyRoot() && songTreeNowEmpty) {
-            // The artist tree for this node is empty, meaning the node is now empty and can be removed
-            list->GetPrevious()->setNext(list->getNext());
-            list->getNext()->setPrevious(list->GetPrevious());
+        if (node->getArtistPlaysTree()->IsEmpty() && node->getNumberOfPlays() != 0) {
+            // The artist tree for this node is now empty, meaning the node is now pointless and can be removed
+            node->getPrevious()->setNext(node->getNext());
+            node->getNext()->setPrevious(node->getPrevious());
+            delete node;
         }
-        list.reset();
-        artistObj[i].SetPtrToSongNode(nullptr);
-        artistObj[i].SetPtrToArtistNode(nullptr);
     }
-    // Removing unnecessary references to shared_ptrs
-    artist.reset();
+    // Removing songs of artist from total song count.
+    numberOfSongs -= artist->getNumberOfSongs();
+    // Removing artist from total artist count.
+    numberOfArtists--;
+    artistTree.Remove(artistId);
     return SUCCESS;
 }
 
