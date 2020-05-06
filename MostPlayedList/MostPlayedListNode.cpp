@@ -3,6 +3,7 @@
 //
 
 #include "MostPlayedListNode.h"
+#include "../Artist/Artist.h"
 
 MostPlayedListNode::MostPlayedListNode(int numOfPlays) : numberOfPlays(numOfPlays) {
 }
@@ -86,3 +87,7 @@ int MostPlayedListNode::getNumberOfPlays() {
 bool MostPlayedListNode::isNextNullptr() {
     return this->getNext();
 }
+
+class Artist;
+
+

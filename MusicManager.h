@@ -31,6 +31,11 @@ public:
     StatusType GetRecommendedSongs(int numOfSongs, int *artist, int *songs);
 
     ~MusicManager();
+
+    StatusType addSongAtEndOfList(int newNumOfPlays, MostPlayedListNode *playsListNode,
+                                  SongPlays *songPlays, ArtistNode *artistNode, int songID, int artistId);
+
+    StatusType addArtistToPlaysNode();
 };
 
 

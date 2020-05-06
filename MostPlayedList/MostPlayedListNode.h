@@ -7,6 +7,7 @@
 
 #include "../ArtistPlays/ArtistPlays.h"
 #include "../SongPlays/SongPlays.h"
+#include "../Artist/Artist.h"
 
 class MostPlayedListNode {
 private:
@@ -54,6 +55,7 @@ public:
     bool isNextNullptr();
 
     ~MostPlayedListNode();
+
 };
 
 
