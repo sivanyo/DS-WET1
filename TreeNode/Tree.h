@@ -47,7 +47,21 @@ public:
 
     void setParent(TreeNode<T> *nParent);
 
+    int getHeight();
+
     void setHeight(int height);
+
+    static TreeNode<T> *find(TreeNode<T> *node, int gKey);
+
+    TreeNode<T> *findMin(TreeNode<T> *node);
+
+    TreeNode<T> *getNext();
+
+    static void printPreOrder(TreeNode<T> *node);
+
+    static void printInOrder(TreeNode<T> *node);
+
+    static void printPostOrder(TreeNode<T> *node);
 
     static int calculateHeight(TreeNode<T> *root) {
         // update heights
@@ -63,14 +77,6 @@ public:
         }
         return 1 + max(subLeftHeight, subRightHeight);
     }
-
-    int getHeight();
-
-    static TreeNode<T> *find(TreeNode<T> *node, int gKey);
-
-    TreeNode<T> *findMin(TreeNode<T> *node);
-
-    TreeNode<T> *getNext();
 
     static int getBalance(TreeNode<T> *node) {
         if (node == nullptr) {
@@ -88,12 +94,6 @@ public:
         }
         return leftHeight - rightHeight;
     }
-
-    static void printPreOrder(TreeNode<T> *node);
-
-    static void printInOrder(TreeNode<T> *node);
-
-    static void printPostOrder(TreeNode<T> *node);
 };
 
 template<class T>
@@ -102,8 +102,26 @@ TreeNode<T>::TreeNode(int key, T *value): key(key), value(value) {
 }
 
 template<class T>
+TreeNode<T>::~TreeNode() {
+    if (this->right != nullptr) {
+        delete this->right;
+    }
+    if (this->left != nullptr) {
+        delete this->left;
+    }
+    if (this->value != nullptr) {
+        delete this->value;
+    }
+}
+
+template<class T>
 int TreeNode<T>::getKey() {
     return this->key;
+}
+
+template<class T>
+void TreeNode<T>::setKey(int gKey) {
+    this->key = gKey;
 }
 
 template<class T>
@@ -115,6 +133,11 @@ template<class T>
 void TreeNode<T>::setValue(T *value) {
     delete this->value;
     this->value = value;
+}
+
+template<class T>
+void TreeNode<T>::removeValue() {
+    this->value = nullptr;
 }
 
 template<class T>
@@ -148,6 +171,44 @@ void TreeNode<T>::setParent(TreeNode<T> *nParent) {
 }
 
 template<class T>
+int TreeNode<T>::getHeight() {
+    return this->nodeHeight;
+}
+
+template<class T>
+void TreeNode<T>::setHeight(int height) {
+    this->nodeHeight = height;
+}
+
+template<class T>
+TreeNode<T> *TreeNode<T>::find(TreeNode<T> *node, int gKey) {
+    if (!node) {
+        return nullptr;
+    } else if (node->getKey() == gKey) {
+        // The current node is the one we're looking for
+        return node;
+    } else if (node->getKey() > gKey) {
+        // The current node is a father of the node we're looking for
+        return find(node->getLeft(), gKey);
+    } else {
+        // The current node is a father of the node we're looking for
+        return find(node->getRight(), gKey);
+    }
+}
+
+template<class T>
+TreeNode<T> *TreeNode<T>::findMin(TreeNode<T> *node) {
+    if (node == nullptr) {
+        return nullptr;
+    } else if (node->getLeft() == nullptr) {
+        // This node has no left child, which means it is the following node in the tree
+        return node;
+    } else {
+        return findMin(node->getLeft());
+    }
+}
+
+template<class T>
 TreeNode<T> *TreeNode<T>::getNext() {
     TreeNode<T> *current = this;
     if (current->getRight() != nullptr) {
@@ -169,64 +230,6 @@ TreeNode<T> *TreeNode<T>::getNext() {
         }
         return parent;
     }
-}
-
-template<class T>
-TreeNode<T> *TreeNode<T>::findMin(TreeNode<T> *node) {
-    if (node == nullptr) {
-        return nullptr;
-    } else if (node->getLeft() == nullptr) {
-        // This node has no left child, which means it is the following node in the tree
-        return node;
-    } else {
-        return findMin(node->getLeft());
-    }
-}
-
-template<class T>
-TreeNode<T> *TreeNode<T>::find(TreeNode<T> *node, int gKey) {
-    if (!node) {
-        return nullptr;
-    } else if (node->getKey() == gKey) {
-        // The current node is the one we're looking for
-        return node;
-    } else if (node->getKey() > gKey) {
-        // The current node is a father of the node we're looking for
-        return find(node->getLeft(), gKey);
-    } else {
-        // The current node is a father of the node we're looking for
-        return find(node->getRight(), gKey);
-    }
-}
-
-template<class T>
-TreeNode<T>::~TreeNode() {
-    if (this->right != nullptr) {
-        delete this->right;
-    }
-    if (this->left != nullptr) {
-        delete this->left;
-    }
-    if (this->value != nullptr) {
-        delete this->value;
-    }
-}
-
-template<class T>
-void TreeNode<T>::setKey(int gKey) {
-    this->key = gKey;
-
-}
-
-template<class T>
-void TreeNode<T>::setHeight(int height) {
-    this->nodeHeight = height;
-
-}
-
-template<class T>
-int TreeNode<T>::getHeight() {
-    return this->nodeHeight;
 }
 
 template<class T>
@@ -278,11 +281,6 @@ void TreeNode<T>::printPostOrder(TreeNode<T> *node) {
 }
 
 template<class T>
-void TreeNode<T>::removeValue() {
-    this->value = nullptr;
-}
-
-template<class T>
 class Tree {
 private:
     TreeNode<T> *root;
@@ -304,11 +302,15 @@ public:
 
     int Height(TreeNode<T> *root) const;
 
+    TreeNode<T> *GetRoot();
+
     TreeNode<T> *Find(int key);
 
     TreeNode<T> *RightRotate(TreeNode<T> *node);
 
     TreeNode<T> *LeftRotate(TreeNode<T> *node);
+
+    bool IsEmpty();
 
     void PrintPreOrder();
 
@@ -323,11 +325,11 @@ Tree<T>::Tree(): root(nullptr) {
 }
 
 template<class T>
-TreeNode<T> *Tree<T>::Find(int key) {
-    if (!root) {
-        return nullptr;
+Tree<T>::~Tree() {
+    if (root) {
+        delete root;
+        root = nullptr;
     }
-    return TreeNode<T>::find(root, key);
 }
 
 template<class T>
@@ -345,23 +347,6 @@ StatusType Tree<T>::Insert(int key, T *value) {
         InsertNode(root, nNode);
     }
     return SUCCESS;
-}
-
-template<class T>
-TreeNode<T>* Tree<T>::InsertGetNode(int key, T *value) {
-    TreeNode<T> *nNode = new TreeNode<T>(key, value);
-
-    if (!nNode) {
-        return nullptr;
-    }
-
-    if (!root) {
-        // Tree is empty, setting new node as first node
-        root = nNode;
-    } else {
-        InsertNode(root, nNode);
-    }
-    return nNode;
 }
 
 template<class T>
@@ -447,20 +432,20 @@ void Tree<T>::InsertNode(TreeNode<T> *iRoot, TreeNode<T> *ins) {
 }
 
 template<class T>
-int Tree<T>::Height(TreeNode<T> *root) const {
-    int height = 0;
-    if (root != nullptr) {
-        int left = Height(root->getLeft());
-        int right = Height(root->getRight());
-        height = 1 + max(left, right);
-    }
-    return height;
-}
+TreeNode<T> *Tree<T>::InsertGetNode(int key, T *value) {
+    TreeNode<T> *nNode = new TreeNode<T>(key, value);
 
-template<class T>
-Tree<T>::~Tree() {
-    delete root;
-    root = nullptr;
+    if (!nNode) {
+        return nullptr;
+    }
+
+    if (!root) {
+        // Tree is empty, setting new node as first node
+        root = nNode;
+    } else {
+        InsertNode(root, nNode);
+    }
+    return nNode;
 }
 
 template<class T>
@@ -472,8 +457,6 @@ StatusType Tree<T>::Remove(int key) {
         RemoveNode(root, key);
     }
     return SUCCESS;
-
-
 }
 
 template<class T>
@@ -498,39 +481,47 @@ void Tree<T>::RemoveNode(TreeNode<T> *iRoot, int key) {
 
             if (temp == nullptr) {
                 // no child
-                if (parentTemp->getKey() > key) {
-                    // the node to be deleted is the left son
-                    parentTemp->setLeft(nullptr);
-                } else {
-                    // the node to be deleted is the right son
-                    parentTemp->setRight(nullptr);
+                if (parentTemp) {
+                    if (parentTemp->getKey() > key) {
+                        // the node to be deleted is the left son
+                        parentTemp->setLeft(nullptr);
+                    } else {
+                        // the node to be deleted is the right son
+                        parentTemp->setRight(nullptr);
+                    }
                 }
-                // We removed a child with no children, we removed his pointer
+                // We removed a node with no children, we removed his pointer
                 // from his parent node, now we can safely delete him.
+                if (trueRoot) {
+                    this->root = nullptr;
+                }
                 iRoot->setLeft(nullptr);
                 iRoot->setRight(nullptr);
-                iRoot->removeValue();
                 delete iRoot;
                 iRoot = nullptr;
                 return;
             } else {
                 // one child case
-                temp->setParent(parentTemp);
-                if (parentTemp->getKey() > key) {
-                    // The node to be deleted is the left son
-                    // connecting his only child to the left side of the original parent
-                    parentTemp->setLeft(temp);
+                if (parentTemp) {
+                    temp->setParent(parentTemp);
+                    if (parentTemp->getKey() > key) {
+                        // The node to be deleted is the left son
+                        // connecting his only child to the left side of the original parent
+                        parentTemp->setLeft(temp);
+                    } else {
+                        // The node to be deleted is the right son
+                        // connecting his only child to the right side of the original parent
+                        parentTemp->setRight(temp);
+                    }
                 } else {
-                    // The node to be deleted is the right son
-                    // connecting his only child to the right side of the original parent
-                    parentTemp->setRight(temp);
+                    this->root = temp;
+                    temp->setParent(nullptr);
                 }
-                // We removed a child with one child, we removed his pointer
+                // We removed a node with one child, we removed his pointer
                 // from his parent node, and set his child as the new child of his parent
                 // now we can safely delete him.
                 iRoot->setLeft(nullptr);
                 iRoot->setRight(nullptr);
-                iRoot->removeValue();
                 delete iRoot;
                 iRoot = nullptr;
                 return;
@@ -541,6 +532,7 @@ void Tree<T>::RemoveNode(TreeNode<T> *iRoot, int key) {
             // Replacing the key and value of the node we want to delete with his successor
             iRoot->setKey(temp->getKey());
             iRoot->setValue(temp->getValue());
+            temp->removeValue();
             // Removing the successor from his original place
             RemoveNode(iRoot->getRight(), temp->getKey());
         }
@@ -598,18 +590,27 @@ void Tree<T>::RemoveNode(TreeNode<T> *iRoot, int key) {
 }
 
 template<class T>
-void Tree<T>::PrintPreOrder() {
-    TreeNode<T>::printPreOrder(root);
+int Tree<T>::Height(TreeNode<T> *root) const {
+    int height = 0;
+    if (root != nullptr) {
+        int left = Height(root->getLeft());
+        int right = Height(root->getRight());
+        height = 1 + max(left, right);
+    }
+    return height;
 }
 
 template<class T>
-void Tree<T>::PrintInOrder() {
-    TreeNode<T>::printInOrder(root);
+TreeNode<T> *Tree<T>::GetRoot() {
+    return this->root;
 }
 
 template<class T>
-void Tree<T>::PrintPostOrder() {
-    TreeNode<T>::printPostOrder(root);
+TreeNode<T> *Tree<T>::Find(int key) {
+    if (!root) {
+        return nullptr;
+    }
+    return TreeNode<T>::find(root, key);
 }
 
 template<class T>
@@ -626,7 +627,6 @@ TreeNode<T> *Tree<T>::LeftRotate(TreeNode<T> *node) {
     if (t) {
         t->setParent(node);
     }
-
 
     // update heights
     node->setHeight(TreeNode<T>::calculateHeight(node));
@@ -658,6 +658,26 @@ TreeNode<T> *Tree<T>::RightRotate(TreeNode<T> *node) {
     x->setHeight(TreeNode<T>::calculateHeight(x));
 
     return x;
+}
+
+template<class T>
+bool Tree<T>::IsEmpty() {
+    return root == nullptr;
+}
+
+template<class T>
+void Tree<T>::PrintPreOrder() {
+    TreeNode<T>::printPreOrder(root);
+}
+
+template<class T>
+void Tree<T>::PrintInOrder() {
+    TreeNode<T>::printInOrder(root);
+}
+
+template<class T>
+void Tree<T>::PrintPostOrder() {
+    TreeNode<T>::printPostOrder(root);
 }
 
 #endif //WET1_TREE_H

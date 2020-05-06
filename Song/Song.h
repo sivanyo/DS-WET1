@@ -12,7 +12,7 @@ class Song {
 private:
     int songId;
     int numberOfPlays = 0;
-    ArtistPlaysNode *ptrToArtistIdPlaysTree = nullptr;
+    TreeNode<ArtistPlays> *ptrToArtistIdPlaysTree = nullptr;
     SongPlaysNode *ptrToSongNodeInPlaysTree = nullptr;
 public:
     Song();
