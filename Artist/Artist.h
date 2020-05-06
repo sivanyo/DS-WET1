@@ -22,6 +22,8 @@ public:
 
     int getNumberOfSongs() const;
 
+    void setNumberOfSongs (int newNum);
+
     Song *operator[](int index) const;
 
     Song *&operator[](int index);

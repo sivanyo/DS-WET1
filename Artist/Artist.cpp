@@ -42,3 +42,7 @@ Artist::~Artist() {
     delete this->artistSongs;
 }
 
+void Artist::setNumberOfSongs(int newNum) {
+    this->numberOfSongs=newNum;
+}
+

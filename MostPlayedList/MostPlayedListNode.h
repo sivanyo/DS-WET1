@@ -49,6 +49,10 @@ public:
 
     void setNext(MostPlayedListNode *ptr);
 
+    int getNumberOfPlays();
+
+    bool isNextNullptr();
+
     ~MostPlayedListNode();
 };
 
