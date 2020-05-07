@@ -320,8 +320,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
                 return ALLOCATION_ERROR;
             }
-            ArtistPlaysTree *nArtistTree = new ArtistPlaysTree();
-            if (!nArtistTree) {
+            ArtistPlaysTree *nArtistPlaysTree = new ArtistPlaysTree();
+            if (!nArtistPlaysTree) {
                 // Rolling back changes to number of plays
                 songPlays->DecrementNumberOfPlays();
                 newNumOfPlays--;
@@ -335,10 +335,11 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 songPlays->DecrementNumberOfPlays();
                 newNumOfPlays--;
                 artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
-                delete nArtistTree;
+                delete nArtistPlaysTree;
                 delete nPlayListNode;
                 return ALLOCATION_ERROR;
             }
+            nPlayListNode->setArtistPlaysTree(nArtistPlaysTree);
             ArtistPlaysNode *nArtistPlaysNode = nPlayListNode->getArtistPlaysTree()->InsertGetNode(
                     artistId, nArtistPlays);
             if (!nArtistPlaysNode) {
@@ -347,7 +348,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 newNumOfPlays--;
                 artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
                 delete nArtistPlays;
-                delete nArtistTree;
+                delete nArtistPlaysTree;
                 delete nPlayListNode;
                 return ALLOCATION_ERROR;
             }
@@ -359,7 +360,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
                 delete nArtistPlaysNode;
                 delete nArtistPlays;
-                delete nArtistTree;
+                delete nArtistPlaysTree;
                 delete nPlayListNode;
                 return ALLOCATION_ERROR;
             }
@@ -372,7 +373,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 delete nSongTree;
                 delete nArtistPlaysNode;
                 delete nArtistPlays;
-                delete nArtistTree;
+                delete nArtistPlaysTree;
                 delete nPlayListNode;
                 return ALLOCATION_ERROR;
             }
@@ -384,6 +385,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             // Updating pointers in the new SongPlaysNode object to the Song object
             nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
             nSongNode->getValue()->setPtrToListNode(nPlayListNode);
+            nPlayListNode->setPtrToLowestArtistId(nArtistPlaysNode);
+            nPlayListNode->setPtrToLowestSongId(nSongNode);
             // Updating linked list pointers because we entered a new node in the middle of the list
             nPlayListNode->setNext(playsListNode->getNext());
             nPlayListNode->getNext()->setPrevious(nPlayListNode);
@@ -401,8 +404,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
             return ALLOCATION_ERROR;
         }
-        ArtistPlaysTree *nArtistTree = new ArtistPlaysTree();
-        if (!nArtistTree) {
+        ArtistPlaysTree *nArtistPlaysTree = new ArtistPlaysTree();
+        if (!nArtistPlaysTree) {
             // Rolling back changes to number of plays
             songPlays->DecrementNumberOfPlays();
             newNumOfPlays--;
@@ -410,13 +413,14 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             delete nPlayListNode;
             return ALLOCATION_ERROR;
         }
+        nPlayListNode->setArtistPlaysTree(nArtistPlaysTree);
         auto *nArtistPlays = new ArtistPlays(artistId, nPlayListNode);
         if (!nArtistPlays) {
             // Rolling back changes to number of plays
             songPlays->DecrementNumberOfPlays();
             newNumOfPlays--;
             artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
-            delete nArtistTree;
+            delete nArtistPlaysTree;
             delete nPlayListNode;
             return ALLOCATION_ERROR;
         }
@@ -428,7 +432,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             newNumOfPlays--;
             artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
             delete nArtistPlays;
-            delete nArtistTree;
+            delete nArtistPlaysTree;
             delete nPlayListNode;
             return ALLOCATION_ERROR;
         }
@@ -440,7 +444,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             artistNode->getValue()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
             delete nArtistPlaysNode;
             delete nArtistPlays;
-            delete nArtistTree;
+            delete nArtistPlaysTree;
             delete nPlayListNode;
             return ALLOCATION_ERROR;
         }
@@ -453,7 +457,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             delete nSongTree;
             delete nArtistPlaysNode;
             delete nArtistPlays;
-            delete nArtistTree;
+            delete nArtistPlaysTree;
             delete nPlayListNode;
             return ALLOCATION_ERROR;
         }
@@ -464,6 +468,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         // Updating pointers in the new SongPlaysNode object to the Song object
         nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
         nSongNode->getValue()->setPtrToListNode(nPlayListNode);
+        nPlayListNode->setPtrToLowestArtistId(nArtistPlaysNode);
+        nPlayListNode->setPtrToLowestSongId(nSongNode);
         // Updating linked list pointers because we entered a new node in the middle of the list
         nPlayListNode->setNext(nullptr);
         playsListNode->setNext(nPlayListNode);
@@ -476,9 +482,9 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         if (artistPlaysNode->getRight() == nullptr && artistPlaysNode->getLeft() == nullptr &&
             artistPlaysNode->getParent() == nullptr) {
             // the artist is alone in the MostPlaysListNode we need to remove the link
-            ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
-            SongPlaysNode *songNode = oArtistPlaysNode->getValue()->getSongPlaysTree()->Find(songID);
-            songNode->removeValue();
+//            ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
+//            SongPlaysNode *songNode = oArtistPlaysNode->getValue()->getSongPlaysTree()->Find(songID);
+//            songNode->removeValue();
             if (playsListNode->getNumberOfPlays() != 0) {
                 // This is not the list node with 0 plays, meaning it is now an empty node in the middle of linked
                 // list, so we can delete it
@@ -489,17 +495,17 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 prev->setNext(next);
                 next->setPrevious(prev);
                 delete playsListNode;
+            } else {
+                playsListNode->getArtistPlaysTree()->Remove(artistId);
             }
-            playsListNode->getArtistPlaysTree()->Remove(artistId);
-            delete playsListNode;//might leak
         } else {
             // there are more artists in this artistsPlaysNode
             // We need to remove only the artist, with it's (old) reference to the song we now addded a stream to.
             // We also need to remember to update the pointer of this list node to the new lowest artist ID, if the
             // artist we just removed is the previous one with the lowest ID
             ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
-            SongPlaysNode *songNode = oArtistPlaysNode->getValue()->getSongPlaysTree()->Find(songID);
-            songNode->removeValue();
+//            SongPlaysNode *songNode = oArtistPlaysNode->getValue()->getSongPlaysTree()->Find(songID);
+//            songNode->removeValue();
             if (playsListNode->getPtrToLowestArtistId()->getKey() == artistId) {
                 playsListNode->setPtrToLowestArtistId(oArtistPlaysNode->getNext());
                 playsListNode->setPtrToLowestSongId(playsListNode->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
@@ -517,7 +523,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             playsListNode->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId()->findMin(songNode));
             oArtistPlaysNode->getValue()->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId());
         }
-        songNode->removeValue();
+//        songNode->removeValue();
         oArtistPlaysNode->getValue()->getSongPlaysTree()->Remove(songID);
     }
     return SUCCESS;
@@ -539,20 +545,21 @@ StatusType MusicManager::GetRecommendedSongs(int numOfSongs, int *artist, int *s
     if (numOfSongs > this->numberOfSongs) {
         return FAILURE;
     }
+    MostPlayedListNode *currListNode = this->ptrToMostRecommended;
     SongPlaysNode *RecommendedSong = this->ptrToMostRecommended->getPtrToLowestSongId();
     ArtistPlaysNode *RecommendedArtist = this->ptrToMostRecommended->getPtrToLowestArtistId();
     int i = 0;
     while (numOfSongs > 0) {
-        //finish printing all the songs in this tree, should move to next artist in line
+        // finish printing all the songs in this tree, should move to next artist in line
         if (RecommendedSong == nullptr) {
             RecommendedArtist = RecommendedArtist->getNext();
-            //finish printing all the songs with K plays, should move to previous node
+            // finish printing all the songs with K plays, should move to previous node
             if (RecommendedArtist == nullptr) {
-                RecommendedSong = RecommendedSong->getValue()->getPtrToListNode()->getPrevious()->getPtrToLowestSongId();
-                RecommendedArtist = RecommendedArtist->getValue()->getPtrToListNode()->getPrevious()->getPtrToLowestArtistId();
-            }
-                //should get ptr to lowest song node
-            else {
+                currListNode = currListNode->getPrevious();
+                RecommendedSong = currListNode->getPtrToLowestSongId();
+                RecommendedArtist = currListNode->getPtrToLowestArtistId();
+            } else {
+                // should get ptr to lowest song node
                 RecommendedSong = RecommendedArtist->getValue()->getPtrToLowestSongId();
             }
         }
@@ -571,7 +578,13 @@ MusicManager::~MusicManager() {
         delete this->artistTree;
     }
     if (this->mostPlayedList) {
-        delete this->mostPlayedList;
+        MostPlayedListNode *current = this->mostPlayedList;
+        MostPlayedListNode *temp = current->getNext();
+        while (current) {
+            temp = current->getNext();
+            delete current;
+            current = temp;
+        }
     }
 }
 

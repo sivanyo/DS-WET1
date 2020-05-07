@@ -77,7 +77,9 @@ bool MostPlayedListNode::AddArtist(ArtistPlaysNode *artistNode) {
 }
 
 MostPlayedListNode::~MostPlayedListNode() {
-    delete this->artistPlaysTree;
+    if (this->getArtistPlaysTree()) {
+        delete this->artistPlaysTree;
+    }
 }
 
 int MostPlayedListNode::getNumberOfPlays() {
