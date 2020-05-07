@@ -169,11 +169,15 @@ StatusType MusicManager::RemoveArtist(int artistId) {
             // Setting a new pointer to the artist with a higher ID;
             node->setPtrToLowestArtistId(artistPlaysNode->getNext());
             // Setting a new pointer to the song of this artist with the lowest ID
-            node->setPtrToLowestSongId(node->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
+            if (node->getPtrToLowestArtistId()) {
+                node->setPtrToLowestSongId(node->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
+            }
         }
         // Removing the artist from the list
-        node->getArtistPlaysTree()->Remove(artistId);
-        if (node->getArtistPlaysTree()->IsEmpty() && node->getNumberOfPlays() != 0) {
+        if (node->getArtistPlaysTree()) {
+            node->getArtistPlaysTree()->Remove(artistId);
+        }
+        if (!node->getArtistPlaysTree() && node->getNumberOfPlays() != 0) {
             // The artist tree for this node is now empty, meaning the node is now pointless and can be removed
             node->getPrevious()->setNext(node->getNext());
             node->getNext()->setPrevious(node->getPrevious());
