@@ -44,5 +44,7 @@ void ArtistPlays::setPtrToListNode(MostPlayedListNode *ptr) {
 }
 
 ArtistPlays::~ArtistPlays() {
-    delete SongPlaysTree;
+    if (SongPlaysTree) {
+        delete SongPlaysTree;
+    }
 }
