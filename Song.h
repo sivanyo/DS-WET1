@@ -6,7 +6,7 @@
 #define WET1_SONG_H
 
 
-#include "../ArtistPlays/ArtistPlays.h"
+#include "ArtistPlays.h"
 
 class ArtistPlays;
 class SongPlays;

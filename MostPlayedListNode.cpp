@@ -3,7 +3,7 @@
 //
 
 #include "MostPlayedListNode.h"
-#include "../Artist/Artist.h"
+#include "Artist.h"
 
 MostPlayedListNode::MostPlayedListNode(int numOfPlays) : numberOfPlays(numOfPlays) {
 }

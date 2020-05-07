@@ -5,8 +5,8 @@
 #ifndef WET1_SONGPLAYS_H
 #define WET1_SONGPLAYS_H
 
-#include "../TreeNode/Tree.h"
-#include "../Song/Song.h"
+#include "Tree.h"
+#include "Song.h"
 
 class MostPlayedListNode;
 class Song;

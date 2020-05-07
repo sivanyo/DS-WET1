@@ -5,9 +5,9 @@
 #ifndef WET1_MOSTPLAYEDLISTNODE_H
 #define WET1_MOSTPLAYEDLISTNODE_H
 
-#include "../ArtistPlays/ArtistPlays.h"
-#include "../SongPlays/SongPlays.h"
-#include "../Artist/Artist.h"
+#include "ArtistPlays.h"
+#include "SongPlays.h"
+#include "Artist.h"
 
 class MostPlayedListNode {
 private:

@@ -2,7 +2,7 @@
 // Created by Mor on 26/04/2020.
 //
 
-#include "Artist/Artist.h"
+#include "Artist.h"
 #include "MusicManager.h"
 
 MusicManager::MusicManager() : artistTree(new ArtistTree()), mostPlayedList(nullptr),

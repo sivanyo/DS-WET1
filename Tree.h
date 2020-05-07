@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include "../library1.h"
+#include "library1.h"
 
 using std::max;
 

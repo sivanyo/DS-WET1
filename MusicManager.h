@@ -7,8 +7,8 @@
 
 
 #include "library1.h"
-#include "MostPlayedList/MostPlayedListNode.h"
-#include "Artist/Artist.h"
+#include "MostPlayedListNode.h"
+#include "Artist.h"
 
 class MusicManager {
 private:

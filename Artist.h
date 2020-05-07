@@ -5,8 +5,8 @@
 #ifndef WET1_ARTIST_H
 #define WET1_ARTIST_H
 
-#include "../Song/Song.h"
-#include "../TreeNode/Tree.h"
+#include "Song.h"
+#include "Tree.h"
 
 class Artist {
 private:
