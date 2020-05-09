@@ -513,7 +513,6 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         // We also need to remember to update the pointer of this list node to the new lowest song ID, if the
         // so we just removed is the previous one with the lowest ID
         ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
-        SongPlaysNode *songNode = oArtistPlaysNode->getValue()->getSongPlaysTree()->Find(songID);
         if (playsListNode->getPtrToLowestSongId()->getKey() == songID) {
             playsListNode->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId()->getNext());
             oArtistPlaysNode->getValue()->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId());
