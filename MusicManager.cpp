@@ -117,7 +117,8 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         plays->setPtrToSong(tempSong);
 
     }
-
+    // Setting pointer in artist node to point to the song with the lowest ID with 0 plays (song ID 0 for now)
+    artistPlaysNode->getValue()->setPtrToLowestSongId(lowestIdSongNode);
     if (this->mostPlayedList->getPtrToLowestArtistId()) {
         if (this->mostPlayedList->getPtrToLowestArtistId()->getKey() > artistId) {
             // The newly added artist has an ID that's lower than the current lowest artist ID,
