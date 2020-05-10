@@ -228,6 +228,10 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 
     // getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list artistNode
     SongPlaysNode *songNode = artistNode->getValue()->operator[](songID)->getPtrToSongNodeInPlaysTree();
+    bool willSwap = false;
+    if (songNode->getLeft() && songNode->getRight()) {
+        willSwap = true;
+    }
     MostPlayedListNode *playsListNode = songNode->getValue()->getPtrToListNode();
     ArtistPlaysNode *artistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
 //    ArtistPlaysNode *artistPlaysNode = artistNode->getValue()->operator[](songID)->getPtrToArtistIdPlaysTree(); // THIS IS OLD
@@ -508,13 +512,13 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         // We also need to remember to update the pointer of this list node to the new lowest song ID, if the
         // Artist ID of this artist is the lowest one in this node
         // Otherwise we just remove the song node
-        removingSongNodeCaseNotAlone(playsListNode, artistId, songID,songNode, artistNode);
+        removingSongNodeCaseNotAlone(playsListNode, artistId, songID, songNode, artistNode, willSwap);
     }
     return SUCCESS;
 }
 
 StatusType MusicManager::NumberOfStreams(int artistId, int songID, int *streams) {
-    if(!streams){
+    if (!streams) {
         return INVALID_INPUT;
     }
     ArtistNode *node = this->artistTree->Find(artistId);
@@ -653,7 +657,7 @@ StatusType MusicManager::addSongAtEndOfList(int newNumOfPlays, MostPlayedListNod
 }
 
 void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNode, int artistId, int songID,
-                                             SongPlaysNode * songNode,ArtistNode* artistNode){
+                                                SongPlaysNode *songNode, ArtistNode *artistNode, bool willSwap) {
     ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
     if (playsListNode->getPtrToLowestArtistId()->getKey() == artistId) {
         // The current artist is the one with the lowest ID in this list node,
@@ -674,8 +678,7 @@ void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNod
     }
     oArtistPlaysNode->getValue()->getSongPlaysTree()->Remove(songID);
     // need to make sure that the song node we removed didn't cause invalid references in the tree or in song array
-    // TODO: this code leaks
-    if (songNode) {
+    if (willSwap) {
         if ((songNode->getLeft() || songNode->getRight()) && songNode->getKey() != songID) {
             // The original node we looked at has a different ID, which means the old node was replaced with the values from a child node,
             // need to update the pointers in the song array.
@@ -684,7 +687,7 @@ void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNod
     }
 }
 
-void MusicManager::removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, MostPlayedListNode *playsListNode, int artistId){
+void MusicManager::removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, MostPlayedListNode *playsListNode, int artistId) {
     if (artistPlaysNode->getRight() == nullptr && artistPlaysNode->getLeft() == nullptr &&
         artistPlaysNode->getParent() == nullptr) {
         // the artist is alone in the MostPlaysListNode we need to remove the link
