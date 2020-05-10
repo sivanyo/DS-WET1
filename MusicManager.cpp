@@ -112,7 +112,7 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         // Saving inside every song of this artist, the pointer to the node of that song in the artist Songs tree
         tempSong->setPtrToSongNodeInPlaysTree(tempSongNode);
         // Saving inside every song of this artist, the pointer to the node of that artist in the linked list
-        tempSong->setPtrToArtistIdPlaysTree(artistPlaysNode);
+//        tempSong->setPtrToArtistIdPlaysTree(artistPlaysNode); // REMOVED TO PREVENT SEGFAULT
         // Saving inside every song plays node of this artist, the pointer to the Song object of that song
         plays->setPtrToSong(tempSong);
 
@@ -153,9 +153,11 @@ StatusType MusicManager::RemoveArtist(int artistId) {
             continue;
         }
         // Getting the list where the current song is stored
-        MostPlayedListNode *node = tempSong->getPtrToArtistIdPlaysTree()->getValue()->getPtrToListNode();
+//        MostPlayedListNode *node = tempSong->getPtrToArtistIdPlaysTree()->getValue()->getPtrToListNode();// THIS IS OLD
+        MostPlayedListNode *node = tempSong->getPtrToSongNodeInPlaysTree()->getValue()->getPtrToListNode();
+        ArtistPlaysNode *artistPlaysNode = node->getArtistPlaysTree()->Find(artistId);
         // Getting the Artist Plays Node of the current song
-        ArtistPlaysNode *artistPlaysNode = tempSong->getPtrToArtistIdPlaysTree();
+//        ArtistPlaysNode *artistPlaysNode = tempSong->getPtrToArtistIdPlaysTree(); // THIS WILL BE DELETED
         // Getting the songs tree where the current song is stored
         SongPlaysTree *songTree = artistPlaysNode->getValue()->getSongPlaysTree();
         // Deleting all nodes from the song plays tree, and marking the songs in the Song array as deleted
@@ -212,8 +214,10 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 
     // getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list artistNode
     SongPlaysNode *songNode = artistNode->getValue()->operator[](songID)->getPtrToSongNodeInPlaysTree();
-    ArtistPlaysNode *artistPlaysNode = artistNode->getValue()->operator[](songID)->getPtrToArtistIdPlaysTree();
-    MostPlayedListNode *playsListNode = artistPlaysNode->getValue()->getPtrToListNode();
+    MostPlayedListNode *playsListNode = songNode->getValue()->getPtrToListNode();
+    ArtistPlaysNode *artistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
+//    ArtistPlaysNode *artistPlaysNode = artistNode->getValue()->operator[](songID)->getPtrToArtistIdPlaysTree(); // THIS IS OLD
+//    MostPlayedListNode *playsListNode = artistPlaysNode->getValue()->getPtrToListNode(); // THIS IS OLD
     // Creating a new song plays object to insert to the next linked list node
     SongPlays *songPlays = new SongPlays(songID, artistId, nullptr);
     if (!songPlays) {
@@ -241,7 +245,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                     return ALLOCATION_ERROR;
                 }
                 // Updating pointers in Song object to the new SongPlaysNode
-                artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode);
+//                artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode); // REMOVED TO PREVENT SEGFAULT
                 artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
                 // Updating pointers in the new SongPlaysNode object to the Song object
                 nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
@@ -295,7 +299,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 }
                 nArtistPlaysNode->getValue()->setPtrToLowestSongId(nSongNode);
                 // Updating pointers in Song object to the new SongPlaysNode
-                artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode);
+//                artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode); // REMOVED TO PREVENT SEGFAULT
                 artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
                 // Updating pointers in the new SongPlaysNode object to the Song object
                 nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
@@ -378,7 +382,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             nArtistPlaysNode->getValue()->setPtrToLowestSongId(nSongNode);
             nArtistPlays->setSongPlaysTree(nSongTree);
             // Updating pointers in Song object to the new SongPlaysNode
-            artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode);
+//            artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode); // REMOVED TO PREVENT SEGFAULT
             artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
             // Updating pointers in the new SongPlaysNode object to the Song object
             nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
@@ -462,7 +466,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         nArtistPlays->setSongPlaysTree(nSongTree);
         nArtistPlaysNode->getValue()->setPtrToLowestSongId(nSongNode);
         // Updating pointers in Song object to the new SongPlaysNode
-        artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode);
+//        artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(nArtistPlaysNode); // REMOVED TO PREVENT SEGFAULT
         artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
         // Updating pointers in the new SongPlaysNode object to the Song object
         nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
@@ -662,7 +666,7 @@ StatusType MusicManager::addSongAtEndOfList(int newNumOfPlays, MostPlayedListNod
     }
     nArtist->setSongPlaysTree(nSongTree);
     this->ptrToMostRecommended = newPlayListNode;
-    artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(newPtrToArtistNode);
+//    artistNode->getValue()->operator[](songID)->setPtrToArtistIdPlaysTree(newPtrToArtistNode);
     artistNode->getValue()->operator[](songID)->setPtrToSongNodeInPlaysTree(nSongNode);
     nSongNode->getValue()->setPtrToSong(artistNode->getValue()->operator[](songID));
     playsListNode->setNext(newPlayListNode);
