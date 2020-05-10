@@ -514,6 +514,9 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 }
 
 StatusType MusicManager::NumberOfStreams(int artistId, int songID, int *streams) {
+    if(!streams){
+        return INVALID_INPUT;
+    }
     ArtistNode *node = this->artistTree->Find(artistId);
     if (node == nullptr) {
         return FAILURE;
