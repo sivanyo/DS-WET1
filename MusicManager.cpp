@@ -176,6 +176,15 @@ StatusType MusicManager::RemoveArtist(int artistId) {
                 // There really is another node in the aritstplays tree
                 node->setPtrToLowestSongId(node->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
             }
+            else{
+                //this artist was alone in this node
+                MostPlayedListNode *temp = this->ptrToMostRecommended;
+                if(node->getNumberOfPlays() == temp->getNumberOfPlays()){
+                    //the song we are deleting is the most recommended song
+                    //now this node is no longer the most recommende
+                    ptrToMostRecommended = node->getPrevious();
+                }
+            }
         }
         // Removing the artist from the list
         if (node->getArtistPlaysTree()) {
