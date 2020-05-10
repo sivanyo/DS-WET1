@@ -501,73 +501,14 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 
     if (songNode->getRight() == nullptr && songNode->getLeft() == nullptr && songNode->getParent() == nullptr) {
         // the song was alone in the artistPlaysTree, we  need to delete the artistPlaysTree
-        if (artistPlaysNode->getRight() == nullptr && artistPlaysNode->getLeft() == nullptr &&
-            artistPlaysNode->getParent() == nullptr) {
-            // the artist is alone in the MostPlaysListNode we need to remove the link
-            if (playsListNode->getNumberOfPlays() != 0) {
-                // This is not the list node with 0 plays, meaning it is now an empty node in the middle of linked
-                // list, so we can delete it
-                // We also need to connect the node after it to the one before it, to make sure the linked list is still
-                // properly connected
-                MostPlayedListNode *prev = playsListNode->getPrevious();
-                MostPlayedListNode *next = playsListNode->getNext();
-                prev->setNext(next);
-                next->setPrevious(prev);
-                delete playsListNode;
-            } else {
-                // Removing the last artist from the 0 plays list node
-                playsListNode->getArtistPlaysTree()->Remove(artistId);
-                // Updating pointers to lowest song and artist ID to null because there are no
-                // artists or songs in this node
-                playsListNode->setPtrToLowestArtistId(nullptr);
-                playsListNode->setPtrToLowestSongId(nullptr);
-            }
-        } else {
-            // there are more artists in this artistsPlaysNode
-            // We need to remove only the artist, with it's (old) reference to the song we now added a stream to.
-            // We also need to remember to update the pointer of this list node to the new lowest artist ID, if the
-            // artist we just removed is the previous one with the lowest ID
-            ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
-            if (playsListNode->getPtrToLowestArtistId()->getKey() == artistId) {
-                playsListNode->setPtrToLowestArtistId(oArtistPlaysNode->getNext());
-                playsListNode->setPtrToLowestSongId(playsListNode->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
-            }
-            playsListNode->getArtistPlaysTree()->Remove(artistId);
-        }
+        removingSongNodeCaseAlone(artistPlaysNode, playsListNode, artistId);
     } else {
         // This is not the last song of the artist with this number of plays,
         // so we should only remove this song
         // We also need to remember to update the pointer of this list node to the new lowest song ID, if the
         // Artist ID of this artist is the lowest one in this node
         // Otherwise we just remove the song node
-        ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
-        if (playsListNode->getPtrToLowestArtistId()->getKey() == artistId) {
-            // The current artist is the one with the lowest ID in this list node,
-            // So we need to check if the song we added a stream to is the one with the lowest ID
-            // If it is, we need to update the list pointer to the following song
-            if (playsListNode->getPtrToLowestSongId()->getKey() == songID) {
-                playsListNode->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId()->getNext());
-                oArtistPlaysNode->getValue()->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId());
-            }
-        } else {
-            // The current artist is not the one with the lowest ID in this list node,
-            // But we still need to check if the song we're now removing is the one with the lowest ID
-            // For him, if so, we need to find the next one
-            if (oArtistPlaysNode->getValue()->getPtrToLowestSongId()->getKey() == songID) {
-                // Need to update the pointer to the next song
-                oArtistPlaysNode->getValue()->setPtrToLowestSongId(songNode->getNext());
-            }
-        }
-        oArtistPlaysNode->getValue()->getSongPlaysTree()->Remove(songID);
-        // need to make sure that the song node we removed didn't cause invalid references in the tree or in song array
-        // TODO: this code leaks
-        if (songNode) {
-            if ((songNode->getLeft() || songNode->getRight()) && songNode->getKey() != songID) {
-                // The original node we looked at has a different ID, which means the old node was replaced with the values from a child node,
-                // need to update the pointers in the song array.
-                artistNode->getValue()->operator[](songNode->getKey())->setPtrToSongNodeInPlaysTree(songNode);
-            }
-        }
+        removingSongNodeCaseNotAlone(playsListNode, artistId, songID,songNode, artistNode);
     }
     return SUCCESS;
 }
@@ -708,3 +649,70 @@ StatusType MusicManager::addSongAtEndOfList(int newNumOfPlays, MostPlayedListNod
     return SUCCESS;
 }
 
+void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNode, int artistId, int songID,
+                                             SongPlaysNode * songNode,ArtistNode* artistNode){
+    ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
+    if (playsListNode->getPtrToLowestArtistId()->getKey() == artistId) {
+        // The current artist is the one with the lowest ID in this list node,
+        // So we need to check if the song we added a stream to is the one with the lowest ID
+        // If it is, we need to update the list pointer to the following song
+        if (playsListNode->getPtrToLowestSongId()->getKey() == songID) {
+            playsListNode->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId()->getNext());
+            oArtistPlaysNode->getValue()->setPtrToLowestSongId(playsListNode->getPtrToLowestSongId());
+        }
+    } else {
+        // The current artist is not the one with the lowest ID in this list node,
+        // But we still need to check if the song we're now removing is the one with the lowest ID
+        // For him, if so, we need to find the next one
+        if (oArtistPlaysNode->getValue()->getPtrToLowestSongId()->getKey() == songID) {
+            // Need to update the pointer to the next song
+            oArtistPlaysNode->getValue()->setPtrToLowestSongId(songNode->getNext());
+        }
+    }
+    oArtistPlaysNode->getValue()->getSongPlaysTree()->Remove(songID);
+    // need to make sure that the song node we removed didn't cause invalid references in the tree or in song array
+    // TODO: this code leaks
+    if (songNode) {
+        if ((songNode->getLeft() || songNode->getRight()) && songNode->getKey() != songID) {
+            // The original node we looked at has a different ID, which means the old node was replaced with the values from a child node,
+            // need to update the pointers in the song array.
+            artistNode->getValue()->operator[](songNode->getKey())->setPtrToSongNodeInPlaysTree(songNode);
+        }
+    }
+}
+
+void MusicManager::removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, MostPlayedListNode *playsListNode, int artistId){
+    if (artistPlaysNode->getRight() == nullptr && artistPlaysNode->getLeft() == nullptr &&
+        artistPlaysNode->getParent() == nullptr) {
+        // the artist is alone in the MostPlaysListNode we need to remove the link
+        if (playsListNode->getNumberOfPlays() != 0) {
+            // This is not the list node with 0 plays, meaning it is now an empty node in the middle of linked
+            // list, so we can delete it
+            // We also need to connect the node after it to the one before it, to make sure the linked list is still
+            // properly connected
+            MostPlayedListNode *prev = playsListNode->getPrevious();
+            MostPlayedListNode *next = playsListNode->getNext();
+            prev->setNext(next);
+            next->setPrevious(prev);
+            delete playsListNode;
+        } else {
+            // Removing the last artist from the 0 plays list node
+            playsListNode->getArtistPlaysTree()->Remove(artistId);
+            // Updating pointers to lowest song and artist ID to null because there are no
+            // artists or songs in this node
+            playsListNode->setPtrToLowestArtistId(nullptr);
+            playsListNode->setPtrToLowestSongId(nullptr);
+        }
+    } else {
+        // there are more artists in this artistsPlaysNode
+        // We need to remove only the artist, with it's (old) reference to the song we now added a stream to.
+        // We also need to remember to update the pointer of this list node to the new lowest artist ID, if the
+        // artist we just removed is the previous one with the lowest ID
+        ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
+        if (playsListNode->getPtrToLowestArtistId()->getKey() == artistId) {
+            playsListNode->setPtrToLowestArtistId(oArtistPlaysNode->getNext());
+            playsListNode->setPtrToLowestSongId(playsListNode->getPtrToLowestArtistId()->getValue()->getPtrToLowestSongId());
+        }
+        playsListNode->getArtistPlaysTree()->Remove(artistId);
+    }
+}

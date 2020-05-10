@@ -36,6 +36,11 @@ public:
                                   SongPlays *songPlays, ArtistNode *artistNode, int songID, int artistId);
 
     StatusType addArtistToPlaysNode();
+
+    void removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNode, int artistId, int songID, SongPlaysNode *songNode,
+                                   ArtistNode *artistNode);
+
+    void removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, MostPlayedListNode *playsListNode, int artistId);
 };
 
 
