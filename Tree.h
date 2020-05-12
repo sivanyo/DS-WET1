@@ -340,6 +340,10 @@ StatusType Tree<T>::Insert(int key, T *value) {
         return ALLOCATION_ERROR;
     }
 
+    if(Find(key)){
+        return FAILURE;
+    }
+
     if (!root) {
         // Tree is empty, setting new node as first node
         root = nNode;
@@ -428,6 +432,17 @@ void Tree<T>::InsertNode(TreeNode<T> *iRoot, TreeNode<T> *ins) {
         } else {
             temp->setRight(iRoot);
         }
+        TreeNode<T> *subRightTree = temp->getRight();
+        TreeNode<T> *subLeftTree = temp->getLeft();
+        int subLeftHeight = 0;
+        int subRightHeight = 0;
+        if (subLeftTree) {
+            subLeftHeight = subLeftTree->getHeight();
+        }
+        if (subRightTree) {
+            subRightHeight = subRightTree->getHeight();
+        }
+        temp->setHeight(1 + max(subLeftHeight, subRightHeight));
     }
 }
 
@@ -616,23 +631,27 @@ TreeNode<T> *Tree<T>::Find(int key) {
 template<class T>
 TreeNode<T> *Tree<T>::LeftRotate(TreeNode<T> *node) {
     TreeNode<T> *y = node->getRight();
-    TreeNode<T> *t = y->getLeft();
-
-    y->setLeft(node);
-    if (node) {
-        y->setParent(node->getParent());
-        node->setParent(y);
+    if(y) {
+        TreeNode<T> *t = y->getLeft();
+        node->setRight(t);
+        if (t) {
+            t->setParent(node);
+        }
+        y->setLeft(node);
+        if (node) {
+            y->setParent(node->getParent());
+            node->setParent(y);
+        }
     }
-    node->setRight(t);
-    if (t) {
-        t->setParent(node);
+    else{
+        node->setRight(nullptr);
     }
 
     // update heights
     node->setHeight(TreeNode<T>::calculateHeight(node));
-
-    y->setHeight(TreeNode<T>::calculateHeight(y));
-
+    if(y) {
+        y->setHeight(TreeNode<T>::calculateHeight(y));
+    }
     return y;
 
 }
@@ -640,22 +659,24 @@ TreeNode<T> *Tree<T>::LeftRotate(TreeNode<T> *node) {
 template<class T>
 TreeNode<T> *Tree<T>::RightRotate(TreeNode<T> *node) {
     TreeNode<T> *x = node->getLeft();
-    TreeNode<T> *t = x->getRight();
-
-    x->setRight(node);
-    if (node) {
-        x->setParent(node->getParent());
-        node->setParent(x);
-    }
-    node->setLeft(t);
-    if (t) {
-        t->setParent(node);
+    if(x) {
+        TreeNode<T> *t = x->getRight();
+        x->setRight(node);
+        if (node) {
+            x->setParent(node->getParent());
+            node->setParent(x);
+        }
+        node->setLeft(t);
+        if (t) {
+            t->setParent(node);
+        }
+        x->setHeight(TreeNode<T>::calculateHeight(x));
     }
 
     // update heights
     node->setHeight(TreeNode<T>::calculateHeight(node));
 
-    x->setHeight(TreeNode<T>::calculateHeight(x));
+
 
     return x;
 }

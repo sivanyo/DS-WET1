@@ -12,6 +12,10 @@ MusicManager::MusicManager() : artistTree(new ArtistTree()), mostPlayedList(null
 StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
     if (numberOfArtists == 0) {
         // Inserting the new artist to our Artist tree
+        if(this->artistTree->Find(artistId) != nullptr){
+            //there is already such artist
+            return FAILURE;
+        }
         Artist *tempArtist = new Artist(artistId, numOfSongs);
         if (!tempArtist) {
             return ALLOCATION_ERROR;
