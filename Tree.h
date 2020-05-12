@@ -340,7 +340,7 @@ StatusType Tree<T>::Insert(int key, T *value) {
         return ALLOCATION_ERROR;
     }
 
-    if(Find(key)){
+    if (Find(key)) {
         return FAILURE;
     }
 
@@ -466,7 +466,9 @@ TreeNode<T> *Tree<T>::InsertGetNode(int key, T *value) {
 template<class T>
 StatusType Tree<T>::Remove(int key) {
     if (!root) {
-        // Tree is empty, setting new node as first node
+        // Tree is empty
+        return FAILURE;
+    } else if (Find(key) == nullptr) {
         return FAILURE;
     } else {
         RemoveNode(root, key);
@@ -631,7 +633,7 @@ TreeNode<T> *Tree<T>::Find(int key) {
 template<class T>
 TreeNode<T> *Tree<T>::LeftRotate(TreeNode<T> *node) {
     TreeNode<T> *y = node->getRight();
-    if(y) {
+    if (y) {
         TreeNode<T> *t = y->getLeft();
         node->setRight(t);
         if (t) {
@@ -642,14 +644,13 @@ TreeNode<T> *Tree<T>::LeftRotate(TreeNode<T> *node) {
             y->setParent(node->getParent());
             node->setParent(y);
         }
-    }
-    else{
+    } else {
         node->setRight(nullptr);
     }
 
     // update heights
     node->setHeight(TreeNode<T>::calculateHeight(node));
-    if(y) {
+    if (y) {
         y->setHeight(TreeNode<T>::calculateHeight(y));
     }
     return y;
@@ -659,7 +660,7 @@ TreeNode<T> *Tree<T>::LeftRotate(TreeNode<T> *node) {
 template<class T>
 TreeNode<T> *Tree<T>::RightRotate(TreeNode<T> *node) {
     TreeNode<T> *x = node->getLeft();
-    if(x) {
+    if (x) {
         TreeNode<T> *t = x->getRight();
         x->setRight(node);
         if (node) {
@@ -675,7 +676,6 @@ TreeNode<T> *Tree<T>::RightRotate(TreeNode<T> *node) {
 
     // update heights
     node->setHeight(TreeNode<T>::calculateHeight(node));
-
 
 
     return x;

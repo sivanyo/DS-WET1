@@ -144,12 +144,12 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
 }
 
 StatusType MusicManager::RemoveArtist(int artistId) {
-    int currentMostRecommended = this->ptrToMostRecommended->getNumberOfPlays();
     ArtistNode *artistNode = artistTree->Find(artistId);
     if (numberOfArtists == 0 || !artistNode) {
         // There are no artists so this counts as a case where no artist with the input ID exists
         return FAILURE;
     }
+    int currentMostRecommended = this->ptrToMostRecommended->getNumberOfPlays();
     Artist *artist = artistNode->getValue();
     for (int i = 0; i < artist->getNumberOfSongs(); ++i) {
         Song *tempSong = artist->operator[](i);
@@ -238,8 +238,6 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
     }
     MostPlayedListNode *playsListNode = songNode->getValue()->getPtrToListNode();
     ArtistPlaysNode *artistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
-//    ArtistPlaysNode *artistPlaysNode = artistNode->getValue()->operator[](songID)->getPtrToArtistIdPlaysTree(); // THIS IS OLD
-//    MostPlayedListNode *playsListNode = artistPlaysNode->getValue()->getPtrToListNode(); // THIS IS OLD
     // Creating a new song plays object to insert to the next linked list node
     SongPlays *songPlays = new SongPlays(songID, artistId, nullptr);
     if (!songPlays) {

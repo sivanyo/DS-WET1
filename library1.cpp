@@ -37,7 +37,7 @@ StatusType RemoveArtist(void *DS, int artistID) {
 };
 
 StatusType AddToSongCount(void *DS, int artistID, int songID) {
-    if (!DS || artistID <= 0) {
+    if (!DS || artistID <= 0 || songID < 0) {
         return INVALID_INPUT;
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
@@ -46,7 +46,7 @@ StatusType AddToSongCount(void *DS, int artistID, int songID) {
 }
 
 StatusType NumberOfStreams(void *DS, int artistID, int songID, int *streams) {
-    if (!DS || artistID <= 0 || songID < 0) {
+    if (!DS || !streams || artistID <= 0 || songID < 0) {
         return INVALID_INPUT;
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
@@ -55,8 +55,11 @@ StatusType NumberOfStreams(void *DS, int artistID, int songID, int *streams) {
 }
 
 StatusType GetRecommendedSongs(void *DS, int numOfSongs, int *artists, int *songs) {
-    if (!DS || numOfSongs <= 0) {
+    if (!DS) {
         return INVALID_INPUT;
+    }
+    if (numOfSongs <= 0) {
+        return ALLOCATION_ERROR;
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
     return nDS->GetRecommendedSongs(numOfSongs, artists, songs);
