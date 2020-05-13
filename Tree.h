@@ -9,10 +9,6 @@
 #include <algorithm>
 #include "library1.h"
 #include <iostream> // TODO only for testing
-
-using std::cout;
-using std::endl;
-
 /**
  * Generic Template Class for a TreeNode
  * Made Specifically for use as a balanced AVL tree node meant to store dynamic
@@ -45,8 +41,9 @@ private:
     TreeNode<T> *RightRotate();
 
     TreeNode<T> *DeleteNode(int keyRemove);
+
 public:
-    TreeNode(int key, T *data_in = nullptr, TreeNode *parent = nullptr);
+    TreeNode(int key, T *nData = nullptr, TreeNode *parent = nullptr);
 
     ~TreeNode();
 
@@ -58,9 +55,9 @@ public:
 
     TreeNode<T> *Find(int keyFind);
 
-    TreeNode<T> *getMinNode();
+    TreeNode<T> *findMin();
 
-    TreeNode<T> *getMaxNode();
+    TreeNode<T> *findMax();
 
     T *getData();
 
@@ -70,26 +67,32 @@ public:
 
     TreeNode<T> *getLeft();
 
+    void setLeft(TreeNode<T> *ptr);
+
     TreeNode<T> *getRight();
 
+    void setRight(TreeNode<T> *ptr);
+
     TreeNode<T> *getParent();
+
+    void setParent(TreeNode<T> *ptr);
 
     int mapInOrder(int *keys, int size);
 
     int mapSucc(int *keys, int size);
 };
 
-
 /**
- * creates node
- * @tparam T
- * @param key
- * @param data_in
+ * Creates a new TreeNode for insertion to an AVL tree
+ * Provided key is a dynamically allocated data of type T
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param key A key
+ * @param nData
  * @param parent
  */
 template<class T>
-TreeNode<T>::TreeNode(int key, T *data_in, TreeNode *parent):
-        data(data_in), key(key), left(nullptr), right(nullptr), parent(parent), height(1) {};
+TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent):
+        key(key), data(nData), height(1), left(nullptr), right(nullptr), parent(parent) {};
 
 /**
  * delete node and it release its data
@@ -397,7 +400,7 @@ TreeNode<T> *TreeNode<T>::Remove(int keyRemove) {
 template<class T>
 TreeNode<T> *TreeNode<T>::DeleteNode(int keyRemove) {
     if (left != nullptr) { //Find successor of node
-        TreeNode<T> *successor = left->getMaxNode();
+        TreeNode<T> *successor = left->findMax();
         if (left->right != nullptr) {
             successor->parent->right = successor->left;
             if (successor->left != nullptr) {
@@ -450,9 +453,9 @@ void TreeNode<T>::SwapNodesParent(TreeNode<T> *takePlace) {
  * @return min by key node in struct
  */
 template<class T>
-TreeNode<T> *TreeNode<T>::getMinNode() {
+TreeNode<T> *TreeNode<T>::findMin() {
     if (left != nullptr) {
-        return left->getMinNode();
+        return left->findMin();
     }
     return this;
 }
@@ -463,9 +466,9 @@ TreeNode<T> *TreeNode<T>::getMinNode() {
  * @return max by key node in struct
  */
 template<class T>
-TreeNode<T> *TreeNode<T>::getMaxNode() {
+TreeNode<T> *TreeNode<T>::findMax() {
     if (right != nullptr) {
-        return right->getMaxNode();
+        return right->findMax();
     }
     return this;
 }
@@ -549,6 +552,21 @@ TreeNode<T> *TreeNode<T>::getNext() {
     }
 }
 
+template<class T>
+void TreeNode<T>::setLeft(TreeNode<T> *ptr) {
+    left = ptr;
+}
+
+template<class T>
+void TreeNode<T>::setRight(TreeNode<T> *ptr) {
+    right = ptr;
+}
+
+template<class T>
+void TreeNode<T>::setParent(TreeNode<T> *ptr) {
+    parent = ptr;
+}
+
 /**
  * This is a generic template for an AVL Tree - the nodes of a tree can have unique data stored in them.
  * For example, a node may hold another AVL Tree inside it
@@ -616,7 +634,7 @@ void Tree<T>::Insert(int key, T *data) {
         root = root->Insert(key, data);
 
         if (!min_node || key < min_node->getKey()) { // in case we Insert new min by key data
-            this->min_node = root->getMinNode();
+            this->min_node = root->findMin();
         }
     }
 }
@@ -632,7 +650,7 @@ TreeNode<T> *Tree<T>::InsertGetBack(int key, T *data) {
         root = root->Insert(key, data, result);
 
         if (!min_node || key < min_node->getKey()) { // in case we Insert new min by key data
-            this->min_node = root->getMinNode();
+            this->min_node = root->findMin();
         }
         return result;
     }
@@ -649,7 +667,7 @@ void Tree<T>::Remove(int key) {
         root = root->Remove(key);
         if (flag) {
             if (root != nullptr) {
-                min_node = root->getMinNode();
+                min_node = root->findMin();
             } else {
                 min_node = nullptr;
             }
