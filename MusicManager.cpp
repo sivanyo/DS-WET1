@@ -198,7 +198,7 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         if (!node->getArtistPlaysTree() && node->getNumberOfPlays() != 0) {
             // The artist tree for this node is now empty, meaning the node is now pointless and can be removed
             node->getPrevious()->setNext(node->getNext());
-            if (currentMostRecommended != node->getNumberOfPlays()) {
+            if (node->getNext()) {
                 node->getNext()->setPrevious(node->getPrevious());
             }
             //node->setArtistPlaysTree(nullptr);
@@ -229,10 +229,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 
     // getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list artistNode
     SongPlaysNode *songNode = artistNode->getData()->operator[](songID)->getPtrToSongNodeInPlaysTree();
-//    bool willSwap = false;
-//    if (songNode->getLeft() && songNode->getRight()) {
-//        willSwap = true;
-//    }
+
     MostPlayedListNode *playsListNode = songNode->getData()->getPtrToListNode();
     ArtistPlaysNode *artistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
     // Creating a new song plays object to insert to the next linked list node
@@ -505,7 +502,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         nPlayListNode->setPtrToLowestArtistId(nArtistPlaysNode);
         nPlayListNode->setPtrToLowestSongId(nSongNode);
         // Updating linked list pointers because we entered a new node in the end of the list
-        nPlayListNode->setNext(nullptr);
+        nPlayListNode->setNext(playsListNode->getNext());
         playsListNode->setNext(nPlayListNode);
         nPlayListNode->setPrevious(playsListNode);
         this->ptrToMostRecommended = nPlayListNode;
@@ -708,7 +705,10 @@ void MusicManager::removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, M
             MostPlayedListNode *prev = playsListNode->getPrevious();
             MostPlayedListNode *next = playsListNode->getNext();
             prev->setNext(next);
-            next->setPrevious(prev);
+            if(next){
+                next->setPrevious(prev);
+            }
+
             delete playsListNode;
         } else {
             // Removing the last artist from the 0 plays list node
