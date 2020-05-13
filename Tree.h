@@ -8,697 +8,742 @@
 #include <iostream>
 #include <algorithm>
 #include "library1.h"
+#include <iostream> // TODO only for testing
 
-using std::max;
+using std::cout;
+using std::endl;
 
+/**
+ * This is a generic template for an AVL node, the nodes of AVL Tree
+ * the nodes of a tree can have unique data stored in them *
+ */
 template<class T>
 class TreeNode {
-private:
+    T *data;
     int key;
-    T *value;
-    int nodeHeight = 1;
-    TreeNode<T> *parent = nullptr;
-    TreeNode<T> *left = nullptr;
-    TreeNode<T> *right = nullptr;
+    TreeNode<T> *left, *right, *parent;
+    int height;
+
+    void updateHeight();
+
+    TreeNode<T> *r_rotation();
+
+    TreeNode<T> *l_rotation();
+
+    TreeNode<T> *lr_rotation();
+
+    TreeNode<T> *rl_rotation();
+
+    TreeNode<T> *balanceTree();
+
+    int getBalanceFactor();
+
+    TreeNode<T> *removeAUX(int keyRemove);
+
+    void adjustParent(TreeNode<T> *takePlace);
+
 public:
-    TreeNode(int key, T *value);
+    TreeNode(int key, T *data_in = nullptr, TreeNode *parent = nullptr);
 
     ~TreeNode();
 
+    void clearAll();
+
+    TreeNode<T> *Insert(int keyAdd, T *dataAdd = nullptr, TreeNode<T> *result = nullptr);
+
+    TreeNode<T> *remove(int keyRemove);
+
+    TreeNode<T> *Find(int keyFind);
+
+    TreeNode<T> *getMinNode();
+
+    TreeNode<T> *getMaxNode();
+
+    T *getData();
+
     int getKey();
 
-    void setKey(int gKey);
+    TreeNode<T> *getLeftSon();
 
-    T *getValue();
-
-    void setValue(T *value);
-
-    void removeValue();
-
-    TreeNode<T> *getLeft();
-
-    void setLeft(TreeNode<T> *nLeft);
-
-    TreeNode<T> *getRight();
-
-    void setRight(TreeNode<T> *nRight);
+    TreeNode<T> *getRightSon();
 
     TreeNode<T> *getParent();
 
-    void setParent(TreeNode<T> *nParent);
+    int mapInOrder(int *keys, int size);
 
-    int getHeight();
+    int mapSucc(int *keys, int size);
 
-    void setHeight(int height);
+    // test funcs: // TODO delete or put in doc
+    void printInOrder();
 
-    static TreeNode<T> *find(TreeNode<T> *node, int gKey);
+    void printInOrderAUX();
 
-    TreeNode<T> *findMin(TreeNode<T> *node);
+    int countNodes();
 
-    TreeNode<T> *getNext();
-
-    static void printPreOrder(TreeNode<T> *node);
-
-    static void printInOrder(TreeNode<T> *node);
-
-    static void printPostOrder(TreeNode<T> *node);
-
-    static int calculateHeight(TreeNode<T> *root) {
-        // update heights
-        TreeNode<T> *subRightTree = root->getRight();
-        TreeNode<T> *subLeftTree = root->getLeft();
-        int subLeftHeight = 0;
-        int subRightHeight = 0;
-        if (subLeftTree) {
-            subLeftHeight = subLeftTree->getHeight();
-        }
-        if (subRightTree) {
-            subRightHeight = subRightTree->getHeight();
-        }
-        return 1 + max(subLeftHeight, subRightHeight);
-    }
-
-    static int getBalance(TreeNode<T> *node) {
-        if (node == nullptr) {
-            return 0;
-        }
-        TreeNode<T> *iLeft = node->getLeft();
-        TreeNode<T> *iRight = node->getRight();
-        int leftHeight = 0;
-        int rightHeight = 0;
-        if (iLeft) {
-            leftHeight = iLeft->getHeight();
-        }
-        if (iRight) {
-            rightHeight = iRight->getHeight();
-        }
-        return leftHeight - rightHeight;
-    }
+    bool checkBalancedAVL();
 };
 
+
+/**
+ * creates node
+ * @tparam T
+ * @param key
+ * @param data_in
+ * @param parent
+ */
 template<class T>
-TreeNode<T>::TreeNode(int key, T *value): key(key), value(value) {
+TreeNode<T>::TreeNode(int key, T *data_in, TreeNode *parent):
+        data(data_in), key(key), left(nullptr), right(nullptr), parent(parent), height(1) {};
 
-}
-
+/**
+ * delete node and it release its data
+ * does not delete its parent or sons!
+ * @tparam T
+ */
 template<class T>
 TreeNode<T>::~TreeNode() {
-    if (this->right != nullptr) {
-        delete this->right;
-    }
-    if (this->left != nullptr) {
-        delete this->left;
-    }
-    if (this->value != nullptr) {
-        delete this->value;
+    if (data != nullptr) {
+        delete data;
+        data = nullptr;
     }
 }
 
+/**
+ * delete the node and all its sons, grandsons and so on
+ * use when we want to delete not just the current node (this) but all the data that connects to it
+ * @param T
+ */
+template<class T>
+void TreeNode<T>::clearAll() {
+    if (left != nullptr) {
+        left->clearAll();
+        delete left;
+        left = nullptr;
+    }
+    if (right != nullptr) {
+        right->clearAll();
+        delete right;
+        right = nullptr;
+    }
+}
+
+/**
+ * @tparam T
+ * @return the custom data of the node
+ */
+template<class T>
+T *TreeNode<T>::getData() {
+    return data;
+}
+
+/**
+ * @tparam T
+ * @return node's key
+ */
 template<class T>
 int TreeNode<T>::getKey() {
-    return this->key;
+    return key;
 }
 
+/**
+ * @tparam T
+ * @return ptr to left son
+ */
 template<class T>
-void TreeNode<T>::setKey(int gKey) {
-    this->key = gKey;
+TreeNode<T> *TreeNode<T>::getLeftSon() {
+    return left;
 }
 
+/**
+ * @tparam T
+ * @return ptr to right son
+ */
 template<class T>
-T *TreeNode<T>::getValue() {
-    return this->value;
+TreeNode<T> *TreeNode<T>::getRightSon() {
+    return right;
 }
 
-template<class T>
-void TreeNode<T>::setValue(T *value) {
-    delete this->value;
-    this->value = value;
-}
-
-template<class T>
-void TreeNode<T>::removeValue() {
-    this->value = nullptr;
-}
-
-template<class T>
-TreeNode<T> *TreeNode<T>::getLeft() {
-    return this->left;
-}
-
-template<class T>
-void TreeNode<T>::setLeft(TreeNode<T> *nLeft) {
-    this->left = nLeft;
-}
-
-template<class T>
-TreeNode<T> *TreeNode<T>::getRight() {
-    return this->right;
-}
-
-template<class T>
-void TreeNode<T>::setRight(TreeNode<T> *nRight) {
-    this->right = nRight;
-}
-
+/**
+ * @tparam T
+ * @return ptr to node's parent
+ */
 template<class T>
 TreeNode<T> *TreeNode<T>::getParent() {
-    return this->parent;
+    return parent;
 }
 
+/**
+ * @tparam T
+ * @param keyFind
+ * @return a node given its key (if not found return nullptr)
+ */
 template<class T>
-void TreeNode<T>::setParent(TreeNode<T> *nParent) {
-    this->parent = nParent;
-}
-
-template<class T>
-int TreeNode<T>::getHeight() {
-    return this->nodeHeight;
-}
-
-template<class T>
-void TreeNode<T>::setHeight(int height) {
-    this->nodeHeight = height;
-}
-
-template<class T>
-TreeNode<T> *TreeNode<T>::find(TreeNode<T> *node, int gKey) {
-    if (!node) {
-        return nullptr;
-    } else if (node->getKey() == gKey) {
-        // The current node is the one we're looking for
-        return node;
-    } else if (node->getKey() > gKey) {
-        // The current node is a father of the node we're looking for
-        return find(node->getLeft(), gKey);
-    } else {
-        // The current node is a father of the node we're looking for
-        return find(node->getRight(), gKey);
-    }
-}
-
-template<class T>
-TreeNode<T> *TreeNode<T>::findMin(TreeNode<T> *node) {
-    if (node == nullptr) {
-        return nullptr;
-    } else if (node->getLeft() == nullptr) {
-        // This node has no left child, which means it is the following node in the tree
-        return node;
-    } else {
-        return findMin(node->getLeft());
-    }
-}
-
-template<class T>
-TreeNode<T> *TreeNode<T>::getNext() {
-    TreeNode<T> *current = this;
-    if (current->getRight() != nullptr) {
-        // This node has a right child, which means if we follow the branch
-        // once to the right and then all the way to the left, we will find the
-        // correct following child
-        return findMin(current->getRight());
-    } else {
-        TreeNode<T> *parent = current->getParent();
-        while (parent != nullptr) {
-            TreeNode<T> *child = parent->getLeft();
-            if (child && child->getKey() == current->getKey()) {
-                // The node we started with is the left child of the current parent,
-                // which means the parent is the next node in the tree.
-                return parent;
-            }
-            current = parent;
-            parent = current->getParent();
+TreeNode<T> *TreeNode<T>::Find(int keyFind) {
+    if (keyFind == key) {
+        return this;
+    } else if (keyFind < key) {
+        if (left != nullptr) {
+            return left->Find(keyFind);
+        } else {
+            return nullptr;
         }
-        return parent;
+    } else {
+        if (right != nullptr) {
+            return right->Find(keyFind);
+        } else {
+            return nullptr;
+        }
+    }
+}
+
+
+/**
+ *
+ * @tparam T
+ * @param keyAdd
+ * @param dataAdd
+ * @return add a new node in this connected nodes data structure, with param keyAdd and dataAdd
+ * the Insert is by AVL-ordering-by-key
+ * if during Insert founds that keyAdd already in struct, does not do anything
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::Insert(int keyAdd, T *dataAdd, TreeNode<T> *result) {
+
+    if (keyAdd > key) {
+        if (right == nullptr) {
+            right = new TreeNode(keyAdd, dataAdd, this);
+            result = right;
+        } else {
+            right->Insert(keyAdd, dataAdd, result);
+        }
+    } else if (keyAdd < key) {
+        if (left == nullptr) {
+            left = new TreeNode(keyAdd, dataAdd, this);
+            result = left;
+        } else {
+            left->Insert(keyAdd, dataAdd, result);
+        }
+    } else {
+        return nullptr; // indicate already in tree. no actions or changing in tree
+    }
+    return balanceTree();
+}
+
+/**
+ * updeate node's height
+ * @tparam T
+ */
+template<class T>
+void TreeNode<T>::updateHeight() {
+    int tmpRight = 0, tmpLeft = 0;
+    if (left != nullptr) {
+        tmpLeft = left->height;
+    }
+    if (right != nullptr) {
+        tmpRight = right->height;
+    }
+
+    if (tmpLeft > tmpRight) {
+        height = tmpLeft + 1;
+    } else {
+        height = tmpRight + 1;
+    }
+}
+
+/**
+ * single right rotation
+ * @tparam T
+ * @return update root of sub-node-struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::r_rotation() {
+    TreeNode<T> *tmpRight = right;
+    right = right->left;
+    if (right != nullptr) {
+        right->parent = this;
+    }
+    tmpRight->left = this;
+    tmpRight->parent = this->parent;
+    if (this->parent != nullptr) {
+        if (this->parent->left != nullptr && this->parent->left->key == this->key) {
+            this->parent->left = tmpRight;
+        } else {
+            this->parent->right = tmpRight;
+        }
+    }
+    this->parent = tmpRight;
+    this->updateHeight();
+    tmpRight->updateHeight();
+    return tmpRight;
+}
+
+/**
+ * single left rotation
+ * @tparam T
+ * @return update root of sub-node-struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::l_rotation() {
+    TreeNode<T> *tmpLeft = left;
+    left = left->right;
+    if (left != nullptr) {
+        left->parent = this;
+    }
+    tmpLeft->right = this;
+    tmpLeft->parent = this->parent;
+    if (this->parent != nullptr) {
+        if (this->parent->left != nullptr && this->parent->left->key == this->key) {
+            this->parent->left = tmpLeft;
+        } else {
+            this->parent->right = tmpLeft;
+        }
+    }
+    this->parent = tmpLeft;
+    this->updateHeight();
+    tmpLeft->updateHeight();
+    return tmpLeft;
+}
+
+/**
+ * one right rotation and than left rotation
+ * @tparam T
+ * @return update root of sub-node-struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::lr_rotation() {
+    left->r_rotation();
+    return this->l_rotation();
+}
+
+/**
+ * one left rotation and than right rotation
+ * @tparam T
+ * @return update root of sub-node-struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::rl_rotation() {
+    right->l_rotation();
+    return this->r_rotation();
+}
+
+template<class T>
+int TreeNode<T>::getBalanceFactor() {
+    updateHeight();
+    int tmpRight = 0, tmpLeft = 0;
+    if (right != nullptr) {
+        tmpRight = right->height;
+    }
+    if (left != nullptr) {
+        tmpLeft = left->height;
+    }
+    return tmpLeft - tmpRight;
+}
+
+/**
+ * balances nodes (as AVL tree)
+ * @tparam T
+ * @return update root of sub-node-struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::balanceTree() {
+    int bf = getBalanceFactor(); // bf = Balance Factor
+
+    if (bf > 1) {
+        int sub_bf = left->getBalanceFactor();
+        if (sub_bf >= 0) {
+            return l_rotation();
+        } else {
+            return lr_rotation();
+        }
+    } else if (bf < -1) {
+        int sub_bf = right->getBalanceFactor();
+        if (sub_bf > 0) {
+            return rl_rotation();
+        } else {
+            return r_rotation();
+        }
+    }
+    return this;
+}
+
+/**
+ * Find if keyRemove is one of nodes key and Remove it from struct
+ * @tparam T
+ * @param keyRemove
+ * @return update root of sub-node-struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::remove(int keyRemove) {
+    if (keyRemove < key) { //if key is lower than root, Find left subtree
+        if (left != nullptr) {
+            left->remove(keyRemove);
+        } else {
+            return this;
+        }
+    } else if (keyRemove > key) { //if key is bigger than root, Find right subtree
+        if (right != nullptr) {
+            right->remove(keyRemove);
+        } else {
+            return this;
+        }
+    } else { //key found, current node holds key
+        return this->removeAUX(keyRemove); // calls a function that actually delete current node
+    }
+    return balanceTree();
+}
+
+/**
+ * delete this (Current) from node-struct
+ * @tparam T
+ * @param keyRemove
+ * @return update root of sub-node-struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::removeAUX(int keyRemove) {
+    if (left != nullptr) { //Find successor of node
+        TreeNode<T> *successor = left->getMaxNode();
+        if (left->right != nullptr) {
+            successor->parent->right = successor->left;
+            if (successor->left != nullptr) {
+                successor->left->parent = successor->parent;
+            }
+            successor->left = this->left;
+            this->left->parent = successor;
+        }
+        this->adjustParent(successor);
+        successor->right = this->right;
+        if (this->right != nullptr) {
+            this->right->parent = successor;
+        }
+        delete this;
+        return successor->balanceTree();
+    } else if (right != nullptr) {
+        TreeNode<T> *successor = this->right;
+        this->adjustParent(successor);
+        delete this;
+        return successor->balanceTree();
+    } else { // no sons to delete node
+        this->adjustParent(nullptr);
+        delete this;
+        return nullptr;
+    }
+}
+
+/**
+ * adjust parents between nodes that been delete and its successor
+ * @tparam T
+ * @param takePlace - successor
+ */
+template<class T>
+void TreeNode<T>::adjustParent(TreeNode<T> *takePlace) {
+    if (takePlace != nullptr) {
+        takePlace->parent = this->parent;
+    }
+    if (this->parent != nullptr) {
+        if (this->parent->left != nullptr && this->parent->left->key == this->key) {
+            this->parent->left = takePlace;
+        } else {
+            this->parent->right = takePlace;
+        }
+    }
+}
+
+/**
+ *
+ * @tparam T
+ * @return min by key node in struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::getMinNode() {
+    if (left != nullptr) {
+        return left->getMinNode();
+    }
+    return this;
+}
+
+/**
+ *
+ * @tparam T
+ * @return max by key node in struct
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::getMaxNode() {
+    if (right != nullptr) {
+        return right->getMaxNode();
+    }
+    return this;
+}
+
+/**
+ * scan the node-struct by "in-order" method
+ * (from current down. does not go up to parent)
+ * @tparam T
+ * @param keys - arr. assign the  #size lowest keys in the tree into this arr
+ * @param size - num of data to copy into keys[]
+ * @return the number of keys that were assign to keys[]
+ */
+template<class T>
+int TreeNode<T>::mapInOrder(int *keys, int size) {
+    if (size <= 0 || keys == nullptr) {
+        return 0;
+    }
+
+    int index = 0;
+    if (left != nullptr) {
+        index += left->mapInOrder(keys, size);
+        if (index >= size) {
+            return index;
+        }
+    }
+
+    keys[index++] = key;
+
+    if (index < size && right != nullptr) {
+        index += right->mapInOrder(keys + index, size - index);
+    }
+    return index;
+}
+
+/**
+ * scan the node-struct by "successor in-order" method
+ * (from current up. does not go to current sons)
+ * @tparam T
+ * @param keys - arr. assign the  #size lowest keys in the tree into this arr
+ * @param size - num of data to copy into keys[]
+ * @return the number of keys that were assign to keys[]
+ */
+template<class T>
+int TreeNode<T>::mapSucc(int *keys, int size) {
+    if (size <= 0 || keys == nullptr) {
+        return 0;
+    }
+    int index = 0;
+    TreeNode<T> *current = this;
+    while (current && index < size) {
+        keys[index++] = current->key;
+        if (current->right) {
+            index += current->right->mapInOrder(keys + index, size - index);
+        }
+        current = current->parent;
+    }
+    return index;
+}
+
+
+// TODO used only for testing. delete or make as doc
+template<class T>
+void TreeNode<T>::printInOrder() {
+
+    int tmpCalc = 1;
+    for (int i = 0; i < height + 1; ++i) {
+        tmpCalc = tmpCalc * 2;
+    }
+    tmpCalc--;
+
+    int tmpCount = countNodes();
+
+    cout << "**** print in order: num of Nodes: " << tmpCount << ", max height: " << height <<
+         ". AVL test (height^2+1)-1>=nodes num (1 is OK): " << (tmpCalc >= tmpCount) << " ****" << std::endl;
+    cout << "[";
+    printInOrderAUX();
+    cout << "]" << endl;
+    cout << endl;
+}
+
+template<class T>
+void TreeNode<T>::printInOrderAUX() {
+    if (left != nullptr) {
+        left->printInOrderAUX();
+    }
+    cout << ", " << key;
+    if (right != nullptr) {
+        right->printInOrderAUX();
     }
 }
 
 template<class T>
-void TreeNode<T>::printPreOrder(TreeNode<T> *node) {
-    if (!node) {
-        return;
+int TreeNode<T>::countNodes() {
+    checkBalancedAVL();
+
+    int tmpR = 0, tmpL = 0;
+
+    if (right != nullptr) {
+        tmpR = right->countNodes();
     }
-
-    // Print the data of our node
-    std::cout << node->getKey() << ", ";
-
-    // Print the left subtree
-    printPreOrder(node->getLeft());
-
-    // Print the right subtree
-    printPreOrder(node->getRight());
+    if (left != nullptr) {
+        tmpL = left->countNodes();
+    }
+    return 1 + tmpL + tmpR;
 }
 
+/**
+ * check no out of balanced nodes in struct
+ * @tparam T
+ * @return
+ */
 template<class T>
-void TreeNode<T>::printInOrder(TreeNode<T> *node) {
-    if (!node) {
-        return;
+bool TreeNode<T>::checkBalancedAVL() {
+    int flag = getBalanceFactor();
+    if (flag > 1 || flag < -1) {
+        cout << "BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG" << endl;
+        cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FOUND OUT OF BALANCED NODE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+        cout << "BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG" << endl;
+        return false;
     }
-
-    // Print the left subtree
-    printInOrder(node->getLeft());
-
-    // Print the data of our node
-    std::cout << node->getKey() << ", ";
-
-    // Print the right subtree
-    printInOrder(node->getRight());
+    return true;
 }
 
-template<class T>
-void TreeNode<T>::printPostOrder(TreeNode<T> *node) {
-    if (!node) {
-        return;
-    }
-
-    // Print the left subtree
-    printPostOrder(node->getLeft());
-
-    // Print the right subtree
-    printPostOrder(node->getRight());
-
-    // Print the data of our node
-    std::cout << node->getKey() << ", ";
-}
-
+/**
+ * This is a generic template for an AVL Tree - the nodes of a tree can have unique data stored in them.
+ * For example, a node may hold another AVL Tree inside it
+ * in this implementation, the tree "take control" on its data in the meaning it become the charge of its release/delete
+*/
 template<class T>
 class Tree {
-private:
     TreeNode<T> *root;
-
-    void InsertNode(TreeNode<T> *iRoot, TreeNode<T> *ins);
-
-    void RemoveNode(TreeNode<T> *iRoot, int key);
+    TreeNode<T> *min_node; // lowest by key data in tree
 
 public:
     Tree();
 
     ~Tree();
 
-    StatusType Insert(int key, T *value);
+    void Insert(int key, T *data = nullptr);
 
-    TreeNode<T> *InsertGetNode(int key, T *value);
+    TreeNode<T> *InsertGetBack(int key, T *data);
 
-    StatusType Remove(int key);
+    void Remove(int key);
 
-    int Height(TreeNode<T> *root) const;
-
-    TreeNode<T> *GetRoot();
+    bool IsRootNull();
 
     TreeNode<T> *Find(int key);
 
-    TreeNode<T> *RightRotate(TreeNode<T> *node);
+    TreeNode<T> *getMinNode();
 
-    TreeNode<T> *LeftRotate(TreeNode<T> *node);
+    int mapSucc(int *keys, int size);
 
-    bool IsEmpty();
-
-    void PrintPreOrder();
-
-    void PrintInOrder();
-
-    void PrintPostOrder();
 };
 
+/**
+ * Initialize an empty AVL tree
+ */
 template<class T>
-Tree<T>::Tree(): root(nullptr) {
+Tree<T>::Tree(): root(nullptr), min_node(nullptr) {};
 
-}
 
+/**
+ * delete tree and release all its data
+ */
 template<class T>
 Tree<T>::~Tree() {
-    if (root) {
+    if (root != nullptr) {
+        root->clearAll();
         delete root;
         root = nullptr;
     }
 }
 
+/**
+ * Insert a single data represent by key to the tree
+ * if key already shows in tree - nothing will be done
+ * @param key the key of the data (node)
+ * @param data
+ */
 template<class T>
-StatusType Tree<T>::Insert(int key, T *value) {
-    TreeNode<T> *nNode = new TreeNode<T>(key, value);
-
-    if (!nNode) {
-        return ALLOCATION_ERROR;
-    }
-
-    if (Find(key)) {
-        return FAILURE;
-    }
-
-    if (!root) {
-        // Tree is empty, setting new node as first node
-        root = nNode;
+void Tree<T>::Insert(int key, T *data) {
+    if (root == nullptr) { // in case the tree is empty
+        root = new TreeNode<T>(key, data);
+        min_node = root;
     } else {
-        InsertNode(root, nNode);
-    }
-    return SUCCESS;
-}
+        root = root->Insert(key, data);
 
-template<class T>
-void Tree<T>::InsertNode(TreeNode<T> *iRoot, TreeNode<T> *ins) {
-    bool trueRoot = false;
-    if (iRoot == nullptr) {
-        return;
-    }
-    if (!iRoot->getParent()) {
-        trueRoot = true;
-    }
-    // Before using insert we already check if the key exists in the tree,
-    // so no need to check this here.
-    if (ins->getKey() < iRoot->getKey()) {
-        if (iRoot->getLeft()) {
-            // iRoot has a left child, continue searching for correct spot to place
-            // new node
-            InsertNode(iRoot->getLeft(), ins);
-        } else {
-            iRoot->setLeft(ins);
-            ins->setParent(iRoot);
-        }
-
-    } else {
-        if (iRoot->getRight()) {
-            // iRoot has a right child, continue searching for correct spot to place
-            // new now
-            InsertNode(iRoot->getRight(), ins);
-        } else {
-            iRoot->setRight(ins);
-            ins->setParent(iRoot);
-        }
-    }
-
-    // update heights
-    TreeNode<T> *subRightTree = iRoot->getRight();
-    TreeNode<T> *subLeftTree = iRoot->getLeft();
-    int subLeftHeight = 0;
-    int subRightHeight = 0;
-    if (subLeftTree) {
-        subLeftHeight = subLeftTree->getHeight();
-    }
-    if (subRightTree) {
-        subRightHeight = subRightTree->getHeight();
-    }
-    iRoot->setHeight(1 + max(subLeftHeight, subRightHeight));
-
-    int balance = TreeNode<T>::getBalance(iRoot);
-    // balancing the tree if necessary
-    // LL case
-    if (balance > 1 && ins->getKey() < subLeftTree->getKey()) {
-        iRoot = RightRotate(iRoot);
-    }
-
-    // RR case
-    if (balance < -1 && ins->getKey() > subRightTree->getKey()) {
-        iRoot = LeftRotate(iRoot);
-    }
-
-    // LR case
-    if (balance > 1 && ins->getKey() > subLeftTree->getKey()) {
-        iRoot->setLeft(LeftRotate(iRoot->getLeft()));
-        iRoot = RightRotate(iRoot);
-    }
-
-    // RL case
-    if (balance < -1 && ins->getKey() < subRightTree->getKey()) {
-        iRoot->setRight(RightRotate(iRoot->getRight()));
-        iRoot = LeftRotate(iRoot);
-    }
-    if (trueRoot) {
-        this->root = iRoot;
-        TreeNode<T> *temp = this->root;
-        temp->setParent(nullptr);
-    } else {
-        TreeNode<T> *temp = iRoot->getParent();
-        if (temp->getKey() > iRoot->getKey()) {
-            temp->setLeft(iRoot);
-        } else {
-            temp->setRight(iRoot);
-        }
-        TreeNode<T> *subRightTree = temp->getRight();
-        TreeNode<T> *subLeftTree = temp->getLeft();
-        int subLeftHeight = 0;
-        int subRightHeight = 0;
-        if (subLeftTree) {
-            subLeftHeight = subLeftTree->getHeight();
-        }
-        if (subRightTree) {
-            subRightHeight = subRightTree->getHeight();
-        }
-        temp->setHeight(1 + max(subLeftHeight, subRightHeight));
-    }
-}
-
-template<class T>
-TreeNode<T> *Tree<T>::InsertGetNode(int key, T *value) {
-    TreeNode<T> *nNode = new TreeNode<T>(key, value);
-
-    if (!nNode) {
-        return nullptr;
-    }
-
-    if (!root) {
-        // Tree is empty, setting new node as first node
-        root = nNode;
-    } else {
-        InsertNode(root, nNode);
-    }
-    return nNode;
-}
-
-template<class T>
-StatusType Tree<T>::Remove(int key) {
-    if (!root) {
-        // Tree is empty
-        return FAILURE;
-    } else if (Find(key) == nullptr) {
-        return FAILURE;
-    } else {
-        RemoveNode(root, key);
-    }
-    return SUCCESS;
-}
-
-template<class T>
-void Tree<T>::RemoveNode(TreeNode<T> *iRoot, int key) {
-    bool trueRoot = false;
-    if (!iRoot->getParent()) {
-        trueRoot = true;
-    }
-    // called find before, know that a matching key exist
-    if (iRoot->getKey() > key) {
-        // should search at the left side
-        RemoveNode(iRoot->getLeft(), key);
-    } else if (iRoot->getKey() < key) {
-        // should search at the right side
-        RemoveNode(iRoot->getRight(), key);
-    } else {
-        // find a matching key :)
-        if (iRoot->getLeft() == nullptr || iRoot->getRight() == nullptr) {
-            // Node has either 1 child or none
-            TreeNode<T> *temp = iRoot->getLeft() ? iRoot->getLeft() : iRoot->getRight();
-            TreeNode<T> *parentTemp = iRoot->getParent();
-
-            if (temp == nullptr) {
-                // no child
-                if (parentTemp) {
-                    if (parentTemp->getKey() > key) {
-                        // the node to be deleted is the left son
-                        parentTemp->setLeft(nullptr);
-                    } else {
-                        // the node to be deleted is the right son
-                        parentTemp->setRight(nullptr);
-                    }
-                }
-                // We removed a node with no children, we removed his pointer
-                // from his parent node, now we can safely delete him.
-                if (trueRoot) {
-                    this->root = nullptr;
-                }
-                iRoot->setLeft(nullptr);
-                iRoot->setRight(nullptr);
-                delete iRoot;
-                iRoot = nullptr;
-                return;
-            } else {
-                // one child case
-                if (parentTemp) {
-                    temp->setParent(parentTemp);
-                    if (parentTemp->getKey() > key) {
-                        // The node to be deleted is the left son
-                        // connecting his only child to the left side of the original parent
-                        parentTemp->setLeft(temp);
-                    } else {
-                        // The node to be deleted is the right son
-                        // connecting his only child to the right side of the original parent
-                        parentTemp->setRight(temp);
-                    }
-                } else {
-                    this->root = temp;
-                    temp->setParent(nullptr);
-                }
-                // We removed a node with one child, we removed his pointer
-                // from his parent node, and set his child as the new child of his parent
-                // now we can safely delete him.
-                iRoot->setLeft(nullptr);
-                iRoot->setRight(nullptr);
-                delete iRoot;
-                iRoot = nullptr;
-                return;
-            }
-        } else {
-            // node with 2 children case
-            TreeNode<T> *temp = iRoot->findMin(iRoot->getRight());
-            // Replacing the key and value of the node we want to delete with his successor
-            iRoot->setKey(temp->getKey());
-            iRoot->setValue(temp->getValue());
-            temp->removeValue();
-            // Removing the successor from his original place
-            RemoveNode(iRoot->getRight(), temp->getKey());
-        }
-    }
-
-    // update heights
-    TreeNode<T> *subRightTree = iRoot->getRight();
-    TreeNode<T> *subLeftTree = iRoot->getLeft();
-    int subLeftHeight = 0;
-    int subRightHeight = 0;
-    if (subLeftTree) {
-        subLeftHeight = subLeftTree->getHeight();
-    }
-    if (subRightTree) {
-        subRightHeight = subRightTree->getHeight();
-    }
-    iRoot->setHeight(1 + max(subLeftHeight, subRightHeight));
-
-    // Calculating the new balance factor
-    int balance = TreeNode<T>::getBalance(iRoot);
-
-    // LL case
-    if (balance > 1 && TreeNode<T>::getBalance(iRoot->getLeft()) >= 0) {
-        iRoot = RightRotate(iRoot);
-    }
-
-    // LR case
-    if (balance > 1 && TreeNode<T>::getBalance(iRoot->getLeft()) < 0) {
-        iRoot->setLeft(LeftRotate(iRoot->getLeft()));
-        iRoot = RightRotate(iRoot);
-    }
-
-    // RR case
-    if (balance < -1 && TreeNode<T>::getBalance(iRoot->getRight()) <= 0) {
-        iRoot = LeftRotate(iRoot);
-    }
-
-    // RL case
-    if (balance < -1 && TreeNode<T>::getBalance(iRoot->getRight()) > 0) {
-        iRoot->setRight(RightRotate(iRoot->getRight()));
-        iRoot = LeftRotate(iRoot);
-    }
-    if (trueRoot) {
-        this->root = iRoot;
-        TreeNode<T> *temp = this->root;
-        temp->setParent(nullptr);
-    } else {
-        TreeNode<T> *temp = iRoot->getParent();
-        if (temp->getKey() > iRoot->getKey()) {
-            temp->setLeft(iRoot);
-        } else {
-            temp->setRight(iRoot);
+        if (!min_node || key < min_node->getKey()) { // in case we Insert new min by key data
+            this->min_node = root->getMinNode();
         }
     }
 }
 
 template<class T>
-int Tree<T>::Height(TreeNode<T> *root) const {
-    int height = 0;
+TreeNode<T> *Tree<T>::InsertGetBack(int key, T *data) {
+    if (root == nullptr) { // in case the tree is empty
+        root = new TreeNode<T>(key, data);
+        min_node = root;
+        return root;
+    } else {
+        TreeNode<T> *result = nullptr;
+        root = root->Insert(key, data, result);
+
+        if (!min_node || key < min_node->getKey()) { // in case we Insert new min by key data
+            this->min_node = root->getMinNode();
+        }
+        return result;
+    }
+}
+
+/**
+ * Remove the data (node) with the key value from the tree
+ * @param key
+ */
+template<class T>
+void Tree<T>::Remove(int key) {
+    bool flag = min_node != nullptr && min_node->getKey() == key;
     if (root != nullptr) {
-        int left = Height(root->getLeft());
-        int right = Height(root->getRight());
-        height = 1 + max(left, right);
+        root = root->remove(key);
+        if (flag) {
+            if (root != nullptr) {
+                min_node = root->getMinNode();
+            } else {
+                min_node = nullptr;
+            }
+        }
     }
-    return height;
 }
 
-template<class T>
-TreeNode<T> *Tree<T>::GetRoot() {
-    return this->root;
-}
-
+/**
+ * @param key
+ * @return Returns a node given its key
+ * return nullptr if not found
+ */
 template<class T>
 TreeNode<T> *Tree<T>::Find(int key) {
-    if (!root) {
+    if (root == nullptr) {
         return nullptr;
     }
-    return TreeNode<T>::find(root, key);
+
+    return root->Find(key);
 }
 
+/**
+ * @return true if tree has no data, false otherwise
+ */
 template<class T>
-TreeNode<T> *Tree<T>::LeftRotate(TreeNode<T> *node) {
-    TreeNode<T> *y = node->getRight();
-    if (y) {
-        TreeNode<T> *t = y->getLeft();
-        node->setRight(t);
-        if (t) {
-            t->setParent(node);
-        }
-        y->setLeft(node);
-        if (node) {
-            y->setParent(node->getParent());
-            node->setParent(y);
-        }
-    } else {
-        node->setRight(nullptr);
+bool Tree<T>::IsRootNull() {
+    return (root == nullptr);
+}
+
+/**
+ * @return min by key node in the tree
+ */
+template<class T>
+TreeNode<T> *Tree<T>::getMinNode() {
+    return min_node;
+}
+
+/**
+ * scan the tree by "successor in-order" method
+ * @tparam T
+ * @param keys - arr. assign the  #size lowest keys in the tree into this arr
+ * @param size - num of data to copy into keys[]
+ * @return the number of keys that were assign to keys[]
+ */
+template<class T>
+int Tree<T>::mapSucc(int *keys, int size) {
+    if (size <= 0 || keys == nullptr || min_node == nullptr) {
+        return 0;
     }
 
-    // update heights
-    node->setHeight(TreeNode<T>::calculateHeight(node));
-    if (y) {
-        y->setHeight(TreeNode<T>::calculateHeight(y));
-    }
-    return y;
-
+    return min_node->mapSucc(keys, size);
 }
 
-template<class T>
-TreeNode<T> *Tree<T>::RightRotate(TreeNode<T> *node) {
-    TreeNode<T> *x = node->getLeft();
-    if (x) {
-        TreeNode<T> *t = x->getRight();
-        x->setRight(node);
-        if (node) {
-            x->setParent(node->getParent());
-            node->setParent(x);
-        }
-        node->setLeft(t);
-        if (t) {
-            t->setParent(node);
-        }
-        x->setHeight(TreeNode<T>::calculateHeight(x));
-    }
-
-    // update heights
-    node->setHeight(TreeNode<T>::calculateHeight(node));
-
-
-    return x;
-}
-
-template<class T>
-bool Tree<T>::IsEmpty() {
-    return root == nullptr;
-}
-
-template<class T>
-void Tree<T>::PrintPreOrder() {
-    TreeNode<T>::printPreOrder(root);
-}
-
-template<class T>
-void Tree<T>::PrintInOrder() {
-    TreeNode<T>::printInOrder(root);
-}
-
-template<class T>
-void Tree<T>::PrintPostOrder() {
-    TreeNode<T>::printPostOrder(root);
-}
 
 #endif //WET1_TREE_H
