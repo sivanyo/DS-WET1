@@ -150,7 +150,7 @@ int TreeNode<T>::getKey() {
  */
 template<class T>
 TreeNode<T> *TreeNode<T>::getLeft() {
-    return left;
+    return this->left;
 }
 
 /**
@@ -159,7 +159,7 @@ TreeNode<T> *TreeNode<T>::getLeft() {
  */
 template<class T>
 TreeNode<T> *TreeNode<T>::getRight() {
-    return right;
+    return this->right;
 }
 
 /**
@@ -535,7 +535,8 @@ TreeNode<T> *TreeNode<T>::getNext() {
         // This node has a right child, which means if we follow the branch
         // once to the right and then all the way to the left, we will find the
         // correct following child
-        return findMin(current->getRight());
+        TreeNode<T> *rightOfCurrent = current->getRight();
+        return rightOfCurrent->findMin();
     } else {
         TreeNode<T> *parent = current->getParent();
         while (parent != nullptr) {
