@@ -68,7 +68,8 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         return ALLOCATION_ERROR;
     }
     // Creating ArtistPlaysNode object to store SongTree
-    ArtistPlaysNode *artistPlaysNode = this->mostPlayedList->getArtistPlaysTree()->InsertGetBack(artistId, artistPlays);
+    this->mostPlayedList->getArtistPlaysTree()->Insert(artistId, artistPlays);
+    ArtistPlaysNode *artistPlaysNode = this->mostPlayedList->getArtistPlaysTree()->Find(artistId);
     if (!artistPlaysNode) {
         if (numberOfArtists == 0) {
             delete this->mostPlayedList;
@@ -103,7 +104,8 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         }
 
         Song *tempSong = artist->operator[](i);
-        SongPlaysNode *tempSongNode = songsTree->InsertGetBack(i, plays);
+        songsTree->Insert(i,plays);
+        SongPlaysNode *tempSongNode = songsTree->Find(i);
         if (i == 0) {
             // This is the song with the lowest ID, saving in case we need to update the lowest song ID pointer
             lowestIdSongNode = tempSongNode;
@@ -160,7 +162,7 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         // Deleting all nodes from the song plays tree, and marking the songs in the Song array as deleted
         SongPlays::DeleteSongPlaysNode(songTree->GetRoot());
         // Deleting the tree object
-        delete songTree;
+        //delete songTree;
         // Marking as deleted to avoid invalid delete.
         songTree = nullptr;
         artistPlaysNode->getData()->setSongPlaysTree(nullptr);
@@ -227,10 +229,10 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
 
     // getting the pointers to the relevant ArtistPlaysTree, SongsPlaysTree and plays list artistNode
     SongPlaysNode *songNode = artistNode->getData()->operator[](songID)->getPtrToSongNodeInPlaysTree();
-    bool willSwap = false;
-    if (songNode->getLeft() && songNode->getRight()) {
-        willSwap = true;
-    }
+//    bool willSwap = false;
+//    if (songNode->getLeft() && songNode->getRight()) {
+//        willSwap = true;
+//    }
     MostPlayedListNode *playsListNode = songNode->getData()->getPtrToListNode();
     ArtistPlaysNode *artistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
     // Creating a new song plays object to insert to the next linked list node
@@ -251,8 +253,9 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             ArtistPlaysNode *nArtistPlaysNode = nextNode->getArtistPlaysTree()->Find(artistId);
             if (nArtistPlaysNode) {
                 // This artist already has songs with this number of plays.
-                SongPlaysNode *nSongNode = nArtistPlaysNode->getData()->getSongPlaysTree()->InsertGetBack(songID,
-                                                                                                           songPlays);
+                nArtistPlaysNode->getData()->getSongPlaysTree()->Insert(songID,
+                                                                               songPlays);
+                SongPlaysNode *nSongNode = nArtistPlaysNode->getData()->getSongPlaysTree()->Find(songID);
                 if (!nSongNode) {
                     // Rolling back changes to number of plays
                     songPlays->DecrementNumberOfPlays();
@@ -290,8 +293,10 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                     artistNode->getData()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
                     return ALLOCATION_ERROR;
                 }
-                ArtistPlaysNode *nArtistPlaysNode = nextNode->getArtistPlaysTree()->InsertGetBack(artistId,
-                                                                                                  nArtistPlays);
+
+                nextNode->getArtistPlaysTree()->Insert(artistId,
+                                                              nArtistPlays);
+                ArtistPlaysNode *nArtistPlaysNode = nextNode->getArtistPlaysTree()->Find(artistId);
                 if (!nArtistPlaysNode) {
                     // Rolling back changes to number of plays
                     songPlays->DecrementNumberOfPlays();
@@ -310,8 +315,9 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                     return ALLOCATION_ERROR;
                 }
                 nArtistPlays->setSongPlaysTree(nSongTree);
-                SongPlaysNode *nSongNode = nArtistPlaysNode->getData()->getSongPlaysTree()->InsertGetBack(songID,
-                                                                                                           songPlays);
+                nArtistPlaysNode->getData()->getSongPlaysTree()->Insert(songID,
+                                                                               songPlays);
+                SongPlaysNode *nSongNode = nArtistPlaysNode->getData()->getSongPlaysTree()->Find(songID);
                 if (!nSongNode) {
                     // Rolling back changes to number of plays
                     songPlays->DecrementNumberOfPlays();
@@ -365,8 +371,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 return ALLOCATION_ERROR;
             }
             nPlayListNode->setArtistPlaysTree(nArtistPlaysTree);
-            ArtistPlaysNode *nArtistPlaysNode = nPlayListNode->getArtistPlaysTree()->InsertGetBack(
-                    artistId, nArtistPlays);
+            nPlayListNode->getArtistPlaysTree()->Insert(artistId, nArtistPlays);
+            ArtistPlaysNode *nArtistPlaysNode = nPlayListNode->getArtistPlaysTree()->Find(artistId);
             if (!nArtistPlaysNode) {
                 // Rolling back changes to number of plays
                 songPlays->DecrementNumberOfPlays();
@@ -389,7 +395,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
                 delete nPlayListNode;
                 return ALLOCATION_ERROR;
             }
-            SongPlaysNode *nSongNode = nSongTree->InsertGetBack(songID, songPlays);
+            nSongTree->Insert(songID, songPlays);
+            SongPlaysNode *nSongNode = nSongTree->Find(songID);
             if (!nSongNode) {
                 // Rolling back changes to number of plays
                 songPlays->DecrementNumberOfPlays();
@@ -449,8 +456,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             delete nPlayListNode;
             return ALLOCATION_ERROR;
         }
-        ArtistPlaysNode *nArtistPlaysNode = nPlayListNode->getArtistPlaysTree()->InsertGetBack(
-                artistId, nArtistPlays);
+        nPlayListNode->getArtistPlaysTree()->Insert(artistId, nArtistPlays);
+        ArtistPlaysNode *nArtistPlaysNode = nPlayListNode->getArtistPlaysTree()->Find(artistId);
         if (!nArtistPlaysNode) {
             // Rolling back changes to number of plays
             songPlays->DecrementNumberOfPlays();
@@ -473,7 +480,8 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             delete nPlayListNode;
             return ALLOCATION_ERROR;
         }
-        SongPlaysNode *nSongNode = nSongTree->InsertGetBack(songID, songPlays);
+        nSongTree->Insert(songID, songPlays);
+        SongPlaysNode *nSongNode = nSongTree->Find(songID);
         if (!nSongNode) {
             // Rolling back changes to number of plays
             songPlays->DecrementNumberOfPlays();
@@ -512,7 +520,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         // We also need to remember to update the pointer of this list node to the new lowest song ID, if the
         // Artist ID of this artist is the lowest one in this node
         // Otherwise we just remove the song node
-        removingSongNodeCaseNotAlone(playsListNode, artistId, songID, songNode, artistNode, willSwap);
+        removingSongNodeCaseNotAlone(playsListNode, artistId, songID, songNode, artistNode);
     }
     return SUCCESS;
 }
@@ -608,8 +616,8 @@ StatusType MusicManager::addSongAtEndOfList(int newNumOfPlays, MostPlayedListNod
         delete newPlayListNode;
         return ALLOCATION_ERROR;
     }
-    ArtistPlaysNode *newPtrToArtistNode = newPlayListNode->getArtistPlaysTree()->InsertGetBack(
-            artistId, nArtist);
+    newPlayListNode->getArtistPlaysTree()->Insert(artistId, nArtist);
+    ArtistPlaysNode *newPtrToArtistNode = newPlayListNode->getArtistPlaysTree()->Find(artistId);
     if (!newPtrToArtistNode) {
         // Rolling back changes to number of plays
         songPlays->DecrementNumberOfPlays();
@@ -632,7 +640,8 @@ StatusType MusicManager::addSongAtEndOfList(int newNumOfPlays, MostPlayedListNod
         delete newPlayListNode;
         return ALLOCATION_ERROR;
     }
-    SongPlaysNode *nSongNode = nSongTree->InsertGetBack(songID, songPlays);
+    nSongTree->Insert(songID, songPlays);
+    SongPlaysNode *nSongNode = nSongTree->Find(songID);
     if (!nSongNode) {
         // Rolling back changes to number of plays
         songPlays->DecrementNumberOfPlays();
@@ -657,7 +666,7 @@ StatusType MusicManager::addSongAtEndOfList(int newNumOfPlays, MostPlayedListNod
 }
 
 void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNode, int artistId, int songID,
-                                                SongPlaysNode *songNode, ArtistNode *artistNode, bool willSwap) {
+                                                SongPlaysNode *songNode, ArtistNode *artistNode) {
     ArtistPlaysNode *oArtistPlaysNode = playsListNode->getArtistPlaysTree()->Find(artistId);
     if (playsListNode->getPtrToLowestArtistId()->getKey() == artistId) {
         // The current artist is the one with the lowest ID in this list node,
@@ -678,14 +687,13 @@ void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNod
     }
     oArtistPlaysNode->getData()->getSongPlaysTree()->Remove(songID);
     // need to make sure that the song node we removed didn't cause invalid references in the tree or in song array
-    if (willSwap) {
-        if ((songNode->getLeft() || songNode->getRight()) && songNode->getKey() != songID) {
+//    if (willSwap) {
+  //      if ((songNode->getLeft() || songNode->getRight()) && songNode->getKey() != songID) {
             // The original node we looked at has a different ID, which means the old node was replaced with the values from a child node,
             // need to update the pointers in the song array.
-            artistNode->getData()->operator[](songNode->getKey())->setPtrToSongNodeInPlaysTree(songNode);
+    //        artistNode->getData()->operator[](songNode->getKey())->setPtrToSongNodeInPlaysTree(songNode);
         }
-    }
-}
+
 
 void MusicManager::removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, MostPlayedListNode *playsListNode,
                                              int artistId) {
