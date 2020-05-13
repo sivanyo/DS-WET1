@@ -466,7 +466,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             // Rolling back changes to number of plays
             songPlays->DecrementNumberOfPlays();
             newNumOfPlays--;
-            artistNode->getData())->operator[](songID)->setNumberOfPlays(newNumOfPlays);
+            artistNode->getData()->operator[](songID)->setNumberOfPlays(newNumOfPlays);
             delete nArtistPlaysNode;
             delete nArtistPlays;
             delete nArtistPlaysTree;
@@ -503,7 +503,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         this->ptrToMostRecommended = nPlayListNode;
     }
 
-    if (songNode->getRightSon() == nullptr && songNode->getLeftSon() == nullptr && songNode->getParent() == nullptr) {
+    if (songNode->getRight() == nullptr && songNode->getLeft() == nullptr && songNode->getParent() == nullptr) {
         // the song was alone in the artistPlaysTree, we  need to delete the artistPlaysTree
         removingSongNodeCaseAlone(artistPlaysNode, playsListNode, artistId);
     } else {
@@ -679,7 +679,7 @@ void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNod
     oArtistPlaysNode->getData()->getSongPlaysTree()->Remove(songID);
     // need to make sure that the song node we removed didn't cause invalid references in the tree or in song array
     if (willSwap) {
-        if ((songNode->getLeftSon() || songNode->getRightSon()) && songNode->getKey() != songID) {
+        if ((songNode->getLeft() || songNode->getRight()) && songNode->getKey() != songID) {
             // The original node we looked at has a different ID, which means the old node was replaced with the values from a child node,
             // need to update the pointers in the song array.
             artistNode->getData()->operator[](songNode->getKey())->setPtrToSongNodeInPlaysTree(songNode);
@@ -689,7 +689,7 @@ void MusicManager::removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNod
 
 void MusicManager::removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, MostPlayedListNode *playsListNode,
                                              int artistId) {
-    if (artistPlaysNode->getRightSon() == nullptr && artistPlaysNode->getLeftSon() == nullptr &&
+    if (artistPlaysNode->getRight() == nullptr && artistPlaysNode->getLeft() == nullptr &&
         artistPlaysNode->getParent() == nullptr) {
         // the artist is alone in the MostPlaysListNode we need to remove the link
         if (playsListNode->getNumberOfPlays() != 0) {
