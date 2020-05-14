@@ -569,19 +569,24 @@ void TreeNode<T>::setParent(TreeNode<T> *ptr) {
 }
 
 /**
- * This is a generic template for an AVL Tree - the nodes of a tree can have unique data stored in them.
- * For example, a node may hold another AVL Tree inside it
- * in this implementation, the tree "take control" on its data in the meaning it become the charge of its release/delete
-*/
+ * Generic Template Class for an AVL Tree
+ * Stores and organizes AVL tree nodes meant to store dynamic user data
+ * @tparam T Pointer to dynamically allocated object of type T
+ */
 template<class T>
 class Tree {
     TreeNode<T> *root;
-    TreeNode<T> *min_node; // lowest by key data in tree
 
 public:
     Tree();
 
-    ~Tree();
+    TreeNode<T> *GetRoot();
+
+    void MarkRootAsNullptr();
+
+    void MarkRootDataAsNullptr();
+
+    TreeNode<T> *Find(int key);
 
     void Insert(int key, T *data = nullptr);
 
@@ -591,99 +596,45 @@ public:
 
     bool IsRootNull();
 
-    TreeNode<T> *GetRoot();
-
-    TreeNode<T> *Find(int key);
-
-    TreeNode<T> *getMinNode();
-
-    int mapSucc(int *keys, int size);
-
+    ~Tree();
 };
 
 /**
- * Initialize an empty AVL tree
+ * =============================================================================
+ * Tree Functions Implementation
+ * =============================================================================
+ */
+
+/**
+ * Creates an empty AVL Tree to store nodes with type T
+ * @tparam T Pointer to dynamically allocated object of type T
  */
 template<class T>
-Tree<T>::Tree(): root(nullptr), min_node(nullptr) {};
+Tree<T>::Tree(): root(nullptr) {};
 
 
 /**
- * delete tree and release all its data
+ * Returns a pointer to the root of the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return A pointer to the root of the tree
  */
 template<class T>
-Tree<T>::~Tree() {
-    if (root != nullptr) {
-        root->DeleteTreeData();
-        delete root;
-        root = nullptr;
-    }
-}
-
-/**
- * Insert a single data represent by key to the tree
- * if key already shows in tree - nothing will be done
- * @param key the key of the data (node)
- * @param data
- */
-template<class T>
-void Tree<T>::Insert(int key, T *data) {
-    if (root == nullptr) { // in case the tree is empty
-        root = new TreeNode<T>(key, data);
-        min_node = root;
-    } else {
-        root = root->Insert(key, data);
-
-        if (!min_node || key < min_node->getKey()) { // in case we Insert new min by key data
-            this->min_node = root->findMin();
-        }
-    }
-}
-
-template<class T>
-TreeNode<T> *Tree<T>::InsertGetBack(int key, T *data) {
-    if (root == nullptr) { // in case the tree is empty
-        root = new TreeNode<T>(key, data);
-        min_node = root;
+TreeNode<T> *Tree<T>::GetRoot() {
+    if (root) {
         return root;
-    } else {
-        TreeNode<T> *result = nullptr;
-        root = root->Insert(key, data, result);
-
-        if (!min_node || key < min_node->getKey()) { // in case we Insert new min by key data
-            this->min_node = root->findMin();
-        }
-        return result;
     }
+    return nullptr;
 }
 
 /**
- * Remove the data (node) with the key value from the tree
- * @param key
- */
-template<class T>
-void Tree<T>::Remove(int key) {
-    bool flag = min_node != nullptr && min_node->getKey() == key;
-    if (root != nullptr) {
-        root = root->Remove(key);
-        if (flag) {
-            if (root != nullptr) {
-                min_node = root->findMin();
-            } else {
-                min_node = nullptr;
-            }
-        }
-    }
-}
-
-/**
- * @param key
- * @return Returns a node given its key
- * return nullptr if not found
+ * Searches for a node by key in the tree and returns it if it exists
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param key The key of the node to find
+ * @return A pointer to the node if it's found in the tree, nullptr otherwise
  */
 template<class T>
 TreeNode<T> *Tree<T>::Find(int key) {
-    if (root == nullptr) {
+    if (!root) {
         return nullptr;
     }
 
@@ -691,7 +642,61 @@ TreeNode<T> *Tree<T>::Find(int key) {
 }
 
 /**
- * @return true if tree has no data, false otherwise
+ * Inserts a new node with the given key and data to the tree
+ * If the key already exists in the tree, nothing will be done
+ * (This also means the dynamic data sent to the function will not
+ * be freed)
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param key The key of the new node
+ * @param data The data of the new node
+ */
+template<class T>
+void Tree<T>::Insert(int key, T *data) {
+    if (!root) {
+        // The tree is empty, inserting the new node as the root
+        root = new TreeNode<T>(key, data);
+    } else {
+        root = root->Insert(key, data);
+    }
+}
+
+/**
+ * Insert a new node to the subtree tree and returns a pointer to the new node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param key The key of the new node
+ * @param data The data object of the new node
+ * @param result A pointer to save a reference to the new node in
+ * @return A pointer to the newely inserted ndoe
+ */
+template<class T>
+TreeNode<T> *Tree<T>::InsertGetBack(int key, T *data) {
+    if (!root) {
+        // The tree is empty, inserting the new node as the root
+        root = new TreeNode<T>(key, data);
+        return root;
+    } else {
+        TreeNode<T> *result = nullptr;
+        root = root->Insert(key, data, result);
+        return result;
+    }
+}
+
+/**
+ * Removes a node with the given key from the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param key The key of the node to remove
+ */
+template<class T>
+void Tree<T>::Remove(int key) {
+    if (root) {
+        root = root->Remove(key);
+    }
+}
+
+/**
+ * Checks if the tree is empty
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return True if the root of the tree is a nullptr, False otherwiese
  */
 template<class T>
 bool Tree<T>::IsRootNull() {
@@ -699,32 +704,35 @@ bool Tree<T>::IsRootNull() {
 }
 
 /**
- * @return min by key node in the tree
+ * Marks the root of the tree as nullptr
+ * @tparam T Pointer to dynamically allocated object of type T
  */
 template<class T>
-TreeNode<T> *Tree<T>::getMinNode() {
-    return min_node;
+void Tree<T>::MarkRootAsNullptr() {
+    root = nullptr;
 }
 
 /**
- * scan the tree by "successor in-order" method
- * @tparam T
- * @param keys - arr. assign the  #size lowest keys in the tree into this arr
- * @param size - num of data to copy into keys[]
- * @return the number of keys that were assign to keys[]
+ * Marks the data of the root of the tree as nullptr
+ * @tparam T Pointer to dynamically allocated object of type T
  */
 template<class T>
-int Tree<T>::mapSucc(int *keys, int size) {
-    if (size <= 0 || keys == nullptr || min_node == nullptr) {
-        return 0;
-    }
-
-    return min_node->mapSucc(keys, size);
+void Tree<T>::MarkRootDataAsNullptr() {
+    root->removeDataPointer();
 }
 
+/**
+ * Deletes all nodes stored in the tree, including the dynamic data stored in them
+ * and then sets the root of the tree to nullptr
+ * @tparam T Pointer to dynamically allocated object of type T
+ */
 template<class T>
-TreeNode<T> *Tree<T>::GetRoot() {
-    return root;
+Tree<T>::~Tree() {
+    if (root) {
+        root->DeleteTreeData();
+        delete root;
+        root = nullptr;
+    }
 }
 
 
