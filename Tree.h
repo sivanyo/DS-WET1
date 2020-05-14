@@ -5,7 +5,6 @@
 #ifndef WET1_TREE_H
 #define WET1_TREE_H
 
-#include <iostream>
 #include <algorithm>
 #include "library1.h"
 
