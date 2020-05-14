@@ -112,8 +112,6 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         }
         // Saving inside every song of this artist, the pointer to the node of that song in the artist Songs tree
         tempSong->setPtrToSongNodeInPlaysTree(tempSongNode);
-        // Saving inside every song of this artist, the pointer to the node of that artist in the linked list
-//        tempSong->setPtrToArtistIdPlaysTree(artistPlaysNode); // REMOVED TO PREVENT SEGFAULT
         // Saving inside every song plays node of this artist, the pointer to the Song object of that song
         plays->setPtrToSong(tempSong);
 
