@@ -8,6 +8,7 @@
 #include <iostream>
 #include <algorithm>
 #include "library1.h"
+
 using std::max;
 
 /**
@@ -42,7 +43,7 @@ private:
     TreeNode<T> *RightRotate();
 
 public:
-    TreeNode(int key, T *nData = nullptr,TreeNode *parent = nullptr);
+    TreeNode(int key, T *nData = nullptr, TreeNode *parent = nullptr, TreeNode *left = nullptr, TreeNode *right = nullptr);
 
     int getKey();
 
@@ -166,8 +167,8 @@ void TreeNode<T>::SwapNodesParent(TreeNode<T> *replacement) {
     if (replacement) {
         replacement->parent = this->parent;
     }
-    if (this->getParent()) {
-        if (this->getParent()->getLeft() && this->getParent()->getLeft()->getKey() == this->getKey()) {
+    if (getParent()) {
+        if (getParent()->getLeft() && getParent()->getLeft()->getKey() == getKey()) {
             this->parent->left = replacement;
         } else {
             this->parent->right = replacement;
@@ -351,7 +352,7 @@ TreeNode<T> *TreeNode<T>::RightRotate() {
     newRoot->parent = this->parent;
     if (this->getParent()) {
         // Checking if newRoot is a right child or left child of the original parent
-         updateRotatedRootParent(this, newRoot);
+        updateRotatedRootParent(this, newRoot);
     }
 
     this->parent = newRoot;
@@ -404,11 +405,11 @@ TreeNode<T> *TreeNode<T>::DeleteAndReplaceNodeWithRightSuccessor() {
 }
 
 template<class T>
-TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent):
+TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent, TreeNode *left, TreeNode *right):
         key(key), data(nData) {
     height = 1;
-    left = nullptr;
-    right = nullptr;
+    this->left = left;
+    this->right = right;
     this->parent = parent;
 };
 
@@ -465,30 +466,26 @@ void TreeNode<T>::DeleteTreeData() {
     }
 }
 
-/**
- * Finds the successor to the current node
- * @tparam T Pointer to dynamically allocated object of type T
- * @return The successor of the current node
- */
 template<class T>
 TreeNode<T> *TreeNode<T>::getNext() {
     TreeNode<T> *current = this;
-    if (current->right) {
+    if (current->getRight() != nullptr) {
         // This node has a right child, which means if we follow the branch
         // once to the right and then all the way to the left, we will find the
         // correct following child
-        return findMin();
+        TreeNode<T> *rightOfCurrent = current->getRight();
+        return rightOfCurrent->findMin();
     } else {
-        TreeNode<T> *parent = current->parent;
-        while (parent) {
-            TreeNode<T> *child = parent->left;
-            if (child && child->key == current->key) {
+        TreeNode<T> *parent = current->getParent();
+        while (parent != nullptr) {
+            TreeNode<T> *child = parent->getLeft();
+            if (child && child->getKey() == current->getKey()) {
                 // The node we started with is the left child of the current parent,
                 // which means the parent is the next node in the tree.
                 return parent;
             }
             current = parent;
-            parent = current->parent;
+            parent = current->getParent();
         }
         return parent;
     }
