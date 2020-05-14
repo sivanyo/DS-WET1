@@ -161,7 +161,8 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         SongPlaysTree *songTree = artistPlaysNode->getData()->getSongPlaysTree();
         // Deleting all nodes from the song plays tree, and marking the songs in the Song array as deleted
         SongPlays::DeleteSongPlaysNode(songTree->GetRoot());
-        songTree->MarkRootAsNullptr();
+        //songTree->MarkRootAsNullptr();
+        songTree->MarkRootDataAsNullptr();
         // Deleting the tree object
         delete songTree;
         // Marking as deleted to avoid invalid delete.
