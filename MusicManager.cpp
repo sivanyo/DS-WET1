@@ -68,7 +68,16 @@ StatusType MusicManager::AddArtist(int artistId, int numOfSongs) {
         return ALLOCATION_ERROR;
     }
     // Creating ArtistPlaysNode object to store SongTree
-    this->mostPlayedList->getArtistPlaysTree()->Insert(artistId, artistPlays);
+    if(this->mostPlayedList->getArtistPlaysTree()){
+        this->mostPlayedList->getArtistPlaysTree()->Insert(artistId, artistPlays);
+    }
+    else{
+        // There is no ArtistTree in the 0 playListNode
+        // need to create such
+        ArtistPlaysTree *nArtistPlaysTree = new ArtistPlaysTree;
+        this->mostPlayedList->setArtistPlaysTree(nArtistPlaysTree);
+        this->mostPlayedList->getArtistPlaysTree()->Insert(artistId, artistPlays);
+    }
     ArtistPlaysNode *artistPlaysNode = this->mostPlayedList->getArtistPlaysTree()->Find(artistId);
     if (!artistPlaysNode) {
         if (numberOfArtists == 0) {
