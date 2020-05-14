@@ -38,7 +38,7 @@ private:
 
     TreeNode<T> *LeftRightRotate();
 
-    TreeNode<T> *RightLeftRotatet();
+    TreeNode<T> *RightLeftRotate();
 
     TreeNode<T> *LeftRotate();
 
@@ -92,39 +92,11 @@ public:
     TreeNode<T> *DeleteNode();
 
     int getHeight();
+
+    void updateRebalancedNodeHeights(TreeNode<T> *origin, TreeNode<T> *newRoot);
+
+    void updateRotatedRootParent(TreeNode<T> *previousRoot, TreeNode<T> *newRoot);
 };
-
-/**
- *
- * @tparam T
- * @param keyAdd
- * @param dataAdd
- * @return add a new node in this connected nodes data structure, with param keyAdd and dataAdd
- * the Insert is by AVL-ordering-by-key
- * if during Insert founds that keyAdd already in struct, does not do anything
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::Insert(int keyAdd, T *dataAdd, TreeNode<T> *result) {
-
-    if (keyAdd > key) {
-        if (right == nullptr) {
-            right = new TreeNode(keyAdd, dataAdd, this);
-            result = right;
-        } else {
-            right->Insert(keyAdd, dataAdd, result);
-        }
-    } else if (keyAdd < key) {
-        if (left == nullptr) {
-            left = new TreeNode(keyAdd, dataAdd, this);
-            result = left;
-        } else {
-            left->Insert(keyAdd, dataAdd, result);
-        }
-    } else {
-        return nullptr; // indicate already in tree. no actions or changing in tree
-    }
-    return Rebalance();
-}
 
 /**
  * updeate node's height
@@ -145,82 +117,6 @@ void TreeNode<T>::updateNodeHeight() {
     } else {
         height = tmpRight + 1;
     }
-}
-
-/**
- * single right rotation
- * @tparam T
- * @return update root of sub-node-struct
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::RightRotate() {
-    TreeNode<T> *tmpRight = right;
-    right = right->left;
-    if (right != nullptr) {
-        right->parent = this;
-    }
-    tmpRight->left = this;
-    tmpRight->parent = this->parent;
-    if (this->parent != nullptr) {
-        if (this->parent->left != nullptr && this->parent->left->key == this->key) {
-            this->parent->left = tmpRight;
-        } else {
-            this->parent->right = tmpRight;
-        }
-    }
-    this->parent = tmpRight;
-    this->updateNodeHeight();
-    tmpRight->updateNodeHeight();
-    return tmpRight;
-}
-
-/**
- * single left rotation
- * @tparam T
- * @return update root of sub-node-struct
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::LeftRotate() {
-    TreeNode<T> *tmpLeft = left;
-    left = left->right;
-    if (left != nullptr) {
-        left->parent = this;
-    }
-    tmpLeft->right = this;
-    tmpLeft->parent = this->parent;
-    if (this->parent != nullptr) {
-        if (this->parent->left != nullptr && this->parent->left->key == this->key) {
-            this->parent->left = tmpLeft;
-        } else {
-            this->parent->right = tmpLeft;
-        }
-    }
-    this->parent = tmpLeft;
-    this->updateNodeHeight();
-    tmpLeft->updateNodeHeight();
-    return tmpLeft;
-}
-
-/**
- * one right rotation and than left rotation
- * @tparam T
- * @return update root of sub-node-struct
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::LeftRightRotate() {
-    left->RightRotate();
-    return this->LeftRotate();
-}
-
-/**
- * one left rotation and than right rotation
- * @tparam T
- * @return update root of sub-node-struct
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::RightLeftRotatet() {
-    right->LeftRotate();
-    return this->RightRotate();
 }
 
 template<class T>
@@ -255,7 +151,7 @@ TreeNode<T> *TreeNode<T>::Rebalance() {
     } else if (bf < -1) {
         int sub_bf = right->getBalanceFactor();
         if (sub_bf > 0) {
-            return RightLeftRotatet();
+            return RightLeftRotate();
         } else {
             return RightRotate();
         }
@@ -320,58 +216,151 @@ void TreeNode<T>::SwapNodesParent(TreeNode<T> *takePlace) {
 }
 
 /**
- * scan the node-struct by "in-order" method
- * (from current down. does not go up to parent)
- * @tparam T
- * @param keys - arr. assign the  #size lowest keys in the tree into this arr
- * @param size - num of data to copy into keys[]
- * @return the number of keys that were assign to keys[]
+ * Performs a left right rotation based on AVL tree rotation algorithms
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the rotated subtree
  */
 template<class T>
-int TreeNode<T>::mapInOrder(int *keys, int size) {
-    if (size <= 0 || keys == nullptr) {
-        return 0;
+TreeNode<T> *TreeNode<T>::LeftRightRotate() {
+    if (left) {
+        left->RightRotate();
     }
-
-    int index = 0;
-    if (left != nullptr) {
-        index += left->mapInOrder(keys, size);
-        if (index >= size) {
-            return index;
-        }
-    }
-
-    keys[index++] = key;
-
-    if (index < size && right != nullptr) {
-        index += right->mapInOrder(keys + index, size - index);
-    }
-    return index;
+    return this->LeftRotate();
 }
 
 /**
- * scan the node-struct by "successor in-order" method
- * (from current up. does not go to current sons)
- * @tparam T
- * @param keys - arr. assign the  #size lowest keys in the tree into this arr
- * @param size - num of data to copy into keys[]
- * @return the number of keys that were assign to keys[]
+ * Performs a right left rotation based on AVL tree rotation algorithms
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the rotated subtree
  */
 template<class T>
-int TreeNode<T>::mapSucc(int *keys, int size) {
-    if (size <= 0 || keys == nullptr) {
-        return 0;
+TreeNode<T> *TreeNode<T>::RightLeftRotate() {
+    if (right) {
+        right->LeftRotate();
     }
-    int index = 0;
-    TreeNode<T> *current = this;
-    while (current && index < size) {
-        keys[index++] = current->key;
-        if (current->right) {
-            index += current->right->mapInOrder(keys + index, size - index);
+    return this->RightRotate();
+}
+
+/**
+ * Performs a left rotation based on AVL tree rotation algorithms
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the rotated subtree
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::LeftRotate() {
+    TreeNode<T> *newRoot = left;
+    left = left->right;
+    if (left) {
+        left->parent = this;
+    }
+    // Moving newRoot to the place of "this"
+    newRoot->right = this;
+    newRoot->parent = this->parent;
+    if (this->getParent()) {
+        // Checking if newRoot is a right child or left child of the original parent
+        updateRotatedRootParent(this, newRoot);
+    }
+    this->parent = newRoot;
+    // Updating node heights after switches
+    updateRebalancedNodeHeights(this, newRoot);
+    return newRoot;
+}
+
+/**
+ * Updates the height of nodes that were the core components of a rebalance
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param origin The original root of the subtree
+ * @param newRoot The new root of the subtree
+ */
+template<class T>
+void TreeNode<T>::updateRebalancedNodeHeights(TreeNode<T> *origin, TreeNode<T> *newRoot) {
+    origin->updateNodeHeight();
+    newRoot->updateNodeHeight();
+}
+
+/**
+ * Updates the parent of a new rotated subtree root
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param previousRoot The old root of the subtree
+ * @param newRoot The new root of the subtree
+ */
+template<class T>
+void TreeNode<T>::updateRotatedRootParent(TreeNode<T> *previousRoot, TreeNode<T> *newRoot) {
+    // Checking if newRoot is a right child or left child of the original parent
+    if (previousRoot->getParent()->getLeft() && previousRoot->getParent()->getLeft()->getKey() == previousRoot->getKey()) {
+        previousRoot->parent->left = newRoot;
+    } else {
+        previousRoot->parent->right = newRoot;
+    }
+}
+
+/**
+ * Insert a new node to the subtree tree and returns the new root of the subtree
+ * after rotations and rebalance
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param nodeKey The key of the new node
+ * @param nodeData The data object of the new node
+ * @param result A pointer to save a reference to the new node in
+ * @return The new root of the rebalanced tree after insert
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::Insert(int nodeKey, T *nodeData, TreeNode<T> *result) {
+    // Search for the right place to insert the node
+    if (nodeKey > getKey()) {
+        // The node will be a right child of this node
+        if (!right) {
+            // Found the correct spot to insert the node
+            right = new TreeNode(nodeKey, nodeData, this);
+            // Saving the new object to the result pointer for future retrieval
+            result = right;
+        } else {
+            // Need to continue searching for the right spot of the new node
+            right->Insert(nodeKey, nodeData, result);
         }
-        current = current->parent;
+    } else if (nodeKey < getKey()) {
+        // The node will be a left child of this node
+        if (!left) {
+            // Found the correct spot to insert the node
+            left = new TreeNode(nodeKey, nodeData, this);
+            // Saving the new object to the result pointer for future retrieval
+            result = left;
+        } else {
+            // Need to continue searching for the right spot of the new node
+            left->Insert(nodeKey, nodeData, result);
+        }
+    } else {
+        // The input key already exists in the tree, returning nullptr without
+        // modifying the tree or the input data
+        return nullptr;
     }
-    return index;
+    // Rebalancing tree after insertion
+    return Rebalance();
+}
+
+/**
+ * Performs a right rotation based on AVL tree rotation algorithms
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the rotated subtree
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::RightRotate() {
+    TreeNode<T> *newRoot = right;
+    right = right->left;
+    if (right) {
+        right->parent = this;
+    }
+    // Moving newRoot to the place of "this"
+    newRoot->left = this;
+    newRoot->parent = this->parent;
+    if (this->getParent()) {
+        // Checking if newRoot is a right child or left child of the original parent
+        updateRotatedRootParent(this, newRoot);
+    }
+
+    this->parent = newRoot;
+    // Updating node heights after switches
+    updateRebalancedNodeHeights(this, newRoot);
+    return newRoot;
 }
 
 /**
