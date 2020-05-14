@@ -9,6 +9,8 @@
 #include <algorithm>
 #include "library1.h"
 #include <iostream> // TODO only for testing
+
+using std::max;
 /**
  * Generic Template Class for a TreeNode
  * Made Specifically for use as a balanced AVL tree node meant to store dynamic
@@ -96,123 +98,125 @@ public:
     void updateRebalancedNodeHeights(TreeNode<T> *origin, TreeNode<T> *newRoot);
 
     void updateRotatedRootParent(TreeNode<T> *previousRoot, TreeNode<T> *newRoot);
+
+    int getRightChildHeight();
+
+    int getLeftChildHeight();
 };
 
 /**
- * updeate node's height
- * @tparam T
+ * =============================================================================
+ * Tree Node Functions Implementation
+ * =============================================================================
  */
-template<class T>
-void TreeNode<T>::updateNodeHeight() {
-    int tmpRight = 0, tmpLeft = 0;
-    if (left != nullptr) {
-        tmpLeft = left->height;
-    }
-    if (right != nullptr) {
-        tmpRight = right->height;
-    }
-
-    if (tmpLeft > tmpRight) {
-        height = tmpLeft + 1;
-    } else {
-        height = tmpRight + 1;
-    }
-}
-
-template<class T>
-int TreeNode<T>::getBalanceFactor() {
-    updateNodeHeight();
-    int tmpRight = 0, tmpLeft = 0;
-    if (right != nullptr) {
-        tmpRight = right->height;
-    }
-    if (left != nullptr) {
-        tmpLeft = left->height;
-    }
-    return tmpLeft - tmpRight;
-}
 
 /**
- * balances nodes (as AVL tree)
- * @tparam T
- * @return update root of sub-node-struct
+ * Checks the balance factor of the tree and rebalances it using the AVL tree
+ * rotation algorithms, returns the root of the new subtree at the end
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the subtree after rebalancing
  */
 template<class T>
 TreeNode<T> *TreeNode<T>::Rebalance() {
-    int bf = getBalanceFactor(); // bf = Balance Factor
+    // Getting the balance factor of the current node
+    int balance = getBalanceFactor();
 
-    if (bf > 1) {
-        int sub_bf = left->getBalanceFactor();
-        if (sub_bf >= 0) {
-            return LeftRotate();
-        } else {
-            return LeftRightRotate();
-        }
-    } else if (bf < -1) {
-        int sub_bf = right->getBalanceFactor();
-        if (sub_bf > 0) {
+    if (balance < -1) {
+        // The tree is right heavy
+        int rightSubtreeBalance = getRight()->getBalanceFactor();
+        if (rightSubtreeBalance > 0) {
             return RightLeftRotate();
         } else {
             return RightRotate();
         }
+
+    } else if (balance > 1) {
+        // The tree is left heavy
+        int leftSubtreeBalance = getLeft()->getBalanceFactor();
+        if (leftSubtreeBalance >= 0) {
+            return LeftRotate();
+        } else {
+            return LeftRightRotate();
+        }
     }
+
     return this;
 }
 
 /**
- * delete this (Current) from node-struct
- * @tparam T
- * @param keyRemove
- * @return update root of sub-node-struct
+ * Calculates the balance factor of the current node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The balance factor of the current node
  */
 template<class T>
-TreeNode<T> *TreeNode<T>::DeleteNode(int keyRemove) {
-    if (left != nullptr) { //Find successor of node
-        TreeNode<T> *successor = left->findMax();
-        if (left->right != nullptr) {
-            successor->parent->right = successor->left;
-            if (successor->left != nullptr) {
-                successor->left->parent = successor->parent;
-            }
-            successor->left = this->left;
-            this->left->parent = successor;
+int TreeNode<T>::getBalanceFactor() {
+    updateNodeHeight();
+    int leftHeight = 0;
+    int rightHeight = 0;
+    if (getRight()) {
+        rightHeight = getRight()->height;
+    }
+    if (getLeft()) {
+        leftHeight = getLeft()->height;
+    }
+    return leftHeight - rightHeight;
+}
+
+/**
+ * Updates the pointers of the "next in line" node in order to make sure proper linkage
+ * of the subtree after deletion
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param replacement The successor node
+ */
+template<class T>
+void TreeNode<T>::SwapNodesParent(TreeNode<T> *replacement) {
+    if (replacement) {
+        replacement->parent = this->parent;
+    }
+    if (this->getParent()) {
+        if (this->getParent()->getLeft() && this->getParent()->getLeft()->getKey() == this->getKey()) {
+            this->parent->left = replacement;
+        } else {
+            this->parent->right = replacement;
         }
-        this->SwapNodesParent(successor);
-        successor->right = this->right;
-        if (this->right != nullptr) {
-            this->right->parent = successor;
-        }
-        delete this;
-        return successor->Rebalance();
-    } else if (right != nullptr) {
-        TreeNode<T> *successor = this->right;
-        this->SwapNodesParent(successor);
-        delete this;
-        return successor->Rebalance();
-    } else { // no sons to delete node
-        this->SwapNodesParent(nullptr);
-        delete this;
-        return nullptr;
     }
 }
 
 /**
- * adjust parents between nodes that been delete and its successor
- * @tparam T
- * @param takePlace - successor
+ * Updates the height of the node based on it's children
+ * @tparam T Pointer to dynamically allocated object of type T
  */
 template<class T>
-void TreeNode<T>::SwapNodesParent(TreeNode<T> *takePlace) {
-    if (takePlace != nullptr) {
-        takePlace->parent = this->parent;
+void TreeNode<T>::updateNodeHeight() {
+    int leftHeight = getLeftChildHeight();
+    int rightHeight = getRightChildHeight();
+    height = 1 + max(leftHeight, rightHeight);
+}
+
+/**
+ * Returns the height of the left child
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The height of the left child
+ */
+template<class T>
+int TreeNode<T>::getLeftChildHeight() {
+    if (left) {
+        return left->height;
     }
-    if (this->parent != nullptr) {
-        if (this->parent->left != nullptr && this->parent->left->key == this->key) {
-            this->parent->left = takePlace;
-        } else {
-            this->parent->right = takePlace;
-        }
+    return 0;
+}
+
+/**
+ * Returns the height of the right child
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The height of the right child
+ */
+template<class T>
+int TreeNode<T>::getRightChildHeight() {
+    if (right) {
+        return right->height;
     }
+    return 0;
 }
 
 /**
