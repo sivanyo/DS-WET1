@@ -82,7 +82,7 @@ static bool isInit = false;
 /***************************************************************************/
 
 int main(int argc, const char**argv) {
-
+    setbuf(stdout, 0);
     char buffer[MAX_STRING_INPUT_SIZE];
 
     // Reading commands
@@ -255,10 +255,10 @@ static errorType OnGetRecommendedSongs(void* DS, const char* const command) {
     int numOfSongs;
     int *artists, *songs;
 
+	ValidateRead(sscanf(command, "%d", &numOfSongs), 1, "%s failed.\n", commandStr[GETRECOMMENDEDSONGS_CMD]);
 	artists = (int *)malloc(numOfSongs * sizeof(int));
 	songs = (int *)malloc(numOfSongs * sizeof(int));
 
-    ValidateRead(sscanf(command, "%d", &numOfSongs), 1, "%s failed.\n", commandStr[GETRECOMMENDEDSONGS_CMD]);
 	StatusType res;
 	if (artists != NULL && songs != NULL) {
 		res = GetRecommendedSongs(DS, numOfSongs, artists, songs);
@@ -269,6 +269,8 @@ static errorType OnGetRecommendedSongs(void* DS, const char* const command) {
 
     if (res != SUCCESS) {
         printf("%s: %s\n", commandStr[GETRECOMMENDEDSONGS_CMD], ReturnValToStr(res));
+		if (artists != NULL) free(artists);
+		if (songs != NULL) free(songs);
         return error_free;
     }
 

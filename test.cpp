@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include "ArtistTree/ArtistNode.h"
 
 
 int main() {

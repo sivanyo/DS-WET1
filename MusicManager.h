@@ -7,18 +7,16 @@
 
 
 #include "library1.h"
-#include "ArtistTree/ArtistNode.h"
-#include "MostPlayedList/MostPlayedListNode.h"
-
-using std::shared_ptr;
+#include "MostPlayedListNode.h"
+#include "Artist.h"
 
 class MusicManager {
 private:
-    shared_ptr<ArtistNode> artistTree;
-    shared_ptr<MostPlayedListNode> mostPlayedList;
-    shared_ptr<MostPlayedListNode> ptrToMostRecommended;
-    int numberOfArtists = 0;
-    int numberOfSongs = 0;
+    ArtistTree *artistTree;
+    MostPlayedListNode *mostPlayedList;
+    MostPlayedListNode *ptrToMostRecommended;
+    int numberOfArtists;
+    int numberOfSongs;
 public:
     MusicManager();
 
@@ -26,13 +24,23 @@ public:
 
     StatusType RemoveArtist(int artistId);
 
-    StatusType AddToSongCount(int artistId, int numOfSongs);
+    StatusType AddToSongCount(int artistId, int songID);
 
     StatusType NumberOfStreams(int artistId, int songID, int *streams);
 
     StatusType GetRecommendedSongs(int numOfSongs, int *artist, int *songs);
 
     ~MusicManager();
+
+    StatusType addSongAtEndOfList(int newNumOfPlays, MostPlayedListNode *playsListNode,
+                                  SongPlays *songPlays, ArtistNode *artistNode, int songID, int artistId);
+
+    StatusType addArtistToPlaysNode();
+
+    void removingSongNodeCaseNotAlone(MostPlayedListNode *playsListNode, int artistId, int songID, SongPlaysNode *songNode,
+                                      ArtistNode *artistNode);
+
+    void removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, MostPlayedListNode *playsListNode, int artistId);
 };
 
 

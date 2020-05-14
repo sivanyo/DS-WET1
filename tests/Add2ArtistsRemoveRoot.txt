@@ -1,0 +1,5 @@
+Init
+AddArtist 1 12
+AddArtist 2 23
+RemoveArtist 1
+Quit

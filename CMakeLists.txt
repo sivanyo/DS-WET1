@@ -12,5 +12,5 @@ set(CMAKE_CXX_STANDARD 11)
 
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 
-add_executable(wet1 test.cpp library1.cpp MusicManager.cpp MusicManager.h TreeNode/TreeNode.tpp TreeNode/TreeNode.h Artist/Artist.cpp Artist/Artist.h Song/Song.cpp Song/Song.h ArtistPlays/ArtistPlays.cpp ArtistPlays/ArtistPlays.h MostPlayedList/SongPlaysNode.cpp MostPlayedList/SongPlaysNode.h MostPlayedList/MostPlayedListNode.cpp MostPlayedList/MostPlayedListNode.h ArtistTree/ArtistNode.cpp ArtistTree/ArtistNode.h SongPlays/SongPlays.cpp SongPlays/SongPlays.h)
-add_executable(test TreeNode/TreeNode.tpp TreeNode/TreeNode.h Artist/Artist.cpp Artist/Artist.h ArtistTree/ArtistNode.cpp ArtistTree/ArtistNode.h test.cpp TreeNode/TreeNodeImp.h)
+add_executable(wet1 main1.cpp library1.h library1.cpp MusicManager.cpp MusicManager.h Artist.cpp Artist.h Song.cpp Song.h ArtistPlays.cpp ArtistPlays.h MostPlayedListNode.cpp MostPlayedListNode.h SongPlays.cpp SongPlays.h Tree.h)
+add_executable(test Artist.cpp Artist.h test.cpp Tree.h)
