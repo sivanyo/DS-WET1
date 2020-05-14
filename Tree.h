@@ -8,8 +8,8 @@
 #include <iostream>
 #include <algorithm>
 #include "library1.h"
-
 using std::max;
+
 /**
  * Generic Template Class for a TreeNode
  * Made Specifically for use as a balanced AVL tree node meant to store dynamic
@@ -20,10 +20,10 @@ class TreeNode {
 private:
     int key;
     T *data;
-    int height;
-    TreeNode<T> *left;
-    TreeNode<T> *right;
-    TreeNode<T> *parent;
+    int height = 1;
+    TreeNode<T> *left = nullptr;
+    TreeNode<T> *right = nullptr;
+    TreeNode<T> *parent = nullptr;
 
     TreeNode<T> *Rebalance();
 
@@ -31,44 +31,52 @@ private:
 
     void SwapNodesParent(TreeNode<T> *replacement);
 
+    TreeNode<T> *LeftRightRotate();
+
+    TreeNode<T> *RightLeftRotate();
+
+    void updateRotatedRootParent(TreeNode<T> *previousRoot, TreeNode<T> *newRoot);
+
+    TreeNode<T> *LeftRotate();
+
+    TreeNode<T> *RightRotate();
+
+public:
+    TreeNode(int key, T *nData = nullptr,TreeNode *parent = nullptr);
+
+    int getKey();
+
+    T *getData();
+
+    void removeDataPointer();
+
+    int getHeight();
+
+    int getNodeBalanceFactor();
+
+    int getLeftChildHeight();
+
+    int getRightChildHeight();
+
+    TreeNode<T> *findMin();
+
+    TreeNode<T> *Insert(int nodeKey, T *nodeData = nullptr, TreeNode<T> *result = nullptr);
+
+    TreeNode<T> *Remove(int nodeKey);
+
+    TreeNode<T> *DeleteNode();
+
     void updateNodeHeight();
 
     TreeNode<T> *DeleteAndReplaceNodeWithLeftSuccessor();
 
     TreeNode<T> *DeleteAndReplaceNodeWithRightSuccessor();
 
-    TreeNode<T> *LeftRightRotate();
-
-    TreeNode<T> *RightLeftRotate();
-
-    TreeNode<T> *LeftRotate();
-
-    TreeNode<T> *RightRotate();
-
-    TreeNode<T> *DeleteNode();
-
-public:
-    TreeNode(int key, T *nData = nullptr, TreeNode *parent = nullptr);
-
-    ~TreeNode();
-
-    void DeleteTreeData();
-
-    TreeNode<T> *Insert(int nodeKey, T *nodeData = nullptr, TreeNode<T> *result = nullptr);
-
-    TreeNode<T> *Remove(int nodeKey);
+    void updateRebalancedNodeHeights(TreeNode<T> *origin, TreeNode<T> *newRoot);
 
     TreeNode<T> *Find(int searchKey);
 
-    TreeNode<T> *findMin();
-
-    TreeNode<T> *findMax();
-
-    T *getData();
-
     TreeNode<T> *getNext();
-
-    int getKey();
 
     TreeNode<T> *getLeft();
 
@@ -82,19 +90,11 @@ public:
 
     void setParent(TreeNode<T> *ptr);
 
-    void removeDataPointer();
+    TreeNode<T> *findMax();
 
-    int getNodeBalanceFactor();
+    void DeleteTreeData();
 
-    int getHeight();
-
-    void updateRebalancedNodeHeights(TreeNode<T> *origin, TreeNode<T> *newRoot);
-
-    void updateRotatedRootParent(TreeNode<T> *previousRoot, TreeNode<T> *newRoot);
-
-    int getRightChildHeight();
-
-    int getLeftChildHeight();
+    ~TreeNode();
 };
 
 /**
@@ -687,6 +687,7 @@ void TreeNode<T>::removeDataPointer() {
     data = nullptr;
 }
 
+
 /**
  * Generic Template Class for an AVL Tree
  * Stores and organizes AVL tree nodes meant to store dynamic user data
@@ -853,6 +854,5 @@ Tree<T>::~Tree() {
         root = nullptr;
     }
 }
-
 
 #endif //WET1_TREE_H
