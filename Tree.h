@@ -8,7 +8,6 @@
 #include <iostream>
 #include <algorithm>
 #include "library1.h"
-#include <iostream> // TODO only for testing
 
 using std::max;
 /**
@@ -30,7 +29,7 @@ private:
 
     int getBalanceFactor();
 
-    void SwapNodesParent(TreeNode<T> *takePlace);
+    void SwapNodesParent(TreeNode<T> *replacement);
 
     void updateNodeHeight();
 
@@ -46,7 +45,7 @@ private:
 
     TreeNode<T> *RightRotate();
 
-    TreeNode<T> *DeleteNode(int keyRemove);
+    TreeNode<T> *DeleteNode();
 
 public:
     TreeNode(int key, T *nData = nullptr, TreeNode *parent = nullptr);
@@ -55,11 +54,11 @@ public:
 
     void DeleteTreeData();
 
-    TreeNode<T> *Insert(int keyAdd, T *dataAdd = nullptr, TreeNode<T> *result = nullptr);
+    TreeNode<T> *Insert(int nodeKey, T *nodeData = nullptr, TreeNode<T> *result = nullptr);
 
-    TreeNode<T> *Remove(int keyRemove);
+    TreeNode<T> *Remove(int nodeKey);
 
-    TreeNode<T> *Find(int keyFind);
+    TreeNode<T> *Find(int searchKey);
 
     TreeNode<T> *findMin();
 
@@ -83,15 +82,9 @@ public:
 
     void setParent(TreeNode<T> *ptr);
 
-    int mapInOrder(int *keys, int size);
-
-    int mapSucc(int *keys, int size);
-
     void removeDataPointer();
 
     int getNodeBalanceFactor();
-
-    TreeNode<T> *DeleteNode();
 
     int getHeight();
 
