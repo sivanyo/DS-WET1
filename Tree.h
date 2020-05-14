@@ -6,9 +6,13 @@
 #define WET1_TREE_H
 
 #include <algorithm>
+#include <cmath>
 #include "library1.h"
 
 using std::max;
+using std::ceil;
+using std::log2;
+using std::pow;
 
 /**
  * Generic Template Class for a TreeNode
@@ -72,6 +76,10 @@ public:
 
     TreeNode<T> *DeleteAndReplaceNodeWithRightSuccessor();
 
+    int FillNodesWithArrDataInOrder(T **&array, int size, int index);
+
+    int FillArrayWithNodesInOrder(TreeNode<T> **&array, int size, int index);
+
     void updateRebalancedNodeHeights(TreeNode<T> *origin, TreeNode<T> *newRoot);
 
     TreeNode<T> *Find(int searchKey);
@@ -93,6 +101,12 @@ public:
     TreeNode<T> *findMax();
 
     void DeleteTreeData();
+
+    static void CreateCompleteBinaryTree(TreeNode<T> *parent, int treeLevel, int currentLevel);
+
+    static void RemoveExtraNodes(TreeNode<T> *root, int &numberOfNodesToRemove);
+
+    static void FillKeysInOrder(TreeNode<T>* root, int &key);
 
     ~TreeNode();
 };
@@ -682,9 +696,117 @@ void TreeNode<T>::setParent(TreeNode<T> *ptr) {
     parent = ptr;
 }
 
+/**
+ * Removes the reference to the data of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ */
 template<class T>
 void TreeNode<T>::removeDataPointer() {
     data = nullptr;
+}
+
+template<class T>
+int TreeNode<T>::FillNodesWithArrDataInOrder(T **&array, int size, int index) {
+    // Insert on left
+    if (this->left) {
+        index = this->left->FillNodesWithArrDataInOrder(array, size, index);
+    }
+
+    // Insert on root
+    data = array[key];
+    index++;
+
+    // Insert on right
+    if (this->right) {
+        index = this->right->FillNodesWithArrDataInOrder(array, size, index);
+    }
+    return index;
+}
+
+/**
+ * Fills an array with pointers to the TreeNodes of the tree
+ * Array should be as large as the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param array The array to fill with tree nodes
+ * @param size The size of the array
+ * @param index The current insertion position
+ * @return The next index to insert values to the array
+ */
+template<class T>
+int TreeNode<T>::FillArrayWithNodesInOrder(TreeNode<T> **&array, int size, int index) {
+    // Scan left
+    if (this->left) {
+        index = this->left->FillArrayWithNodesInOrder(array, size, index);
+    }
+
+    // Scan root
+    array[index++] = this;
+
+    // Scan right
+    if (this->right) {
+        index = this->right->FillArrayWithNodesInOrder(array, size, index);
+    }
+    return index;
+}
+
+template<class T>
+void TreeNode<T>::CreateCompleteBinaryTree(TreeNode<T> *parent, int treeLevel, int currentLevel) {
+    // Checking if we created all necessary tree levels
+    if (treeLevel <= currentLevel) {
+        // We finished creating all new levels of the tree
+        return;
+    }
+    parent->left = new TreeNode<T>(0, nullptr, parent);
+    parent->right = new TreeNode<T>(0, nullptr, parent);
+    // Checking if the next floor exceeds the height of our tree
+    if (currentLevel + 1 == treeLevel) {
+        parent->left->left = nullptr;
+        parent->left->right = nullptr;
+        parent->right->left = nullptr;
+        parent->right->right = nullptr;
+    }
+    CreateCompleteBinaryTree(parent->left, treeLevel, currentLevel + 1);
+    CreateCompleteBinaryTree(parent->right, treeLevel, currentLevel + 1);
+    // Updating parent height
+    parent->updateNodeHeight();
+}
+
+template<class T>
+void TreeNode<T>::RemoveExtraNodes(TreeNode<T> *root, int &numberOfNodesToRemove) {
+    // Checking if we need to continue removing nodes
+    if (numberOfNodesToRemove == 0 || root == nullptr) {
+        // We removed all the nodes we needed or we reached the end of the tree
+        // scan so we shouldn't perform anymore actions
+        return;
+    }
+    // Removing nodes in reverse in order, only from the bottom level of the tree
+    RemoveExtraNodes(root->right, numberOfNodesToRemove);
+    if (root->left == nullptr && root->right == nullptr) {
+        if (root->parent != nullptr) {
+            // Setting the child of parent as nullptr to avoid segfault
+            if (root->parent->left == root) {
+                root->parent->left = nullptr;
+            } else {
+                root->parent->right = nullptr;
+            }
+        }
+        delete root;
+        numberOfNodesToRemove--;
+        return;
+    }
+    RemoveExtraNodes(root->left, numberOfNodesToRemove);
+    root->updateNodeHeight();
+}
+
+template<class T>
+void TreeNode<T>::FillKeysInOrder(TreeNode<T>* root, int &key) {
+    if (!root) {
+        return;
+    }
+    FillKeysInOrder(root->left, key);
+    root->key = key;
+    key++;
+    FillKeysInOrder(root->right, key);
 }
 
 
@@ -700,11 +822,17 @@ class Tree {
 public:
     Tree();
 
+    Tree(int numberOfNodes);
+
     TreeNode<T> *GetRoot();
 
     void MarkRootAsNullptr();
 
     void MarkRootDataAsNullptr();
+
+    void FillTreeNodesWithArrData(T **&array, int size, int index = 0);
+
+    void FillArrWithNodesInOrder(TreeNode<T> **&array, int size, int index = 0);
 
     TreeNode<T> *Find(int key);
 
@@ -853,6 +981,74 @@ Tree<T>::~Tree() {
         delete root;
         root = nullptr;
     }
+}
+
+/**
+ * Fills an array with pointers to the TreeNodes of the tree
+ * Array should be as large as the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param array The array to fill with tree nodes
+ * @param size The size of the array
+ * @param index The current insertion position
+ */
+template<class T>
+void Tree<T>::FillTreeNodesWithArrData(T **&array, int size, int index) {
+    if (!root) {
+        // Tree is empty, no nodes to save data in
+        return;
+    }
+    index = 0;
+    root->FillNodesWithArrDataInOrder(array, size, index);
+}
+
+/**
+ * Fills an array with pointers to the TreeNodes of the tree
+ * Array should be as large as the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param array The array to fill with tree nodes
+ * @param size The size of the array
+ * @param index The current insertion position
+ */
+template<class T>
+void Tree<T>::FillArrWithNodesInOrder(TreeNode<T> **&array, int size, int index) {
+    if (!root) {
+        // Tree is empty, no nodes to get back
+        return;
+    }
+    index = 0;
+    root->FillArrayWithNodesInOrder(array, size, index);
+}
+
+/**
+ * Creates a new almost complete binary tree according to the input parameters
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param root The key of the trees' root
+ * @param maxHeight The height ot the trees' root
+ * @param maxNode the key of the highest node
+ */
+template<class T>
+Tree<T>::Tree(int numberOfNodes) {
+    // Calculating the height of the tree
+    int treeLevel = ceil(log2(numberOfNodes));
+    if (treeLevel == log2(numberOfNodes)) {
+        // The number of nodes is a power of two, need to increase it by one
+        // to create a real complete binary tree
+        treeLevel++;
+    }
+    // Creating the root of the complete tree
+    root = new TreeNode<T>(0, nullptr, nullptr);
+    TreeNode<T>::CreateCompleteBinaryTree(root, treeLevel, 1);
+
+    // After creating the complete binary tree, we need to remove extra nodes
+    // that are unnecessary
+    int numberOfNodesToRemove = (int)(pow(2, treeLevel) - 1) - numberOfNodes;
+    if (treeLevel != 0) {
+        // The tree has more than one floor, meaning we need to remove a few of
+        // the nodes
+        TreeNode<T>::RemoveExtraNodes(root, numberOfNodesToRemove);
+    }
+    int key = 0;
+    TreeNode<T>::FillKeysInOrder(root, key);
 }
 
 #endif //WET1_TREE_H
