@@ -6,15 +6,11 @@
 #include "MusicManager.h"
 
 void *Init() {
-    try {
-        MusicManager *DS = new MusicManager();
-        if (!DS) {
-            return nullptr;
-        }
-        return (void *) DS;
-    } catch (std::bad_alloc &e) {
+    MusicManager *DS = new MusicManager();
+    if (!DS) {
         return nullptr;
     }
+    return (void *) DS;
 }
 
 StatusType AddArtist(void *DS, int artistID, int numOfSongs) {
@@ -23,8 +19,6 @@ StatusType AddArtist(void *DS, int artistID, int numOfSongs) {
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
     return nDS->AddArtist(artistID, numOfSongs);
-
-    //return ((MusicManager *) DS)->AddArtist(artistID, numOfSongs);
 }
 
 StatusType RemoveArtist(void *DS, int artistID) {
@@ -33,7 +27,6 @@ StatusType RemoveArtist(void *DS, int artistID) {
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
     return nDS->RemoveArtist(artistID);
-    //return ((MusicManager *) DS)->RemoveArtist(artistID);
 };
 
 StatusType AddToSongCount(void *DS, int artistID, int songID) {
@@ -42,7 +35,6 @@ StatusType AddToSongCount(void *DS, int artistID, int songID) {
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
     return nDS->AddToSongCount(artistID, songID);
-    //return ((MusicManager *) DS)->AddToSongCount(artistID, songID);
 }
 
 StatusType NumberOfStreams(void *DS, int artistID, int songID, int *streams) {
@@ -51,7 +43,6 @@ StatusType NumberOfStreams(void *DS, int artistID, int songID, int *streams) {
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
     return nDS->NumberOfStreams(artistID, songID, streams);
-    //return ((MusicManager *) DS)->NumberOfStreams(artistID, songID, streams);
 }
 
 StatusType GetRecommendedSongs(void *DS, int numOfSongs, int *artists, int *songs) {
@@ -63,13 +54,11 @@ StatusType GetRecommendedSongs(void *DS, int numOfSongs, int *artists, int *song
     }
     MusicManager *nDS = static_cast<MusicManager *>(DS);
     return nDS->GetRecommendedSongs(numOfSongs, artists, songs);
-    //return ((MusicManager *) DS)->GetRecommendedSongs(numOfSongs, artists, songs);
 }
 
 void Quit(void **DS) {
     MusicManager *nDS = static_cast<MusicManager *>(*DS);
     delete nDS;
     nDS = nullptr;
-    //delete ((MusicManager *) DS);
     *DS = nullptr;
 }

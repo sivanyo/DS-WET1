@@ -102,11 +102,11 @@ public:
 
     void DeleteTreeData();
 
-    static void CreateCompleteBinaryTree(TreeNode<T> *parent, int treeLevel, int currentLevel);
+    static void CreateCompleteBinaryTree(TreeNode<T> *root, int treeLevel, int currentLevel);
 
     static void RemoveExtraNodes(TreeNode<T> *root, int &numberOfNodesToRemove);
 
-    static void FillKeysInOrder(TreeNode<T>* root, int &key);
+    static void FillKeysInOrder(TreeNode<T> *root, int &key);
 
     ~TreeNode();
 };
@@ -749,32 +749,39 @@ int TreeNode<T>::FillArrayWithNodesInOrder(TreeNode<T> **&array, int size, int i
     return index;
 }
 
+/**
+ * Creates a complete binary tree according to the current tree level
+ * relative to the full height of the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param root The root to create children for
+ * @param treeLevel The total level the tree should reach
+ * @param currentLevel The current level of the tree
+ */
 template<class T>
-void TreeNode<T>::CreateCompleteBinaryTree(TreeNode<T> *parent, int treeLevel, int currentLevel) {
+void TreeNode<T>::CreateCompleteBinaryTree(TreeNode<T> *root, int treeLevel, int currentLevel) {
     // Checking if we created all necessary tree levels
     if (treeLevel <= currentLevel) {
         // We finished creating all new levels of the tree
         return;
     }
-    parent->left = new TreeNode<T>(0, nullptr, parent);
-    parent->right = new TreeNode<T>(0, nullptr, parent);
-    // Checking if the next floor exceeds the height of our tree
-    if (currentLevel + 1 == treeLevel) {
-        parent->left->left = nullptr;
-        parent->left->right = nullptr;
-        parent->right->left = nullptr;
-        parent->right->right = nullptr;
-    }
-    CreateCompleteBinaryTree(parent->left, treeLevel, currentLevel + 1);
-    CreateCompleteBinaryTree(parent->right, treeLevel, currentLevel + 1);
-    // Updating parent height
-    parent->updateNodeHeight();
+    root->left = new TreeNode<T>(0, nullptr, root);
+    root->right = new TreeNode<T>(0, nullptr, root);
+    CreateCompleteBinaryTree(root->left, treeLevel, currentLevel + 1);
+    CreateCompleteBinaryTree(root->right, treeLevel, currentLevel + 1);
+    // Updating root height
+    root->updateNodeHeight();
 }
 
+/**
+ * Removes unnecessary nodes from a Complete Binary Tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param root The root of the current subtree
+ * @param numberOfNodesToRemove The number of nodes left to remove
+ */
 template<class T>
 void TreeNode<T>::RemoveExtraNodes(TreeNode<T> *root, int &numberOfNodesToRemove) {
     // Checking if we need to continue removing nodes
-    if (numberOfNodesToRemove == 0 || root == nullptr) {
+    if (numberOfNodesToRemove == 0 || !root) {
         // We removed all the nodes we needed or we reached the end of the tree
         // scan so we shouldn't perform anymore actions
         return;
@@ -782,7 +789,7 @@ void TreeNode<T>::RemoveExtraNodes(TreeNode<T> *root, int &numberOfNodesToRemove
     // Removing nodes in reverse in order, only from the bottom level of the tree
     RemoveExtraNodes(root->right, numberOfNodesToRemove);
     if (root->left == nullptr && root->right == nullptr) {
-        if (root->parent != nullptr) {
+        if (root->parent) {
             // Setting the child of parent as nullptr to avoid segfault
             if (root->parent->left == root) {
                 root->parent->left = nullptr;
@@ -798,14 +805,24 @@ void TreeNode<T>::RemoveExtraNodes(TreeNode<T> *root, int &numberOfNodesToRemove
     root->updateNodeHeight();
 }
 
+/**
+ * Fills the nodes of the tree with keys using in order scan
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param root The root of the current subtree
+ * @param key The current node's key
+ */
 template<class T>
-void TreeNode<T>::FillKeysInOrder(TreeNode<T>* root, int &key) {
+void TreeNode<T>::FillKeysInOrder(TreeNode<T> *root, int &key) {
+    // We reached an empty node, no need to assign key
     if (!root) {
         return;
     }
+    // Filling keys in the left part of the tree
     FillKeysInOrder(root->left, key);
+    // Setting current node's key
     root->key = key;
     key++;
+    // Filling keys in the right part of the tree
     FillKeysInOrder(root->right, key);
 }
 
@@ -984,8 +1001,9 @@ Tree<T>::~Tree() {
 }
 
 /**
- * Fills an array with pointers to the TreeNodes of the tree
- * Array should be as large as the tree
+ * Fills the tree nodes with data pointer of type T taken from
+ * the input array, the array is ordered so every node's correct data is in
+ * the cell whose index is it's key
  * @tparam T Pointer to dynamically allocated object of type T
  * @param array The array to fill with tree nodes
  * @param size The size of the array
@@ -1041,7 +1059,7 @@ Tree<T>::Tree(int numberOfNodes) {
 
     // After creating the complete binary tree, we need to remove extra nodes
     // that are unnecessary
-    int numberOfNodesToRemove = (int)(pow(2, treeLevel) - 1) - numberOfNodes;
+    int numberOfNodesToRemove = (int) (pow(2, treeLevel) - 1) - numberOfNodes;
     if (treeLevel != 0) {
         // The tree has more than one floor, meaning we need to remove a few of
         // the nodes

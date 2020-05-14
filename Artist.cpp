@@ -43,6 +43,6 @@ Artist::~Artist() {
 }
 
 void Artist::setNumberOfSongs(int newNum) {
-    this->numberOfSongs=newNum;
+    this->numberOfSongs = newNum;
 }
 

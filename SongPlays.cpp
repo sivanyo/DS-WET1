@@ -47,7 +47,7 @@ void SongPlays::setPtrToSong(Song *ptr) {
     ptrToSong = ptr;
 }
 
-void SongPlays::DeleteSongPlaysNode(TreeNode<SongPlays>* songNode) {
+void SongPlays::DeleteSongPlaysNode(TreeNode<SongPlays> *songNode) {
     if (songNode->getLeft()) {
         DeleteSongPlaysNode(songNode->getLeft());
         delete songNode->getLeft();

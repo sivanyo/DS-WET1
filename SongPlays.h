@@ -9,6 +9,7 @@
 #include "Song.h"
 
 class MostPlayedListNode;
+
 class Song;
 
 class SongPlays {
@@ -17,7 +18,7 @@ private:
     int numberOfPlays = 0;
     int artistId;
     MostPlayedListNode *ptrToListNode;
-    Song* ptrToSong;
+    Song *ptrToSong;
 public:
     SongPlays(int songId, int artistId, MostPlayedListNode *ptrToListNode);
 
@@ -37,11 +38,11 @@ public:
 
     void setPtrToListNode(MostPlayedListNode *ptr);
 
-    Song* getPtrToSong() const;
+    Song *getPtrToSong() const;
 
     void setPtrToSong(Song *ptr);
 
-    static void DeleteSongPlaysNode(TreeNode<SongPlays>* node);
+    static void DeleteSongPlaysNode(TreeNode<SongPlays> *node);
 };
 
 typedef TreeNode<SongPlays> SongPlaysNode;

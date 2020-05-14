@@ -9,6 +9,7 @@
 #include "SongPlays.h"
 
 class MostPlayedListNode;
+
 class SongPlays;
 
 class ArtistPlays {

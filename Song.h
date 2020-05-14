@@ -9,6 +9,7 @@
 #include "ArtistPlays.h"
 
 class ArtistPlays;
+
 class SongPlays;
 
 class Song {
