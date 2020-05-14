@@ -277,22 +277,6 @@ void TreeNode<T>::updateRebalancedNodeHeights(TreeNode<T> *origin, TreeNode<T> *
 }
 
 /**
- * Updates the parent of a new rotated subtree root
- * @tparam T Pointer to dynamically allocated object of type T
- * @param previousRoot The old root of the subtree
- * @param newRoot The new root of the subtree
- */
-template<class T>
-void TreeNode<T>::updateRotatedRootParent(TreeNode<T> *previousRoot, TreeNode<T> *newRoot) {
-    // Checking if newRoot is a right child or left child of the original parent
-    if (previousRoot->getParent()->getLeft() && previousRoot->getParent()->getLeft()->getKey() == previousRoot->getKey()) {
-        previousRoot->parent->left = newRoot;
-    } else {
-        previousRoot->parent->right = newRoot;
-    }
-}
-
-/**
  * Insert a new node to the subtree tree and returns the new root of the subtree
  * after rotations and rebalance
  * @tparam T Pointer to dynamically allocated object of type T
@@ -333,6 +317,22 @@ TreeNode<T> *TreeNode<T>::Insert(int nodeKey, T *nodeData, TreeNode<T> *result) 
     }
     // Rebalancing tree after insertion
     return Rebalance();
+}
+
+/**
+ * Updates the parent of a new rotated subtree root
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param previousRoot The old root of the subtree
+ * @param newRoot The new root of the subtree
+ */
+template<class T>
+void TreeNode<T>::updateRotatedRootParent(TreeNode<T> *previousRoot, TreeNode<T> *newRoot) {
+    // Checking if newRoot is a right child or left child of the original parent
+    if (previousRoot->getParent()->getLeft() && previousRoot->getParent()->getLeft()->getKey() == previousRoot->getKey()) {
+        previousRoot->parent->left = newRoot;
+    } else {
+        previousRoot->parent->right = newRoot;
+    }
 }
 
 /**
