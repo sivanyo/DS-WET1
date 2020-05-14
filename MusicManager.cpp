@@ -176,12 +176,15 @@ StatusType MusicManager::RemoveArtist(int artistId) {
                 node->setPtrToLowestSongId(node->getPtrToLowestArtistId()->getData()->getPtrToLowestSongId());
             } else {
                 // this artist was alone in this node
-                MostPlayedListNode *temp = this->ptrToMostRecommended;
-                if (node->getNumberOfPlays() == temp->getNumberOfPlays()) {
+                if (node->getNumberOfPlays() == ptrToMostRecommended->getNumberOfPlays()) {
                     // the song we are deleting is the most recommended song
                     // now this node is no longer the most recommended
-                    ptrToMostRecommended = node->getPrevious();
-//                    ptrToMostRecommended->setNext(nullptr);
+                    if(node->getPrevious()){
+                        ptrToMostRecommended = node->getPrevious();
+                    }
+                    else{
+                        ptrToMostRecommended= nullptr;
+                    }
 //                    delete temp;
                 }
             }
@@ -340,7 +343,7 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
             }
         } else {
             // The next node is not the right one, we need to create a new one and then add the song to it
-            auto *nPlayListNode = new MostPlayedListNode(newNumOfPlays, playsListNode, nullptr);
+            auto *nPlayListNode = new MostPlayedListNode(newNumOfPlays, playsListNode, playsListNode->getNext());
             if (!nPlayListNode) {
                 // Rolling back changes to number of plays
                 songPlays->DecrementNumberOfPlays();
@@ -502,9 +505,9 @@ StatusType MusicManager::AddToSongCount(int artistId, int songID) {
         nPlayListNode->setPtrToLowestArtistId(nArtistPlaysNode);
         nPlayListNode->setPtrToLowestSongId(nSongNode);
         // Updating linked list pointers because we entered a new node in the end of the list
-        nPlayListNode->setNext(playsListNode->getNext());
+//        nPlayListNode->setNext(playsListNode->getNext());
         playsListNode->setNext(nPlayListNode);
-        nPlayListNode->setPrevious(playsListNode);
+//        nPlayListNode->setPrevious(playsListNode);
         this->ptrToMostRecommended = nPlayListNode;
     }
 
@@ -704,11 +707,11 @@ void MusicManager::removingSongNodeCaseAlone(ArtistPlaysNode *artistPlaysNode, M
             // properly connected
             MostPlayedListNode *prev = playsListNode->getPrevious();
             MostPlayedListNode *next = playsListNode->getNext();
-            prev->setNext(next);
-            if(next){
-                next->setPrevious(prev);
+            if(prev){
+                prev->setNext(next);
             }
 
+                next->setPrevious(prev);
             delete playsListNode;
         } else {
             // Removing the last artist from the 0 plays list node
