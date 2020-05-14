@@ -6,11 +6,15 @@
 #include "MusicManager.h"
 
 void *Init() {
-    MusicManager *DS = new MusicManager();
-    if (!DS) {
+    try {
+        MusicManager *DS = new MusicManager();
+        if (!DS) {
+            return nullptr;
+        }
+        return (void *) DS;
+    } catch (std::bad_alloc &e) {
         return nullptr;
     }
-    return (void *) DS;
 }
 
 StatusType AddArtist(void *DS, int artistID, int numOfSongs) {
