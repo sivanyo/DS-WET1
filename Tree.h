@@ -32,6 +32,10 @@ private:
 
     void updateNodeHeight();
 
+    TreeNode<T> *DeleteAndReplaceNodeWithLeftSuccessor();
+
+    TreeNode<T> *DeleteAndReplaceNodeWithRightSuccessor();
+
     TreeNode<T> *LeftRightRotate();
 
     TreeNode<T> *RightLeftRotatet();
@@ -80,6 +84,12 @@ public:
     int mapInOrder(int *keys, int size);
 
     int mapSucc(int *keys, int size);
+
+    void removeDataPointer();
+
+    int getNodeBalanceFactor();
+
+    TreeNode<T> *DeleteNode();
 };
 
 /**
@@ -93,19 +103,6 @@ public:
 template<class T>
 TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent):
         key(key), data(nData), height(1), left(nullptr), right(nullptr), parent(parent) {};
-
-/**
- * delete node and it release its data
- * does not delete its parent or sons!
- * @tparam T
- */
-template<class T>
-TreeNode<T>::~TreeNode() {
-    if (data != nullptr) {
-        delete data;
-        data = nullptr;
-    }
-}
 
 /**
  * delete the node and all its sons, grandsons and so on
@@ -142,57 +139,6 @@ T *TreeNode<T>::getData() {
 template<class T>
 int TreeNode<T>::getKey() {
     return key;
-}
-
-/**
- * @tparam T
- * @return ptr to left son
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::getLeft() {
-    return this->left;
-}
-
-/**
- * @tparam T
- * @return ptr to right son
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::getRight() {
-    return this->right;
-}
-
-/**
- * @tparam T
- * @return ptr to node's parent
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::getParent() {
-    return parent;
-}
-
-/**
- * @tparam T
- * @param keyFind
- * @return a node given its key (if not found return nullptr)
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::Find(int keyFind) {
-    if (keyFind == key) {
-        return this;
-    } else if (keyFind < key) {
-        if (left != nullptr) {
-            return left->Find(keyFind);
-        } else {
-            return nullptr;
-        }
-    } else {
-        if (right != nullptr) {
-            return right->Find(keyFind);
-        } else {
-            return nullptr;
-        }
-    }
 }
 
 
@@ -366,32 +312,6 @@ TreeNode<T> *TreeNode<T>::Rebalance() {
 }
 
 /**
- * Find if keyRemove is one of nodes key and Remove it from struct
- * @tparam T
- * @param keyRemove
- * @return update root of sub-node-struct
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::Remove(int keyRemove) {
-    if (keyRemove < key) { //if key is lower than root, Find left subtree
-        if (left != nullptr) {
-            left->Remove(keyRemove);
-        } else {
-            return this;
-        }
-    } else if (keyRemove > key) { //if key is bigger than root, Find right subtree
-        if (right != nullptr) {
-            right->Remove(keyRemove);
-        } else {
-            return this;
-        }
-    } else { //key found, current node holds key
-        return this->DeleteNode(keyRemove); // calls a function that actually delete current node
-    }
-    return Rebalance();
-}
-
-/**
  * delete this (Current) from node-struct
  * @tparam T
  * @param keyRemove
@@ -445,32 +365,6 @@ void TreeNode<T>::SwapNodesParent(TreeNode<T> *takePlace) {
             this->parent->right = takePlace;
         }
     }
-}
-
-/**
- *
- * @tparam T
- * @return min by key node in struct
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::findMin() {
-    if (left != nullptr) {
-        return left->findMin();
-    }
-    return this;
-}
-
-/**
- *
- * @tparam T
- * @return max by key node in struct
- */
-template<class T>
-TreeNode<T> *TreeNode<T>::findMax() {
-    if (right != nullptr) {
-        return right->findMax();
-    }
-    return this;
 }
 
 /**
@@ -528,6 +422,49 @@ int TreeNode<T>::mapSucc(int *keys, int size) {
     return index;
 }
 
+/**
+ * Replaces a node that is targeted for delete with it's leftmost successor
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the node's subtree after it's removal
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::DeleteAndReplaceNodeWithLeftSuccessor() {
+    TreeNode<T> *next = left->findMax();
+    if (left->getRight()) {
+        next->parent->right = next->left;
+        if (next->getLeft()) {
+            next->left->parent = next->parent;
+        }
+        // might need to be reversed
+        this->left->parent = next;
+        next->left = this->left;
+    }
+    // Performing pointer and parent swap between the next node and the
+    // node we need to delete
+    this->SwapNodesParent(next);
+    next->right = this->right;
+    if (this->getRight()) {
+        this->right->parent = next;
+    }
+    delete this;
+    return next->Rebalance();
+}
+
+/**
+ * Replaces a node that is targeted for delete with it's right successor
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the node's subtree after it's removal
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::DeleteAndReplaceNodeWithRightSuccessor() {
+    TreeNode<T> *next = this->right;
+    // Performing pointer and parent swap between the next node and the
+    // node we need to delete
+    this->SwapNodesParent(next);
+    delete this;
+    return next->Rebalance();
+}
+
 template<class T>
 TreeNode<T> *TreeNode<T>::getNext() {
     TreeNode<T> *current = this;
@@ -553,19 +490,201 @@ TreeNode<T> *TreeNode<T>::getNext() {
     }
 }
 
+/**
+ * Returns the balance factor of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The balance factor of the tree node
+ */
+template<class T>
+int TreeNode<T>::getNodeBalanceFactor() {
+    return getBalanceFactor();
+}
+
+/**
+ * Deletes the data stored in this node,
+ * marks the data as deleted and deletes the node itself
+ * (does not delete child nodes)
+ * @tparam T Pointer to dynamically allocated object of type T
+ */
+template<class T>
+TreeNode<T>::~TreeNode() {
+    if (data) {
+        delete data;
+        data = nullptr;
+    }
+}
+
+/**
+ * Searches for a tree node with the input key and returns a pointer to it
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param searchKey The key of the node to search for
+ * @return A pointer to the tree node if it is found, nullptr otherwise
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::Find(int searchKey) {
+    if (getKey() > searchKey) {
+        // The node we are looking for is a left child of this node
+        if (left) {
+            return left->Find(searchKey);
+        } else {
+            return nullptr;
+        }
+    } else if (getKey() < searchKey) {
+        // The node we are looking for is a right child of this node
+        if (right) {
+            return right->Find(searchKey);
+        } else {
+            return nullptr;
+        }
+    } else {
+        // We found the node we were looking for
+        return this;
+    }
+}
+
+/**
+ * Removes a node with input key from the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param nodeKey The key of the node to remove
+ * @return The new root of the subtree after removal of the node
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::Remove(int nodeKey) {
+    // Searching for the node to remove
+    if (nodeKey > getKey()) {
+        // The delete target is a right child of the current node
+        if (right) {
+            right->Remove(nodeKey);
+        } else {
+            return this;
+        }
+    } else if (nodeKey < getKey()) {
+        // The delete target is a left child of the current node
+        if (left) {
+            left->Remove(nodeKey);
+        } else {
+            return this;
+        }
+    } else {
+        // Found the node we need to delete
+        // Using delete handler to remove the node from the tree
+        return this->DeleteNode();
+    }
+    // Rebalancing tree after removal
+    return Rebalance();
+}
+
+/**
+ * Deletes the node from the tree, returns the new root of the node's subtree
+ * after it's removal
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The new root of the node's subtree after it's removal
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::DeleteNode() {
+    // Search for the next node to act as subtree root
+    if (left) {
+        return DeleteAndReplaceNodeWithLeftSuccessor();
+    } else if (right) {
+        return DeleteAndReplaceNodeWithRightSuccessor();
+    } else {
+        // The node we want to delete has no leafs, so it's subtree will remain empty
+        // after deletion.
+        this->SwapNodesParent(nullptr);
+        delete this;
+        return nullptr;
+    }
+}
+
+/**
+ * Finds the minimal node from this point downward in the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The minimal node
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::findMin() {
+    if (left) {
+        return left->findMin();
+    }
+    return this;
+}
+
+/**
+ * Finds the maximal node from this point downward in the tree
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The maximal node
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::findMax() {
+    if (right) {
+        return right->findMax();
+    }
+    return this;
+}
+
+/**
+ * Returns the left child of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The left child of the node
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::getLeft() {
+    return left;
+}
+
+/**
+ * Sets the left child of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param ptr The new left child of the node
+ */
 template<class T>
 void TreeNode<T>::setLeft(TreeNode<T> *ptr) {
     left = ptr;
 }
 
+/**
+ * Returns the right child of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The right child of the node
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::getRight() {
+    return right;
+}
+
+/**
+ * Sets the right child of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param ptr The new right child of the node
+ */
 template<class T>
 void TreeNode<T>::setRight(TreeNode<T> *ptr) {
     right = ptr;
 }
 
+/**
+ * Returns the parent of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The parent of the node
+ */
+template<class T>
+TreeNode<T> *TreeNode<T>::getParent() {
+    return parent;
+}
+
+/**
+ * Sets the parent of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @param ptr The new parent of the node
+ */
 template<class T>
 void TreeNode<T>::setParent(TreeNode<T> *ptr) {
     parent = ptr;
+}
+
+template<class T>
+void TreeNode<T>::removeDataPointer() {
+    data = nullptr;
 }
 
 /**
