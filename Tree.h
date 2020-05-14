@@ -8,6 +8,7 @@
 #include <iostream>
 #include <algorithm>
 #include "library1.h"
+
 using std::max;
 
 /**
@@ -42,7 +43,7 @@ private:
     TreeNode<T> *RightRotate();
 
 public:
-    TreeNode(int key, T *nData = nullptr,TreeNode *parent = nullptr);
+    TreeNode(int key, T *nData = nullptr, TreeNode *parent = nullptr, TreeNode *left = nullptr, TreeNode *right = nullptr);
 
     int getKey();
 
@@ -166,8 +167,8 @@ void TreeNode<T>::SwapNodesParent(TreeNode<T> *replacement) {
     if (replacement) {
         replacement->parent = this->parent;
     }
-    if (this->getParent()) {
-        if (this->getParent()->getLeft() && this->getParent()->getLeft()->getKey() == this->getKey()) {
+    if (getParent()) {
+        if (getParent()->getLeft() && getParent()->getLeft()->getKey() == getKey()) {
             this->parent->left = replacement;
         } else {
             this->parent->right = replacement;
@@ -404,11 +405,11 @@ TreeNode<T> *TreeNode<T>::DeleteAndReplaceNodeWithRightSuccessor() {
 }
 
 template<class T>
-TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent):
+TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent, TreeNode *left, TreeNode *right):
         key(key), data(nData) {
     height = 1;
-    left = nullptr;
-    right = nullptr;
+    this->left = left;
+    this->right = right;
     this->parent = parent;
 };
 
