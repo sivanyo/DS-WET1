@@ -90,57 +90,9 @@ public:
     int getNodeBalanceFactor();
 
     TreeNode<T> *DeleteNode();
+
+    int getHeight();
 };
-
-/**
- * Creates a new TreeNode for insertion to an AVL tree
- * Provided key is a dynamically allocated data of type T
- * @tparam T Pointer to dynamically allocated object of type T
- * @param key A key
- * @param nData
- * @param parent
- */
-template<class T>
-TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent):
-        key(key), data(nData), height(1), left(nullptr), right(nullptr), parent(parent) {};
-
-/**
- * delete the node and all its sons, grandsons and so on
- * use when we want to delete not just the current node (this) but all the data that connects to it
- * @param T
- */
-template<class T>
-void TreeNode<T>::DeleteTreeData() {
-    if (left != nullptr) {
-        left->DeleteTreeData();
-        delete left;
-        left = nullptr;
-    }
-    if (right != nullptr) {
-        right->DeleteTreeData();
-        delete right;
-        right = nullptr;
-    }
-}
-
-/**
- * @tparam T
- * @return the custom data of the node
- */
-template<class T>
-T *TreeNode<T>::getData() {
-    return data;
-}
-
-/**
- * @tparam T
- * @return node's key
- */
-template<class T>
-int TreeNode<T>::getKey() {
-    return key;
-}
-
 
 /**
  *
@@ -463,6 +415,68 @@ TreeNode<T> *TreeNode<T>::DeleteAndReplaceNodeWithRightSuccessor() {
     this->SwapNodesParent(next);
     delete this;
     return next->Rebalance();
+}
+
+template<class T>
+TreeNode<T>::TreeNode(int key, T *nData, TreeNode *parent):
+        key(key), data(nData) {
+    height = 1;
+    left = nullptr;
+    right = nullptr;
+    this->parent = parent;
+};
+
+/**
+ * Returns the key of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The key of the tree node
+ */
+template<class T>
+int TreeNode<T>::getKey() {
+    return key;
+}
+
+/**
+ * Returns the stored data object in the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The data stored in the tree node
+ */
+template<class T>
+T *TreeNode<T>::getData() {
+    if (data) {
+        return data;
+    }
+    return nullptr;
+}
+
+/**
+ * Returns the height of the node
+ * @tparam T Pointer to dynamically allocated object of type T
+ * @return The height of the tree node
+ */
+template<class T>
+int TreeNode<T>::getHeight() {
+    return height;
+}
+
+/**
+ * Completely deletes the tree from the given node downward, including all dynamically
+ * allocated data in each node
+ * also marks every deleted node as nullptr
+ * @tparam T Pointer to dynamically allocated object of type T
+ */
+template<class T>
+void TreeNode<T>::DeleteTreeData() {
+    if (left) {
+        left->DeleteTreeData();
+        delete left;
+        left = nullptr;
+    }
+    if (right) {
+        right->DeleteTreeData();
+        delete right;
+        right = nullptr;
+    }
 }
 
 template<class T>
