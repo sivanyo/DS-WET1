@@ -146,7 +146,6 @@ StatusType MusicManager::RemoveArtist(int artistId) {
         // There are no artists so this counts as a case where no artist with the input ID exists
         return FAILURE;
     }
-    int currentMostRecommended = this->ptrToMostRecommended->getNumberOfPlays();
     Artist *artist = artistNode->getData();
     for (int i = 0; i < artist->getNumberOfSongs(); ++i) {
         Song *tempSong = artist->operator[](i);
