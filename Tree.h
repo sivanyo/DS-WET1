@@ -797,8 +797,8 @@ void TreeNode<T>::RemoveExtraNodes(TreeNode<T> *root, int &numberOfNodesToRemove
                 root->parent->right = nullptr;
             }
         }
-        delete root;
         numberOfNodesToRemove--;
+        delete root;
         return;
     }
     RemoveExtraNodes(root->left, numberOfNodesToRemove);
@@ -820,8 +820,7 @@ void TreeNode<T>::FillKeysInOrder(TreeNode<T> *root, int &key) {
     // Filling keys in the left part of the tree
     FillKeysInOrder(root->left, key);
     // Setting current node's key
-    root->key = key;
-    key++;
+    root->key = key++;
     // Filling keys in the right part of the tree
     FillKeysInOrder(root->right, key);
 }
