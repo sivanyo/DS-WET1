@@ -2,6 +2,7 @@ init done.
 AddArtist: SUCCESS
 AddArtist: SUCCESS
 AddArtist: FAILURE
+AddArtist: INVALID_INPUT
 RemoveArtist: SUCCESS
 RemoveArtist: FAILURE
 AddToSongCount: SUCCESS

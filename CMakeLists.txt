@@ -12,4 +12,5 @@ set(CMAKE_CXX_STANDARD 11)
 
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 
-add_executable(wet1 main.cpp)
+add_executable(wet1 main1.cpp library1.h library1.cpp MusicManager.cpp MusicManager.h Artist.cpp Artist.h Song.cpp Song.h ArtistPlays.cpp ArtistPlays.h MostPlayedListNode.cpp MostPlayedListNode.h SongPlays.cpp SongPlays.h Tree.h)
+add_executable(test Artist.cpp Artist.h test.cpp Tree.h)

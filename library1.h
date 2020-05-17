@@ -40,7 +40,7 @@ StatusType NumberOfStreams(void *DS, int artistID, int songID, int *streams);
 
 StatusType GetRecommendedSongs(void *DS, int numOfSongs, int *artists, int *songs);
 
-void Quit(void** DS);
+void Quit(void **DS);
 
 #ifdef __cplusplus
 }
